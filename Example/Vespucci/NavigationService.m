@@ -145,14 +145,6 @@ static NSString *const SingleMessageNodeId = @"root.messages.message";
     return [NSURL URLWithString:URLString];
 }
 
-- (NSURL *)_URLWithFormat:(NSString *)format, ... {
-    va_list arguments;
-    va_start(arguments, format);
-    NSString *URLString = [[NSString alloc] initWithFormat:format arguments:arguments];
-    va_end(arguments);
-    return [NSURL URLWithString:URLString];
-}
-
 @end
 
 

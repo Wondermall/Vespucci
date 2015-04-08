@@ -13,7 +13,7 @@
  *  If implemented, view controller will get navigationParameters if 
  *  presented with navigation maanger.
  */
-@protocol WMLNavigationNodeViewController <NSObject>
+@protocol WMLNavigationParametrizedViewController <NSObject>
 
 @property (nonatomic, copy) NSDictionary *navigationParameters;
 

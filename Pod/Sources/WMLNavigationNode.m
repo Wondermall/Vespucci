@@ -16,12 +16,14 @@
 #import "NSArray+RACSequenceAdditions.h"
 #import "NSError+Vespucci.h"
 
+
 @interface __WMLHostingStrategy : NSObject
 @property (nonatomic, copy) WMLNavigationNodeViewControllerMountHandler mountingBlock;
 @property (nonatomic, copy) WMLNavigationNodeViewControllerMountHandler unmountingBlock;
 @property (nonatomic, copy) NSString *nodeId;
 - (BOOL)isGoodForNode:(WMLNavigationNode *)node;
 @end
+
 
 @implementation __WMLHostingStrategy
 - (BOOL)isGoodForNode:(WMLNavigationNode *)node {
@@ -218,6 +220,9 @@
         doCompleted:^{
             @strongify(self);
             self.child = newChild;
+            if ([newChild.viewController conformsToProtocol:@protocol(WMLNavigationParametrizedViewController)]) {
+                ((UIViewController <WMLNavigationParametrizedViewController> *)newChild.viewController).navigationParameters = newChild.navigationParameters;
+            }
         }]
         concat:mountBlock(self.viewController, newChild.viewController, animated)];
 }
