@@ -10,29 +10,27 @@
 Pod::Spec.new do |s|
   s.name             = "Vespucci"
   s.version          = "0.1.0"
-  s.summary          = "A short description of Vespucci."
+  s.summary          = "Routing made simple. Not only for UINavigationController."
   s.description      = <<-DESC
-                       An optional longer description of Vespucci
+                        Routing made simple:
 
-                       * Markdown format.
-                       * Don't worry about the indent, we strip it!
+                        1. Register route.
+                        2. Explain how to present view controller.
+                        3. Explain how to dismiss it.
+
+                        That's it. Framework takes care of all the transition permutations!
                        DESC
-  s.homepage         = "https://github.com/<GITHUB_USERNAME>/Vespucci"
-  # s.screenshots     = "www.example.com/screenshots_1", "www.example.com/screenshots_2"
+  s.homepage         = "https://github.com/Wondermall/Vespucci"
   s.license          = 'MIT'
   s.author           = { "Sash Zats" => "sash@zats.io" }
-  s.source           = { :git => "https://github.com/<GITHUB_USERNAME>/Vespucci.git", :tag => s.version.to_s }
-  # s.social_media_url = 'https://twitter.com/<TWITTER_USERNAME>'
-
-  s.platform     = :ios, '7.0'
+  s.source           = { :git => "https://github.com/Wondermall/Vespucci.git", :tag => s.version.to_s }
+  s.social_media_url = 'https://twitter.com/zats'
+  s.platform     = :ios,'7.0'
   s.requires_arc = true
 
-  s.source_files = 'Pod/Classes/**/*'
-  s.resource_bundles = {
-    'Vespucci' => ['Pod/Assets/*.png']
-  }
-
+  s.source_files = 'Pod/Sources/**/*'
   # s.public_header_files = 'Pod/Classes/**/*.h'
   # s.frameworks = 'UIKit', 'MapKit'
-  # s.dependency 'AFNetworking', '~> 2.3'
+  s.dependency 'ReactiveCocoa', '~> 2.4'
+  s.dependency 'JLRoutes', '~> 1.5.2'
 end

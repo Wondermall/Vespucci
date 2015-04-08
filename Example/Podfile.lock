@@ -1,0 +1,32 @@
+PODS:
+  - Expecta (0.3.2)
+  - JLRoutes (1.5.2)
+  - ReactiveCocoa (2.4.7):
+    - ReactiveCocoa/UI (= 2.4.7)
+  - ReactiveCocoa/Core (2.4.7):
+    - ReactiveCocoa/no-arc
+  - ReactiveCocoa/no-arc (2.4.7)
+  - ReactiveCocoa/UI (2.4.7):
+    - ReactiveCocoa/Core
+  - Specta (0.5.0)
+  - Vespucci (0.1.0):
+    - JLRoutes (~> 1.5.2)
+    - ReactiveCocoa (~> 2.4)
+
+DEPENDENCIES:
+  - Expecta
+  - Specta
+  - Vespucci (from `../`)
+
+EXTERNAL SOURCES:
+  Vespucci:
+    :path: ../
+
+SPEC CHECKSUMS:
+  Expecta: 8c507baf13211207b1e9d0a741480600e6b4ed15
+  JLRoutes: fc36fd38ab476d5ac3a6a84b05be60e4b1a2bc81
+  ReactiveCocoa: eb38dee0a0e698f73a9b25e5c1faea2bb4c79240
+  Specta: eb90708ed77569bbda089f8ead10bb99b8e9489e
+  Vespucci: f80c0558a5d2731084642bc851891971f8a290c7
+
+COCOAPODS: 0.36.0
