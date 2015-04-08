@@ -1,0 +1,12 @@
+source 'https://github.com/CocoaPods/Specs.git'
+
+target 'Vespucci', :exclusive => true do
+  pod "Vespucci", :path => "../"
+end
+
+target 'Tests', :exclusive => true do
+  pod "Vespucci", :path => "../"
+
+  pod 'Specta'
+  pod 'Expecta'
+end
