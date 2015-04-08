@@ -8,16 +8,22 @@
 
 #import "MessageViewController.h"
 
-@interface MessageViewController ()
-@property (weak, nonatomic) IBOutlet UILabel *userIdLabel;
+#import <ReactiveCocoa/ReactiveCocoa.h>
 
+
+@interface MessageViewController ()
+@property (weak, nonatomic) IBOutlet UILabel *messageIdLabel;
 @end
 
 @implementation MessageViewController
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-    // Do any additional setup after loading the view.
+    
+    RAC(self.messageIdLabel, text) = [RACObserve(self, navigationParameters)
+        map:^id(NSDictionary *parameters) {
+            return parameters[@"messageId"];
+        }];
 }
 
 - (void)didReceiveMemoryWarning {

@@ -8,6 +8,11 @@
 
 #import <UIKit/UIKit.h>
 
-@interface MessageViewController : UIViewController
+#import <Vespucci/Vespucci.h>
+
+
+@interface MessageViewController : UIViewController <WMLNavigationParametrizedViewController>
+
+@property (nonatomic, copy) NSDictionary *navigationParameters;
 
 @end
