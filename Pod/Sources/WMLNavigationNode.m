@@ -35,7 +35,7 @@
 @interface WMLNavigationNode ()
 
 @property (nonatomic, weak) WMLNavigationNode *parent;
-@property (nonatomic, copy) NSDictionary *navigationParameters;
+@property (nonatomic, copy) NSDictionary *parameters;
 
 @property (nonatomic) NSMutableArray *logicalEqualityRules;
 @property (nonatomic) NSMutableArray *hostingRules;
@@ -58,7 +58,7 @@
     if (!self) {
         return nil;
     }
-    self.navigationParameters = dictionary;
+    self.parameters = dictionary;
     self.hostingRules = [NSMutableArray array];
     self.logicalEqualityRules = [NSMutableArray array];
 

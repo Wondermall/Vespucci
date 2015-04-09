@@ -59,7 +59,7 @@ typedef UIViewController *(^WMLNavigationNodeViewControllerFactory)(NSDictionary
  *  If navigation item was created in response to URL navigation, 
  *  this property will contain all the provided parameters.
  */
-@property (nonatomic, copy, readonly) NSDictionary *navigationParameters;
+@property (nonatomic, copy, readonly) NSDictionary *parameters;
 
 @property (nonatomic, copy) NSString *nodeId;
 

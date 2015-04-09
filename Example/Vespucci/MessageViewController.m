@@ -22,7 +22,7 @@
     
     RAC(self.messageIdLabel, text) = [RACObserve(self, navigationNode)
         map:^id(WMLNavigationNode *node) {
-            return node.navigationParameters[@"messageId"];
+            return node.parameters[@"messageId"];
         }];
 }
 
