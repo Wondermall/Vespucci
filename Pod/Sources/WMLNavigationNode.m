@@ -216,7 +216,7 @@
         return [RACSignal error:[NSError wml_vespuciErrorWithCode:0 message:@"Failed to find mount blocks for %@", newChild]];
     }
 
-    return [[unmountBlock ? unmountBlock(self.viewController, self.child.viewController, animated) : [RACSignal empty]
+    return [[unmountBlock ? unmountBlock(self.viewController, self.child.viewController, animated) ?: [RACSignal empty] : [RACSignal empty]
         doCompleted:^{
             @strongify(self);
             self.child = newChild;
@@ -224,7 +224,7 @@
                 ((UIViewController <WMLNavigationParametrizedViewController> *)newChild.viewController).navigationNode = newChild;
             }
         }]
-        concat:mountBlock(self.viewController, newChild.viewController, animated)];
+        concat:mountBlock(self.viewController, newChild.viewController, animated) ?: [RACSignal empty]];
 }
 
 - (BOOL)_containsSameDataAsNode:(WMLNavigationNode *)node {
