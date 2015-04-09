@@ -25,9 +25,11 @@ typedef UIViewController *(^WMLNavigationNodeViewControllerFactory)(NSDictionary
 
 
 @class RACSignal;
-@interface WMLNavigationNode : NSObject
+@interface WMLNavigationNode : NSObject <NSCopying>
 
 + (instancetype)navigationNodeWithName:(NSString *)name;
+
++ (instancetype)node;
 
 /**
  *  For debug proposes only
@@ -79,39 +81,12 @@ typedef UIViewController *(^WMLNavigationNodeViewControllerFactory)(NSDictionary
 @end
 
 
-typedef BOOL(^WMLNavigationNodeFilterBlock)(WMLNavigationNode *parent, WMLNavigationNode *child);
 typedef BOOL(^WMLNavigationNodeLogicalEqualityRule)(WMLNavigationNode *node1, WMLNavigationNode *node2);
-typedef RACSignal *(^WMLNavigationNodeViewControllerMountHandler)(UIViewController *parent, UIViewController *child, BOOL animated);
 
 @interface WMLNavigationNode (Hosting)
 
 - (void)addIsDataEqualRule:(WMLNavigationNodeLogicalEqualityRule)rule;
 
-/**
- *
- *  @param filterBlock     Describes how to distinguish interesting block being processed
- *  @param mountingBlock   How to mount view controller in animated and not fashion
- *  @param unmountingBlock How to dismount view controller in animated and not fashion
- *
- *  @example If I want to describe how to add node representing date:
- *  @code
- *
- *      [root addHostingRuleForNode:^BOOL(WMLNavigationNode *node1, WMLNavigationNode *node2) {
- *          return pnode2.model isKindOfClass:[NSDate class]];
- *      } mountingBlock:^RACSignal *(WMLPresentableViewController *parent, WMLPresentableViewController *child, BOOL animated) {
- *          // mount view controller
- *          return animated ? [[RACSignal empty] delay:5] : [RACSignal empty];
- *      } unmountingBlock:^RACSignal *(WMLPresentableViewController *parent, WMLPresentableViewController *child, BOOL animated) {
- *          // unmount view controller
- *      }];
- *
- */
-- (void)addHostingRuleForNodeId:(NSString *)nodeId mountingBlock:(WMLNavigationNodeViewControllerMountHandler)mountingBlock unmountingBlock:(WMLNavigationNodeViewControllerMountHandler)unmountingBlock;
-
-- (BOOL)canHostItem:(WMLNavigationNode *)node;
-
-- (BOOL)getHost:(out WMLNavigationNode **)outParent forNode:(inout WMLNavigationNode **)child;
-
-- (RACSignal *)hostNode:(WMLNavigationNode *)newChild animated:(BOOL)animated;
+- (BOOL)containsSameDataAsNode:(WMLNavigationNode *)node;
 
 @end

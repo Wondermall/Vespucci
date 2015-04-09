@@ -8,17 +8,64 @@
 
 #import "WMLNavigationManager.h"
 
+#import "NSError+Vespucci.h"
 #import "WMLNavigationNode.h"
-#import "JLRoutes.h"
-#import "RACEXTScope.h"
+#import <JLROutes/JLRoutes.h>
+#import <ReactiveCocoa/RACExtScope.h>
+#import <ReactiveCocoa/ReactiveCocoa.h>
+#import <Vespucci/WMLNavigationManager.h>
+
+
+NSString *const WMLNavigationManagerDidFinishNavigationNotification = @"WMLNavigationManagerDidFinishNavigationNotification";
+NSString *const WMLNavigationManagerDidFailNavigationNotification = @"WMLNavigationManagerDidFailNavigationNotification";
+NSString *const WMLNavigationManagerNotificationNodeKey = @"WMLNavigationManagerNotificationNodeKey";
+NSString *const WMLNavigationManagerNotificationParametersKey = @"WMLNavigationManagerNotificationParametersKey";
+
+
+@interface __WMLMountingTuple : NSObject
+
++ (instancetype)tupleWithMountBlock:(WMLNavigationNodeViewControllerMountHandler)mountBlock dismountBlock:(WMLNavigationNodeViewControllerDismountHandler)dismountBlock;
+
+@property (nonatomic, copy) WMLNavigationNodeViewControllerMountHandler mountHandler;
+
+@property (nonatomic, copy) WMLNavigationNodeViewControllerDismountHandler dismountHandler;
+
+@end
+
+
+@implementation __WMLMountingTuple
+
++ (instancetype)tupleWithMountBlock:(WMLNavigationNodeViewControllerMountHandler)mountBlock dismountBlock:(WMLNavigationNodeViewControllerDismountHandler)dismountBlock {
+    __WMLMountingTuple *tuple = [[self alloc] init];
+    tuple.mountHandler = mountBlock;
+    tuple.dismountHandler = dismountBlock;
+    return tuple;
+}
+
+@end
+
+
+@interface WMLNavigationManager (NodeHostingInternal)
+
+- (BOOL)_getHost:(inout WMLNavigationNode **)inOutParent forChild:(inout WMLNavigationNode **)inOutChild;
+
+- (RACSignal *)_makeHostNode:(inout WMLNavigationNode **)host hostChildNode:(inout WMLNavigationNode **)child animated:(BOOL)animated;
+
+@end
 
 
 @interface WMLNavigationManager ()
 
 @property (nonatomic) JLRoutes *router;
+
 @property (nonatomic) NSURL *URL;
 
+@property (nonatomic) WMLNavigationNode *navigationRoot;
+
+@property (nonatomic) NSMutableDictionary *hostingRules;
+
 @end
+
 
 @implementation WMLNavigationManager
 
@@ -38,6 +85,8 @@
 
     self.URL = [NSURL URLWithString:[NSString stringWithFormat:@"%@://", URLScheme]];
 
+    self.hostingRules = [NSMutableDictionary dictionary];
+
     return self;
 }
 
@@ -48,7 +97,7 @@
 #pragma mark - Public
 
 - (BOOL)handleURL:(NSURL *)URL {
-    URL = [self _fullyQualifiedURLForURL:URL];
+    // TODO: add support for relative URLs here
     if ([self.URL isEqual:URL]) {
         return NO;
     }
@@ -59,6 +108,49 @@
     return didNavigate;
 }
 
+#pragma mark - Private
+
+- (void)_navigationWithNode:(WMLNavigationNode *)child parameters:(NSDictionary *)parameters {
+    NSAssert(self.navigationRoot, @"No root node installed");
+    BOOL animated = NO;
+    if (parameters[@"animated"]) {
+        NSString *animatedString = [parameters[@"animated"] lowercaseString];
+        animated = [animatedString isEqual:@"true"] || [animatedString isEqual:@"yes"] || [animatedString isEqual:@"1"];
+    }
+    @weakify(self);
+    WMLNavigationNode *proposedRoot = self.navigationRoot;
+    WMLNavigationNode *proposedChild = child;
+    RACSignal *makeHost = [self _makeHostNode:&proposedRoot hostChildNode:&proposedChild animated:animated];
+    [makeHost subscribeError:^(NSError *error) {
+        @strongify(self);
+        [self _postNotificationNamed:WMLNavigationManagerDidFailNavigationNotification node:proposedChild parameters:parameters];
+    } completed:^{
+        @strongify(self);
+        [self _postNotificationNamed:WMLNavigationManagerDidFinishNavigationNotification node:proposedChild parameters:parameters];
+    }];
+}
+
+- (void)_postNotificationNamed:(NSString *)notificationName node:(WMLNavigationNode *)node parameters:(NSDictionary *)parameters {
+    [[NSNotificationCenter defaultCenter] postNotificationName:notificationName object:self userInfo:@{
+        WMLNavigationManagerNotificationNodeKey: node ?: [NSNull null],
+        WMLNavigationManagerNotificationParametersKey: parameters ?: [NSNull null]
+    }];
+}
+
+- (void)_notifyNavigationDidFinishForNode:(WMLNavigationNode *)node parameters:(NSDictionary *)parameters {
+    [[NSNotificationCenter defaultCenter] postNotificationName:WMLNavigationManagerDidFinishNavigationNotification object:self userInfo:@{
+        WMLNavigationManagerNotificationNodeKey: node ?: [NSNull null],
+        WMLNavigationManagerNotificationParametersKey: parameters ?: [NSNull null]
+    }];
+}
+
+@end
+
+
+@implementation WMLNavigationManager (NodeHosting)
+
+#pragma mark - Public
+
 - (void)registerNavigationForRoute:(NSString *)route handler:(WMLNavigationNode *(^)(NSDictionary *))handler {
     @weakify(self);
     [self.router addRoute:route handler:^BOOL(NSDictionary *parameters) {
@@ -68,27 +160,125 @@
         }
         @strongify(self);
         NSAssert(node.viewController, @"No view controller provided, this can't be good!");
-        [self _navigationHandlerForNode:node parameters:parameters];
+        [self _navigationWithNode:node parameters:parameters];
         return YES;
     }];
 }
 
-#pragma mark - Private
-
-- (NSURL *)_fullyQualifiedURLForURL:(NSURL *)URL {
-    // TODO: Add logic
-    return URL;
+- (void)addRuleForHostNodeId:(NSString *)hostNodeId childNodeId:(NSString *)childNodeId mountBlock:(WMLNavigationNodeViewControllerMountHandler)mountBlock dismounBlock:(WMLNavigationNodeViewControllerDismountHandler)dismountBlock {
+    NSMutableDictionary *hostRules = [self _rulesForHostNodeId:hostNodeId];
+    hostRules[childNodeId] = [__WMLMountingTuple tupleWithMountBlock:mountBlock dismountBlock:dismountBlock];
 }
 
-- (void)_navigationHandlerForNode:(WMLNavigationNode *)node parameters:(NSDictionary *)parameters {
-    NSAssert(self.root, @"No root node installed");
-    BOOL animated = NO;
-    if (parameters[@"animated"]) {
-        NSString *aniamtedString = [parameters[@"animated"] lowercaseString];
-        animated = [aniamtedString isEqual:@"true"] || [aniamtedString isEqual:@"yes"] || [aniamtedString isEqual:@"1"];
+#pragma mark - Private
+
+- (NSMutableDictionary *)_rulesForHostNodeId:(NSString *)hostNodeId {
+    return self.hostingRules[hostNodeId] ?: (self.hostingRules[hostNodeId] = [NSMutableDictionary dictionary]);
+}
+
+- (__WMLMountingTuple *)_tupleForHostNodeId:(NSString *)hostNodeId childNodeId:(NSString *)childNodeId {
+    if (!hostNodeId || !childNodeId) {
+        return nil;
     }
-    [self.root hostNode:node animated:animated];
+    return self.hostingRules[hostNodeId][childNodeId];
 }
 
 @end
 
+
+@implementation WMLNavigationManager (NodeHostingInternal)
+
+- (BOOL)_getHost:(inout WMLNavigationNode **)inOutParent forChild:(inout WMLNavigationNode **)inOutChild {
+    if (!inOutParent || !*inOutParent || !inOutChild || !*inOutChild) {
+        return NO;
+    }
+    WMLNavigationNode *child = *inOutChild;
+    WMLNavigationNode *parent = *inOutParent;
+    if ([parent containsSameDataAsNode:child]) {
+        WMLNavigationNode *proposedParent = parent.child;
+        WMLNavigationNode *grandchild = child.child;
+        if ([self _getHost:&proposedParent forChild:&grandchild]) {
+            *inOutParent = proposedParent;
+            *inOutChild = grandchild;
+            return YES;
+        } else if ([self _getHost:inOutParent forChild:&grandchild]) {
+            *inOutChild = grandchild;
+            return YES;
+        }
+    } else if ([self _canParent:parent hostChild:child]) {
+        *inOutParent = parent;
+        *inOutChild = child;
+        return YES;
+    }
+    return NO;
+}
+
+- (BOOL)_canParent:(WMLNavigationNode *)parent hostChild:(WMLNavigationNode *)child {
+    return [self _tupleForHostNodeId:parent.nodeId childNodeId:child.nodeId] != nil;
+}
+
+- (RACSignal *)_makeHostNode:(WMLNavigationNode **)host hostChildNode:(WMLNavigationNode **)child animated:(BOOL)animated {
+    RACSubject *subject = [RACSubject subject];
+
+    // Calculate actual host and actual child
+    WMLNavigationNode *proposedChild = (*child).root;
+    WMLNavigationNode *proposedHost = (*host).root;
+    if (![self _getHost:&proposedHost forChild:&proposedChild]) {
+        [subject sendError:[NSError wml_vespuciErrorWithCode:0 message:@"Failed to find the host for %@", *child]];
+        return subject;
+    }
+
+    // Update original pointers with calculated host and child
+    *child = proposedChild;
+    *host = proposedHost;
+    
+    RACSignal *dismount = [self dismountForHost:proposedHost animated:animated];
+    dismount = [dismount doCompleted:^{
+        proposedHost.child = proposedChild;
+        if ([proposedChild.viewController conformsToProtocol:@protocol(WMLNavigationParametrizedViewController)]) {
+            ((id<WMLNavigationParametrizedViewController>)proposedChild.viewController).navigationNode = proposedChild;
+        }
+    }];
+
+    RACSignal *mount = [self mountForHost:proposedHost newChild:proposedChild animated:animated];
+    [[dismount
+        concat:mount]
+        subscribe:subject];
+    return [subject replayLast];
+}
+
+- (RACSignal *)dismountForHost:(WMLNavigationNode *)host animated:(BOOL)animated {
+    // TODO: should dismount all children not just immediate one
+    // i.e. if there are popups or alerts or something like that, they won't disappear by dismounting immediate child
+    __WMLMountingTuple *tuple = [self _tupleForHostNodeId:host.nodeId childNodeId:host.child.nodeId];
+    WMLNavigationNodeViewControllerDismountHandler dismountBlock = tuple.dismountHandler;
+    NSAssert(!host.child || dismountBlock, @"Don't know how to dismount current child %@", host.child);
+
+    RACSignal *dismount = dismountBlock ? dismountBlock(host.viewController, host.child.viewController, animated) : nil;
+    dismount = dismount ?: [RACSignal empty];
+    dismount.name = @"dismount";
+    return dismount;
+}
+
+- (RACSignal *)mountForHost:(WMLNavigationNode *)host newChild:(WMLNavigationNode *)newChild animated:(BOOL)animated {
+    __WMLMountingTuple * tuple = [self _tupleForHostNodeId:host.nodeId childNodeId:newChild.nodeId];
+    WMLNavigationNodeViewControllerMountHandler mountBlock = tuple.mountHandler;
+    NSAssert(!newChild || mountBlock, @"Don't know hot to mount new child %@", newChild);
+
+    // TODO: mount children recursively not just the first one
+    RACSignal *mount = mountBlock(host.viewController, newChild.viewController, animated) ?: [RACSignal empty];;
+    mount.name = @"mount";
+    return mount;
+}
+
+@end
+
+
+@implementation WMLNavigationManager (Compatibility)
+
+- (void)setNavigationRoot:(WMLNavigationNode *)navigationRoot URL:(NSURL *)URL {
+    self.navigationRoot = navigationRoot;
+    self.URL = URL;
+}
+
+@end
