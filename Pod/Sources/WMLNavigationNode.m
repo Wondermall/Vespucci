@@ -111,7 +111,7 @@
 }
 
 - (NSUInteger)hash {
-    NSUInteger base = self.model ? [self.model hash] : [super hash];
+    NSUInteger base = [self.nodeId hash];
     return self.child ? (base ^ [self.child hash]) : base;
 }
 

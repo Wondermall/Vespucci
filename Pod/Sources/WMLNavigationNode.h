@@ -53,11 +53,6 @@ typedef UIViewController *(^WMLNavigationNodeViewControllerFactory)(NSDictionary
 
 
 /**
- *  Model backing the current navigation item.
- */
-@property (nonatomic) id model;
-
-/**
  *  If navigation item was created in response to URL navigation, 
  *  this property will contain all the provided parameters.
  */
