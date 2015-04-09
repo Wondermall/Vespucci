@@ -6,6 +6,16 @@
 #import <Foundation/Foundation.h>
 
 
+/**
+ * Node Identifiers
+ */
+extern NSString *const MessagesNodeId;
+extern NSString *const SingleMessageNodeId;
+extern NSString *const NotificationsNodeId;
+extern NSString *const ProfileNodeId;
+extern NSString *const RootNodeId;
+
+
 static NSString *const AppSpecificURLScheme = @"vsp";
 
 
@@ -13,7 +23,7 @@ static NSString *const AppSpecificURLScheme = @"vsp";
 
 + (instancetype)sharedService;
 
-- (void)registerRoutesWithRootViewController:(UIViewController *)rootViewController;
+- (void)setupDefaultRoutesWithRootViewController:(UITabBarController *)tabController;
 
 - (BOOL)handleURL:(NSURL *)url;
 
@@ -31,5 +41,15 @@ static NSString *const AppSpecificURLScheme = @"vsp";
 - (NSURL *)profileURLForUser:(NSString *)userId;
 
 - (NSURL *)notificationsURL;
+
+@end
+
+
+@interface NavigationService (Compatibility)
+
+- (void)syncStateForRootController:(UITabBarController *)tabController;
+
+// This doesn't sound safe at all
+- (void)syncStateByRemovingLastNode;
 
 @end

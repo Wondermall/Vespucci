@@ -28,6 +28,9 @@
 }
 
 - (IBAction)_closeButtonAction:(id)sender {
+    [self dismissViewControllerAnimated:YES completion:^{
+        [[NavigationService sharedService] syncStateByRemovingLastNode];
+    }];
 }
 
 - (IBAction)_profileButtonAction:(id)sender {

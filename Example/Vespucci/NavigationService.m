@@ -5,12 +5,19 @@
 
 #import "NavigationService.h"
 
+#import "MessageViewController.h"
+#import "MessagesListViewController.h"
+#import "NotificationsViewController.h"
+
 #import <Vespucci/Vespucci.h>
 #import <ReactiveCocoa/RACSubject.h>
 
 
-static NSString *const SingleMessageNodeId = @"root.messages.message";
-static NSString *const ProfileNodeId = @"root.notifications.profile";
+NSString *const MessagesNodeId = @"root.messages";
+NSString *const SingleMessageNodeId = @"root.messages.message";
+NSString *const NotificationsNodeId = @"root.notification";
+NSString *const ProfileNodeId = @"root.notifications.profile";
+NSString *const RootNodeId = @"root";
 
 
 @interface NavigationService ()
@@ -31,6 +38,7 @@ static NSString *const ProfileNodeId = @"root.notifications.profile";
 - (NSString *)messageForIdRoute;
 
 - (NSString *)pictureForIdRoute;
+
 @end
 
 
@@ -60,13 +68,9 @@ static NSString *const ProfileNodeId = @"root.notifications.profile";
 
 #pragma mark - Public
 
-- (void)registerRoutesWithRootViewController:(UIViewController *)rootViewController {
-    WMLNavigationNode *root = [[WMLNavigationNode alloc] init];
-    root.nodeId = @"root";
-    root.viewController = rootViewController;
-    self.navigationManager.root = root;
-
-    [self _registerNodeRoutes];
+- (void)setupDefaultRoutesWithRootViewController:(UITabBarController *)tabController {
+    [self syncStateForRootController:tabController];
+    [self _registerNodeRoutesForRootViewController:tabController];
 }
 
 - (BOOL)handleURL:(NSURL *)url {
@@ -75,37 +79,115 @@ static NSString *const ProfileNodeId = @"root.notifications.profile";
 
 #pragma mark - Private
 
-- (void)_registerNodeRoutes {
+- (void)_registerNodeRoutesForRootViewController:(UITabBarController *)rootViewController {
     UIStoryboard *storyboard = [UIStoryboard storyboardWithName:@"Main" bundle:nil];
 
+    
     // Message for id
     [self.navigationManager registerNavigationForRoute:[self messageForIdRoute] handler:^WMLNavigationNode *(NSDictionary *parameters) {
         WMLNavigationNode *node = [[WMLNavigationNode alloc] initWithNavigationParameters:parameters];
         node.nodeId = SingleMessageNodeId;
         node.viewController = [storyboard instantiateViewControllerWithIdentifier:@"MessageViewController"];
-        return node;
+       
+        WMLNavigationNode *currentRoot = [self.navigationManager.navigationRoot copy];
+        currentRoot.leaf.child = node;
+        
+        return currentRoot;
     }];
     
+
     // Profile
+
     [self.navigationManager registerNavigationForRoute:[self profileForIdRoute] handler:^WMLNavigationNode *(NSDictionary *parameters) {
         // sample check for valid parameters
         if ([parameters[@"userId"] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]].length == 0) {
+            // For debug purposes only!
+            NSAssert(NO, @"Invalid user id: %@", parameters[@"userId"]);
             return nil;
         }
-        WMLNavigationNode *node = [[WMLNavigationNode alloc] initWithNavigationParameters:parameters];
-        node.nodeId = ProfileNodeId;
-        node.viewController = [storyboard instantiateViewControllerWithIdentifier:@"ProfileViewController"];
-        return node;
+        WMLNavigationNode *profile = [[WMLNavigationNode alloc] initWithNavigationParameters:parameters];
+        profile.nodeId = ProfileNodeId;
+        profile.viewController = [storyboard instantiateViewControllerWithIdentifier:@"ProfileViewController"];
+
+        WMLNavigationNode *notifications = [[WMLNavigationNode alloc] initWithNavigationParameters:nil];
+        notifications.nodeId = NotificationsNodeId;
+        notifications.viewController = rootViewController.viewControllers[1];
+        notifications.child = profile;
+        
+        WMLNavigationNode *root = [[WMLNavigationNode alloc] initWithNavigationParameters:nil];
+        root.nodeId = RootNodeId;
+        root.viewController = rootViewController;
+        root.child = notifications;
+
+        return root;
     }];
-    
-    // Message for id
-    [self.navigationManager.root addHostingRuleForNodeId:SingleMessageNodeId mountingBlock:^RACSignal *(UIViewController *parent, UIViewController *child, BOOL animated) {
+
+
+    // Root -> Profile
+
+    [self.navigationManager addRuleForHostNodeId:NotificationsNodeId childNodeId:ProfileNodeId mountBlock:^RACSignal *(UIViewController *parent, UIViewController *child, BOOL animated) {
         RACSubject *subject = [RACSubject subject];
-        [parent presentViewController:[[UINavigationController alloc] initWithRootViewController:child] animated:animated completion:^{
+        UINavigationController *navigationController = [[UINavigationController alloc] initWithRootViewController:child];
+        navigationController.navigationBar.barStyle = UIBarStyleBlack;
+        [parent presentViewController:navigationController animated:animated completion:^{
             [subject sendCompleted];
         }];
         return subject;
-    } unmountingBlock:^RACSignal *(UIViewController *parent, UIViewController *child, BOOL animated) {
+    } dismounBlock:^RACSignal *(UIViewController *parent, UIViewController *child, BOOL animated) {
+        RACSubject *subject = [RACSubject subject];
+        [child dismissViewControllerAnimated:animated completion:^{
+            [subject sendCompleted];
+        }];
+        return subject;
+    }];
+    
+    
+    // Notifications
+
+    [self.navigationManager addRuleForHostNodeId:RootNodeId childNodeId:NotificationsNodeId mountBlock:^RACSignal *(UIViewController *parent, UIViewController *child, BOOL animated) {
+        ((UITabBarController *)parent).selectedViewController = child;
+        return nil;
+    } dismounBlock:^RACSignal *(UIViewController *parent, UIViewController *child, BOOL animated) {
+        // no-op
+        return nil;
+    }];
+
+    [self.navigationManager registerNavigationForRoute:[self notificationsRoute] handler:^WMLNavigationNode *(NSDictionary *parameters) {
+        WMLNavigationNode *node = [[WMLNavigationNode alloc] initWithNavigationParameters:parameters];
+        node.nodeId = NotificationsNodeId;
+        node.viewController = ((UITabBarController *)rootViewController).viewControllers[1];
+        return node;
+    }];
+    
+
+    // Messages
+
+    [self.navigationManager addRuleForHostNodeId:RootNodeId childNodeId:MessagesNodeId mountBlock:^RACSignal *(UIViewController *parent, UIViewController *child, BOOL animated) {
+        ((UITabBarController *)parent).selectedViewController = child;
+        return nil;
+    } dismounBlock:^RACSignal *(UIViewController *parent, UIViewController *child, BOOL animated) {
+        return nil;
+    }];
+
+    // Root -> Messages
+
+    [self.navigationManager registerNavigationForRoute:[self notificationsRoute] handler:^WMLNavigationNode *(NSDictionary *parameters) {
+        WMLNavigationNode *node = [[WMLNavigationNode alloc] initWithNavigationParameters:parameters];
+        node.nodeId = MessagesNodeId;
+        node.viewController = ((UITabBarController *)rootViewController).viewControllers[0];
+        return node;
+    }];
+
+    // Messages -> Single Message
+    [self.navigationManager addRuleForHostNodeId:MessagesNodeId childNodeId:SingleMessageNodeId mountBlock:^RACSignal *(UIViewController *parent, UIViewController *child, BOOL animated) {
+        RACSubject *subject = [RACSubject subject];
+        UINavigationController *navigationController = [[UINavigationController alloc] initWithRootViewController:child];
+        navigationController.navigationBar.barStyle = UIBarStyleBlack;
+        [parent presentViewController:navigationController animated:animated completion:^{
+            [subject sendCompleted];
+        }];
+        return subject;
+    } dismounBlock:^RACSignal *(UIViewController *parent, UIViewController *child, BOOL animated) {
         RACSubject *subject = [RACSubject subject];
         [child dismissViewControllerAnimated:animated completion:^{
             [subject sendCompleted];
@@ -113,20 +195,6 @@ static NSString *const ProfileNodeId = @"root.notifications.profile";
         return subject;
     }];
 
-    // Profile
-    [self.navigationManager.root addHostingRuleForNodeId:ProfileNodeId mountingBlock:^RACSignal *(UIViewController *parent, UIViewController *child, BOOL animated) {
-        RACSubject *subject = [RACSubject subject];
-        [parent presentViewController:[[UINavigationController alloc] initWithRootViewController:child] animated:animated completion:^{
-            [subject sendCompleted];
-        }];
-        return subject;
-    } unmountingBlock:^RACSignal *(UIViewController *parent, UIViewController *child, BOOL animated) {
-        RACSubject *subject = [RACSubject subject];
-        [child dismissViewControllerAnimated:animated completion:^{
-            [subject sendCompleted];
-        }];
-        return subject;
-    }];
 }
 
 
@@ -166,6 +234,7 @@ static NSString *const ProfileNodeId = @"root.notifications.profile";
 #pragma mark - Private
 
 - (NSURL *)_urlFromRoute:(NSString *)route parameters:(NSDictionary *)parameters {
+    // "animated=true" -> animate all the transitions
     NSMutableString *URLString = [NSMutableString stringWithFormat:@"%@://%@?animated=true", AppSpecificURLScheme, route];
     for (NSString *key in parameters) {
         NSString *normalizedKey = [NSString stringWithFormat:@":%@", key];
@@ -197,6 +266,44 @@ static NSString *const ProfileNodeId = @"root.notifications.profile";
 
 - (NSString *)pictureForIdRoute {
     return @"/notifications/pictures/:pictureId";
+}
+
+@end
+
+
+@implementation NavigationService (Compatibility)
+
+- (void)syncStateForRootController:(UITabBarController *)tabController {
+    UIViewController *selectedViewController = ((UINavigationController *)tabController.selectedViewController).viewControllers.firstObject;
+    NSAssert(selectedViewController.childViewControllers.count == 0, @"Syncronization called in unexpected state");
+
+    NSURL *URL;
+    WMLNavigationNode *child = [WMLNavigationNode node];
+    if ([selectedViewController isKindOfClass:[MessagesListViewController class]]) {
+        URL = [self messagesURL];
+        child.nodeId = MessagesNodeId;
+    } else if ([selectedViewController isKindOfClass:[NotificationsViewController class]]) {
+        URL = [self notificationsURL];
+        child.nodeId = NotificationsNodeId;
+    }
+    child.viewController = tabController.selectedViewController;
+    WMLNavigationNode *root = [WMLNavigationNode node];
+    root.nodeId = RootNodeId;
+    root.child = child;
+    root.viewController = tabController;
+    [self.navigationManager setNavigationRoot:root URL:URL];
+}
+
+// TODO: this should be replaced with navigation to -[URL URLByDeletingLastPathComponent]
+- (void)syncStateByRemovingLastNode {
+    NSURLComponents *components = [NSURLComponents componentsWithURL:self.navigationManager.URL resolvingAgainstBaseURL:NO];
+    components.query = nil;
+    components.path = [components.path stringByDeletingLastPathComponent];
+    NSURL *URL = components.URL;
+    WMLNavigationNode *node = [self.navigationManager.navigationRoot copy];
+    // TODO: can make it nicer by adding -[WMLNavigationNode removeFromParent]
+    node.leaf.parent.child = nil;
+    [self.navigationManager setNavigationRoot:node URL:URL];
 }
 
 @end

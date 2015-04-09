@@ -183,9 +183,9 @@
 				6003F59C195388D20070C39A /* AppDelegate.h */,
 				6003F59D195388D20070C39A /* AppDelegate.m */,
 				5C96047F1AD5C9C30044A899 /* Navigation */,
+				5C9604841AD5CBD30044A899 /* View Controllers */,
 				38EFE3B7DF152DFB0FA6671A /* Resources */,
 				6003F594195388D20070C39A /* Supporting Files */,
-				5C9604841AD5CBD30044A899 /* View Controllers */,
 			);
 			name = "Sample App";
 			path = Vespucci;
