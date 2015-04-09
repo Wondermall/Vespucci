@@ -8,6 +8,7 @@
 
 #import "MessageViewController.h"
 
+#import "NavigationService.h"
 #import <ReactiveCocoa/ReactiveCocoa.h>
 
 
@@ -27,6 +28,13 @@
 }
 
 - (IBAction)_closeButtonAction:(id)sender {
+}
+
+- (IBAction)_profileButtonAction:(id)sender {
+    NSString *messageId = self.navigationNode.parameters[@"messageId"];
+    NSString *userId = [NSString stringWithFormat:@"user-%@",messageId];
+    NSURL *URL = [[NavigationService sharedService] profileURLForUser:userId];
+    [[UIApplication sharedApplication] openURL:URL];
 }
 
 @end
