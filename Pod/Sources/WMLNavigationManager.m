@@ -67,6 +67,7 @@
             return NO;
         }
         @strongify(self);
+        NSAssert(node.viewController, @"No view controller provided, this can't be good!");
         [self _navigationHandlerForNode:node parameters:parameters];
         return YES;
     }];

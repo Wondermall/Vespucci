@@ -88,7 +88,6 @@ typedef RACSignal *(^WMLNavigationNodeViewControllerMountHandler)(UIViewControll
 - (void)addIsDataEqualRule:(WMLNavigationNodeLogicalEqualityRule)rule;
 
 /**
- *  <#Description#>
  *
  *  @param filterBlock     Describes how to distinguish interesting block being processed
  *  @param mountingBlock   How to mount view controller in animated and not fashion
