@@ -165,7 +165,6 @@
                         <rect key="frame" x="0.0" y="0.0" width="320" height="49"/>
                         <autoresizingMask key="autoresizingMask"/>
                         <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
-                        <color key="tintColor" red="0.7254902124" green="0.2117647231" blue="0.16862745579999999" alpha="1" colorSpace="deviceRGB"/>
                     </tabBar>
                     <connections>
                         <segue destination="gPv-cf-9Ge" kind="relationship" relationship="viewControllers" id="4za-1k-Bah"/>
@@ -241,17 +240,30 @@
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Ty1-tz-lAY">
                                 <rect key="frame" x="279" y="289" width="42" height="21"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="17"/>
-                                <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                <color key="textColor" red="0.9215686917" green="0.78431379800000001" blue="0.02745098248" alpha="1" colorSpace="deviceRGB"/>
+                                <nil key="highlightedColor"/>
+                            </label>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="message id:" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="iB0-Lk-HtQ">
+                                <rect key="frame" x="206" y="294" width="68" height="15"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="12"/>
+                                <color key="textColor" red="0.9215686917" green="0.78431379800000001" blue="0.02745098248" alpha="1" colorSpace="deviceRGB"/>
                                 <nil key="highlightedColor"/>
                             </label>
                         </subviews>
-                        <color key="backgroundColor" red="0.17254901959999999" green="0.23137254900000001" blue="0.30196078430000001" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                        <color key="backgroundColor" red="0.55294120309999995" green="0.2078431547" blue="0.69019609689999994" alpha="1" colorSpace="deviceRGB"/>
                         <constraints>
                             <constraint firstAttribute="centerY" secondItem="Ty1-tz-lAY" secondAttribute="centerY" constant="0.5" id="MUw-iW-x9q"/>
+                            <constraint firstItem="Ty1-tz-lAY" firstAttribute="leading" secondItem="iB0-Lk-HtQ" secondAttribute="trailing" constant="5" id="VBF-JG-FmA"/>
+                            <constraint firstItem="iB0-Lk-HtQ" firstAttribute="baseline" secondItem="Ty1-tz-lAY" secondAttribute="baseline" id="eXV-ei-yF3"/>
                             <constraint firstAttribute="centerX" secondItem="Ty1-tz-lAY" secondAttribute="centerX" id="lld-sY-A6M"/>
                         </constraints>
                     </view>
                     <navigationItem key="navigationItem" title="Message" id="SgS-qb-ker">
+                        <barButtonItem key="leftBarButtonItem" title="Profile" id="aK1-Rh-aMq">
+                            <connections>
+                                <action selector="_profileButtonAction:" destination="mWd-0X-ZUy" id="F24-Sl-FzN"/>
+                            </connections>
+                        </barButtonItem>
                         <barButtonItem key="rightBarButtonItem" title="Close" style="done" id="YQp-7h-8Hr">
                             <connections>
                                 <action selector="_closeButtonAction:" destination="mWd-0X-ZUy" id="hrw-zY-K0I"/>
