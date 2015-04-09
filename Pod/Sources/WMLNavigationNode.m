@@ -107,7 +107,7 @@
 }
 
 - (BOOL)isEqualToNode:(WMLNavigationNode *)node {
-    return [self.model isEqual:node.model] && (!self.child || (self.child && [self.child isEqual:node.child]));
+    return [self.nodeId isEqual:node.nodeId] && (!self.child || (self.child && [self.child isEqual:node.child]));
 }
 
 - (NSUInteger)hash {
