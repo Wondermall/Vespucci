@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="7531" systemVersion="14D131" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" initialViewController="DGE-ss-fnz">
     <dependencies>
+        <deployment identifier="iOS"/>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="7520"/>
     </dependencies>
     <scenes>
@@ -11,7 +12,7 @@
                     <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="static" style="plain" separatorStyle="default" rowHeight="65" sectionHeaderHeight="22" sectionFooterHeight="22" id="NmN-DC-J95">
                         <rect key="frame" x="0.0" y="0.0" width="600" height="600"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                        <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                        <color key="backgroundColor" red="0.24313727020000001" green="0.49019610879999997" blue="0.73333334920000004" alpha="1" colorSpace="deviceRGB"/>
                         <sections>
                             <tableViewSection id="coz-eu-oIp">
                                 <cells>
@@ -25,14 +26,21 @@
                                                     <attributedString key="attributedText">
                                                         <fragment content="Johny">
                                                             <attributes>
-                                                                <color key="NSColor" red="0.0" green="0.49803921569999998" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                                                <color key="NSColor" red="0.24313727020000001" green="0.74509805439999999" blue="0.60000002379999995" alpha="1" colorSpace="deviceRGB"/>
                                                                 <font key="NSFont" size="16" name="HelveticaNeue"/>
                                                                 <paragraphStyle key="NSParagraphStyle" alignment="left" lineBreakMode="wordWrapping" baseWritingDirection="natural"/>
                                                             </attributes>
                                                         </fragment>
-                                                        <fragment content=" liked himself">
+                                                        <fragment content=" ">
                                                             <attributes>
                                                                 <color key="NSColor" cocoaTouchSystemColor="darkTextColor"/>
+                                                                <font key="NSFont" size="16" name="HelveticaNeue"/>
+                                                                <paragraphStyle key="NSParagraphStyle" alignment="left" lineBreakMode="wordWrapping" baseWritingDirection="natural"/>
+                                                            </attributes>
+                                                        </fragment>
+                                                        <fragment content="liked himself">
+                                                            <attributes>
+                                                                <color key="NSColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                                                 <font key="NSFont" size="16" name="HelveticaNeue"/>
                                                                 <paragraphStyle key="NSParagraphStyle" alignment="left" lineBreakMode="wordWrapping" baseWritingDirection="natural"/>
                                                             </attributes>
@@ -48,6 +56,7 @@
                                                 </label>
                                             </subviews>
                                         </tableViewCellContentView>
+                                        <color key="backgroundColor" red="0.24313727020000001" green="0.49019610879999997" blue="0.73333334920000004" alpha="1" colorSpace="deviceRGB"/>
                                     </tableViewCell>
                                     <tableViewCell contentMode="scaleToFill" selectionStyle="default" indentationWidth="10" textLabel="r6d-y7-7kq" detailTextLabel="Rd4-6Y-Jd5" rowHeight="65" style="IBUITableViewCellStyleSubtitle" id="g52-GI-ukQ">
                                         <autoresizingMask key="autoresizingMask"/>
@@ -59,14 +68,21 @@
                                                     <attributedString key="attributedText">
                                                         <fragment content="Ivan">
                                                             <attributes>
-                                                                <color key="NSColor" red="0.0" green="0.49803921569999998" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                                                <color key="NSColor" red="0.24313727020000001" green="0.74509805439999999" blue="0.60000002379999995" alpha="1" colorSpace="deviceRGB"/>
                                                                 <font key="NSFont" size="16" name="HelveticaNeue"/>
                                                                 <paragraphStyle key="NSParagraphStyle" alignment="left" lineBreakMode="wordWrapping" baseWritingDirection="natural"/>
                                                             </attributes>
                                                         </fragment>
-                                                        <fragment content=" changed his profile picture">
+                                                        <fragment content=" ">
                                                             <attributes>
                                                                 <color key="NSColor" cocoaTouchSystemColor="darkTextColor"/>
+                                                                <font key="NSFont" size="16" name="HelveticaNeue"/>
+                                                                <paragraphStyle key="NSParagraphStyle" alignment="left" lineBreakMode="wordWrapping" baseWritingDirection="natural"/>
+                                                            </attributes>
+                                                        </fragment>
+                                                        <fragment content="changed his profile picture">
+                                                            <attributes>
+                                                                <color key="NSColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                                                 <font key="NSFont" size="16" name="HelveticaNeue"/>
                                                                 <paragraphStyle key="NSParagraphStyle" alignment="left" lineBreakMode="wordWrapping" baseWritingDirection="natural"/>
                                                             </attributes>
@@ -82,6 +98,7 @@
                                                 </label>
                                             </subviews>
                                         </tableViewCellContentView>
+                                        <color key="backgroundColor" red="0.24313727020000001" green="0.49019610879999997" blue="0.73333334920000004" alpha="1" colorSpace="deviceRGB"/>
                                     </tableViewCell>
                                     <tableViewCell contentMode="scaleToFill" selectionStyle="default" indentationWidth="10" textLabel="kZh-kA-wYT" detailTextLabel="fLV-Et-o5P" rowHeight="65" style="IBUITableViewCellStyleSubtitle" id="EtN-5f-BOH">
                                         <autoresizingMask key="autoresizingMask"/>
@@ -93,14 +110,21 @@
                                                     <attributedString key="attributedText">
                                                         <fragment content="Stephany">
                                                             <attributes>
-                                                                <color key="NSColor" red="0.0" green="0.49803921569999998" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                                                <color key="NSColor" red="0.24313727020000001" green="0.74509805439999999" blue="0.60000002379999995" alpha="1" colorSpace="deviceRGB"/>
                                                                 <font key="NSFont" size="16" name="HelveticaNeue"/>
                                                                 <paragraphStyle key="NSParagraphStyle" alignment="left" lineBreakMode="wordWrapping" baseWritingDirection="natural"/>
                                                             </attributes>
                                                         </fragment>
-                                                        <fragment content=": &quot;Come play with us&quot;">
+                                                        <fragment content=" ">
                                                             <attributes>
                                                                 <color key="NSColor" cocoaTouchSystemColor="darkTextColor"/>
+                                                                <font key="NSFont" size="16" name="HelveticaNeue"/>
+                                                                <paragraphStyle key="NSParagraphStyle" alignment="left" lineBreakMode="wordWrapping" baseWritingDirection="natural"/>
+                                                            </attributes>
+                                                        </fragment>
+                                                        <fragment content="&quot;Come play with us&quot;">
+                                                            <attributes>
+                                                                <color key="NSColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                                                 <font key="NSFont" size="16" name="HelveticaNeue"/>
                                                                 <paragraphStyle key="NSParagraphStyle" alignment="left" lineBreakMode="wordWrapping" baseWritingDirection="natural"/>
                                                             </attributes>
@@ -116,6 +140,7 @@
                                                 </label>
                                             </subviews>
                                         </tableViewCellContentView>
+                                        <color key="backgroundColor" red="0.24313727020000001" green="0.49019610879999997" blue="0.73333334920000004" alpha="1" colorSpace="deviceRGB"/>
                                     </tableViewCell>
                                 </cells>
                             </tableViewSection>
@@ -136,10 +161,11 @@
             <objects>
                 <tabBarController id="DGE-ss-fnz" sceneMemberID="viewController">
                     <nil key="simulatedBottomBarMetrics"/>
-                    <tabBar key="tabBar" contentMode="scaleToFill" id="LXl-fs-vx1">
+                    <tabBar key="tabBar" contentMode="scaleToFill" barStyle="black" id="LXl-fs-vx1">
                         <rect key="frame" x="0.0" y="0.0" width="320" height="49"/>
                         <autoresizingMask key="autoresizingMask"/>
                         <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
+                        <color key="tintColor" red="0.7254902124" green="0.2117647231" blue="0.16862745579999999" alpha="1" colorSpace="deviceRGB"/>
                     </tabBar>
                     <connections>
                         <segue destination="gPv-cf-9Ge" kind="relationship" relationship="viewControllers" id="4za-1k-Bah"/>
@@ -156,7 +182,7 @@
                 <navigationController automaticallyAdjustsScrollViewInsets="NO" id="gPv-cf-9Ge" sceneMemberID="viewController">
                     <tabBarItem key="tabBarItem" badgeValue="3" systemItem="mostViewed" id="hu6-Rq-8vi"/>
                     <toolbarItems/>
-                    <navigationBar key="navigationBar" contentMode="scaleToFill" id="EZv-cs-nAk">
+                    <navigationBar key="navigationBar" contentMode="scaleToFill" barStyle="black" id="EZv-cs-nAk">
                         <rect key="frame" x="0.0" y="0.0" width="320" height="44"/>
                         <autoresizingMask key="autoresizingMask"/>
                     </navigationBar>
@@ -200,10 +226,10 @@
             </objects>
             <point key="canvasLocation" x="1767" y="-1152"/>
         </scene>
-        <!--Message-->
+        <!--Single Message-->
         <scene sceneID="SqV-Hv-199">
             <objects>
-                <viewController storyboardIdentifier="MessageViewController" id="mWd-0X-ZUy" customClass="MessageViewController" sceneMemberID="viewController">
+                <viewController storyboardIdentifier="MessageViewController" id="mWd-0X-ZUy" userLabel="Single Message" customClass="MessageViewController" sceneMemberID="viewController">
                     <layoutGuides>
                         <viewControllerLayoutGuide type="top" id="pgL-6m-hUW"/>
                         <viewControllerLayoutGuide type="bottom" id="5Aa-GZ-rMq"/>
@@ -225,7 +251,13 @@
                             <constraint firstAttribute="centerX" secondItem="Ty1-tz-lAY" secondAttribute="centerX" id="lld-sY-A6M"/>
                         </constraints>
                     </view>
-                    <navigationItem key="navigationItem" title="Message" id="SgS-qb-ker"/>
+                    <navigationItem key="navigationItem" title="Message" id="SgS-qb-ker">
+                        <barButtonItem key="rightBarButtonItem" title="Close" style="done" id="YQp-7h-8Hr">
+                            <connections>
+                                <action selector="_closeButtonAction:" destination="mWd-0X-ZUy" id="hrw-zY-K0I"/>
+                            </connections>
+                        </barButtonItem>
+                    </navigationItem>
                     <simulatedNavigationBarMetrics key="simulatedTopBarMetrics" prompted="NO"/>
                     <connections>
                         <outlet property="messageIdLabel" destination="Ty1-tz-lAY" id="0aj-8g-fKz"/>
@@ -242,11 +274,11 @@
                     <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="static" style="plain" separatorStyle="default" rowHeight="100" sectionHeaderHeight="22" sectionFooterHeight="22" id="rVo-p9-lqc">
                         <rect key="frame" x="0.0" y="0.0" width="600" height="600"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                        <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                        <color key="backgroundColor" red="0.55294120309999995" green="0.2078431547" blue="0.69019609689999994" alpha="1" colorSpace="deviceRGB"/>
                         <sections>
                             <tableViewSection id="b7A-GJ-09V">
                                 <cells>
-                                    <tableViewCell contentMode="scaleToFill" selectionStyle="default" indentationWidth="10" textLabel="dyp-zM-TI7" detailTextLabel="aeO-LL-i68" style="IBUITableViewCellStyleSubtitle" id="APB-YQ-Bln">
+                                    <tableViewCell contentMode="scaleToFill" selectionStyle="none" indentationWidth="10" textLabel="dyp-zM-TI7" detailTextLabel="aeO-LL-i68" style="IBUITableViewCellStyleSubtitle" id="APB-YQ-Bln">
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="APB-YQ-Bln" id="Sfq-27-d2Z">
                                             <autoresizingMask key="autoresizingMask"/>
@@ -256,14 +288,14 @@
                                                     <attributedString key="attributedText">
                                                         <fragment content="Stephany">
                                                             <attributes>
-                                                                <color key="NSColor" red="0.74901960779999999" green="0.098039215690000001" blue="0.023529411760000001" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                                                <color key="NSColor" red="0.9215686917" green="0.78431379800000001" blue="0.02745098248" alpha="1" colorSpace="deviceRGB"/>
                                                                 <font key="NSFont" size="16" name="HelveticaNeue"/>
                                                                 <paragraphStyle key="NSParagraphStyle" alignment="left" lineBreakMode="wordWrapping" baseWritingDirection="natural"/>
                                                             </attributes>
                                                         </fragment>
                                                         <fragment content=": &quot;Come play with us&quot;">
                                                             <attributes>
-                                                                <color key="NSColor" cocoaTouchSystemColor="darkTextColor"/>
+                                                                <color key="NSColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                                                 <font key="NSFont" size="16" name="HelveticaNeue"/>
                                                                 <paragraphStyle key="NSParagraphStyle" alignment="left" lineBreakMode="wordWrapping" baseWritingDirection="natural"/>
                                                             </attributes>
@@ -278,9 +310,11 @@
                                                     <nil key="highlightedColor"/>
                                                 </label>
                                             </subviews>
+                                            <color key="backgroundColor" red="0.55294120309999995" green="0.2078431547" blue="0.69019609689999994" alpha="1" colorSpace="deviceRGB"/>
                                         </tableViewCellContentView>
+                                        <color key="backgroundColor" red="0.55294120309999995" green="0.2078431547" blue="0.69019609689999994" alpha="1" colorSpace="deviceRGB"/>
                                     </tableViewCell>
-                                    <tableViewCell contentMode="scaleToFill" selectionStyle="default" indentationWidth="10" textLabel="Ew9-fu-QoG" detailTextLabel="etm-NK-kAc" style="IBUITableViewCellStyleSubtitle" id="DyM-vV-36m">
+                                    <tableViewCell contentMode="scaleToFill" selectionStyle="none" indentationWidth="10" textLabel="Ew9-fu-QoG" detailTextLabel="etm-NK-kAc" style="IBUITableViewCellStyleSubtitle" id="DyM-vV-36m">
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="DyM-vV-36m" id="q3k-mt-hwZ">
                                             <autoresizingMask key="autoresizingMask"/>
@@ -290,14 +324,14 @@
                                                     <attributedString key="attributedText">
                                                         <fragment content="Johny">
                                                             <attributes>
-                                                                <color key="NSColor" red="0.74901960779999999" green="0.098039215690000001" blue="0.023529411760000001" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                                                <color key="NSColor" red="0.9215686917" green="0.78431379800000001" blue="0.02745098248" alpha="1" colorSpace="deviceRGB"/>
                                                                 <font key="NSFont" size="16" name="HelveticaNeue"/>
                                                                 <paragraphStyle key="NSParagraphStyle" alignment="left" lineBreakMode="wordWrapping" baseWritingDirection="natural"/>
                                                             </attributes>
                                                         </fragment>
                                                         <fragment content=": &quot;Check out my new watch&quot;">
                                                             <attributes>
-                                                                <color key="NSColor" red="0.20000000000000001" green="0.20000000000000001" blue="0.20000000000000001" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                                                <color key="NSColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                                                 <font key="NSFont" size="16" name="HelveticaNeue"/>
                                                                 <paragraphStyle key="NSParagraphStyle" alignment="left" lineBreakMode="wordWrapping" baseWritingDirection="natural"/>
                                                             </attributes>
@@ -313,6 +347,7 @@
                                                 </label>
                                             </subviews>
                                         </tableViewCellContentView>
+                                        <color key="backgroundColor" red="0.55294120309999995" green="0.2078431547" blue="0.69019609689999994" alpha="1" colorSpace="deviceRGB"/>
                                     </tableViewCell>
                                 </cells>
                             </tableViewSection>
@@ -334,7 +369,7 @@
                 <navigationController automaticallyAdjustsScrollViewInsets="NO" id="1kR-eK-W14" sceneMemberID="viewController">
                     <tabBarItem key="tabBarItem" systemItem="recents" id="CD8-pD-Fwd"/>
                     <toolbarItems/>
-                    <navigationBar key="navigationBar" contentMode="scaleToFill" id="u4e-Pn-H6q">
+                    <navigationBar key="navigationBar" contentMode="scaleToFill" barStyle="black" id="u4e-Pn-H6q">
                         <rect key="frame" x="0.0" y="0.0" width="320" height="44"/>
                         <autoresizingMask key="autoresizingMask"/>
                     </navigationBar>
