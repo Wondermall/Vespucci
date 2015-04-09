@@ -10,6 +10,7 @@
 
 
 static NSString *const SingleMessageNodeId = @"root.messages.message";
+static NSString *const ProfileNodeId = @"root.notifications.profile";
 
 
 @interface NavigationService ()
@@ -84,8 +85,36 @@ static NSString *const SingleMessageNodeId = @"root.messages.message";
         node.viewController = [storyboard instantiateViewControllerWithIdentifier:@"MessageViewController"];
         return node;
     }];
-
+    
+    // Profile
+    [self.navigationManager registerNavigationForRoute:[self profileForIdRoute] handler:^WMLNavigationNode *(NSDictionary *parameters) {
+        // sample check for valid parameters
+        if ([parameters[@"userId"] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]].length == 0) {
+            return nil;
+        }
+        WMLNavigationNode *node = [[WMLNavigationNode alloc] initWithNavigationParameters:parameters];
+        node.nodeId = ProfileNodeId;
+        node.viewController = [storyboard instantiateViewControllerWithIdentifier:@"ProfileViewController"];
+        return node;
+    }];
+    
+    // Message for id
     [self.navigationManager.root addHostingRuleForNodeId:SingleMessageNodeId mountingBlock:^RACSignal *(UIViewController *parent, UIViewController *child, BOOL animated) {
+        RACSubject *subject = [RACSubject subject];
+        [parent presentViewController:[[UINavigationController alloc] initWithRootViewController:child] animated:animated completion:^{
+            [subject sendCompleted];
+        }];
+        return subject;
+    } unmountingBlock:^RACSignal *(UIViewController *parent, UIViewController *child, BOOL animated) {
+        RACSubject *subject = [RACSubject subject];
+        [child dismissViewControllerAnimated:animated completion:^{
+            [subject sendCompleted];
+        }];
+        return subject;
+    }];
+
+    // Profile
+    [self.navigationManager.root addHostingRuleForNodeId:ProfileNodeId mountingBlock:^RACSignal *(UIViewController *parent, UIViewController *child, BOOL animated) {
         RACSubject *subject = [RACSubject subject];
         [parent presentViewController:[[UINavigationController alloc] initWithRootViewController:child] animated:animated completion:^{
             [subject sendCompleted];
