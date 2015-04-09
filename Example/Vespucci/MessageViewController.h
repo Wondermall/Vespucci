@@ -13,6 +13,6 @@
 
 @interface MessageViewController : UIViewController <WMLNavigationParametrizedViewController>
 
-@property (nonatomic, copy) NSDictionary *navigationParameters;
+@property (nonatomic, weak) WMLNavigationNode *navigationNode;
 
 @end

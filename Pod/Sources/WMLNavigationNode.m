@@ -221,7 +221,7 @@
             @strongify(self);
             self.child = newChild;
             if ([newChild.viewController conformsToProtocol:@protocol(WMLNavigationParametrizedViewController)]) {
-                ((UIViewController <WMLNavigationParametrizedViewController> *)newChild.viewController).navigationParameters = newChild.navigationParameters;
+                ((UIViewController <WMLNavigationParametrizedViewController> *)newChild.viewController).navigationNode = newChild;
             }
         }]
         concat:mountBlock(self.viewController, newChild.viewController, animated)];

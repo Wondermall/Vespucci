@@ -9,13 +9,14 @@
 #import <UIKit/UIKit.h>
 
 
+@class WMLNavigationNode;
 /**
  *  If implemented, view controller will get navigationParameters if 
  *  presented with navigation maanger.
  */
 @protocol WMLNavigationParametrizedViewController <NSObject>
 
-@property (nonatomic, copy) NSDictionary *navigationParameters;
+@property (nonatomic, weak) WMLNavigationNode *navigationNode;
 
 @end
 
