@@ -260,15 +260,29 @@ NSString *const WMLNavigationManagerNotificationParametersKey = @"WMLNavigationM
     return dismount;
 }
 
-- (RACSignal *)mountForHost:(WMLNavigationNode *)host newChild:(WMLNavigationNode *)newChild animated:(BOOL)animated {
-    __WMLMountingTuple * tuple = [self _tupleForHostNodeId:host.nodeId childNodeId:newChild.nodeId];
-    WMLNavigationNodeViewControllerMountHandler mountBlock = tuple.mountHandler;
-    NSAssert(!newChild || mountBlock, @"Don't know hot to mount new child %@", newChild);
+- (RACSignal *)mountForHost:(WMLNavigationNode *)host newChild:(WMLNavigationNode *)child animated:(BOOL)animated {
+    RACSignal *result = nil, *currentSignal = nil;
 
-    // TODO: mount children recursively not just the first one
-    RACSignal *mount = mountBlock(host.viewController, newChild.viewController, animated) ?: [RACSignal empty];;
-    mount.name = @"mount";
-    return mount;
+    while (child) {
+        __WMLMountingTuple * tuple = [self _tupleForHostNodeId:host.nodeId childNodeId:child.nodeId];
+        WMLNavigationNodeViewControllerMountHandler mountBlock = tuple.mountHandler;
+        NSAssert(!child || mountBlock, @"Don't know hot to mount new child %@", child);
+        // TODO: mount children recursively not just the first one
+        RACSignal *mount = mountBlock(host.viewController, child.viewController, animated) ?: [RACSignal empty];
+        mount.name = @"mount";
+        if (!result) {
+            result = mount;
+        }
+        if (currentSignal) {
+            currentSignal = [currentSignal concat:mount];
+        } else {
+            currentSignal = mount;
+        }
+
+        host = child;
+        child = child.child;        
+    }
+    return result;
 }
 
 @end
