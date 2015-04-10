@@ -1,7 +1,8 @@
 source 'https://github.com/CocoaPods/Specs.git'
 
 target 'Vespucci', :exclusive => true do
-  pod "Vespucci", :path => "../"
+  pod 'Vespucci', :path => '../'
+  pod 'WMLDI', '~> 0.1.0'
 end
 
 target 'Tests', :exclusive => true do
