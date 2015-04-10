@@ -22,8 +22,8 @@
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
     self.window.tintColor = [UIColor whiteColor];
     
-    // We don't remove these observers from those only because this is a demo.
 #ifdef DEBUG
+    // Just for the purpose of the demo
     [[NSNotificationCenter defaultCenter] addObserverForName:WMLNavigationManagerDidFinishNavigationNotification object:nil queue:nil usingBlock:^(NSNotification *note) {
         WMLNavigationNode *node = note.userInfo[WMLNavigationManagerNotificationNodeKey];
         NSLog(@"Navigation manager did finish navigation.\nNode: %@\nParameters: %@", node.root, note.userInfo[WMLNavigationManagerNotificationParametersKey]);
