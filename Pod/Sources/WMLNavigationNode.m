@@ -88,13 +88,6 @@
 
 #pragma mark - NSObject
 
-- (NSString *)debugDescription {
-    if (!self.child) {
-        return self.description;
-    }
-    return [NSString stringWithFormat:@"%@ → %@", self.description, self.child.debugDescription];
-}
-
 - (NSString *)description {
     return [NSString stringWithFormat:@"<%@: %p; id=\"%@\">", [self class], self, self.nodeId] ;
 }
@@ -141,6 +134,18 @@
         }
     }
     return [self.nodeId isEqualToString:node.nodeId];
+}
+
+@end
+
+
+@implementation WMLNavigationNode (Debugging)
+
+- (NSString *)recursiveDescription {
+    if (!self.child) {
+        return self.description;
+    }
+    return [NSString stringWithFormat:@"%@ → %@", self.description, self.child.debugDescription];
 }
 
 @end

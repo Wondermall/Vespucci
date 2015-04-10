@@ -85,3 +85,10 @@ typedef BOOL(^WMLNavigationNodeLogicalEqualityRule)(WMLNavigationNode *node1, WM
 - (BOOL)containsSameDataAsNode:(WMLNavigationNode *)node;
 
 @end
+
+
+@interface WMLNavigationNode (Debugging)
+
+- (NSString *)recursiveDescription;
+
+@end
