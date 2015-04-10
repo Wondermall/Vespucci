@@ -123,10 +123,10 @@ NSString *const WMLNavigationManagerNotificationParametersKey = @"WMLNavigationM
     RACSignal *makeHost = [self _makeHostNode:&proposedRoot hostChildNode:&proposedChild animated:animated];
     [makeHost subscribeError:^(NSError *error) {
         @strongify(self);
-        [self _postNotificationNamed:WMLNavigationManagerDidFailNavigationNotification node:proposedChild parameters:parameters];
+        [self _postNotificationNamed:WMLNavigationManagerDidFailNavigationNotification node:proposedChild.leaf parameters:parameters];
     } completed:^{
         @strongify(self);
-        [self _postNotificationNamed:WMLNavigationManagerDidFinishNavigationNotification node:proposedChild parameters:parameters];
+        [self _postNotificationNamed:WMLNavigationManagerDidFinishNavigationNotification node:proposedChild.leaf parameters:parameters];
     }];
 }
 
