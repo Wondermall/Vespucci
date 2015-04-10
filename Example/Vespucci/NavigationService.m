@@ -126,27 +126,32 @@ NSString *const RootNodeId = @"root";
     // Notifications -> Profile
 
     [self.navigationManager addRuleForHostNodeId:NotificationsNodeId childNodeId:ProfileNodeId mountBlock:^RACSignal *(UIViewController *parent, UIViewController *child, BOOL animated) {
-        RACSubject *subject = [RACSubject subject];
-        UINavigationController *navigationController = [[UINavigationController alloc] initWithRootViewController:child];
-        navigationController.navigationBar.barStyle = UIBarStyleBlack;
-        [parent presentViewController:navigationController animated:animated completion:^{
-            [subject sendCompleted];
+        return [RACSignal createSignal:^RACDisposable *(id<RACSubscriber> subscriber) {
+            UINavigationController *navigationController = [[UINavigationController alloc] initWithRootViewController:child];
+            navigationController.navigationBar.barStyle = UIBarStyleBlack;
+            [parent presentViewController:navigationController animated:animated completion:^{
+                [subscriber sendCompleted];
+            }];
+            return nil;
         }];
-        return subject;
     } dismounBlock:^RACSignal *(UIViewController *parent, UIViewController *child, BOOL animated) {
-        RACSubject *subject = [RACSubject subject];
-        [child dismissViewControllerAnimated:animated completion:^{
-            [subject sendCompleted];
+        return [RACSignal createSignal:^RACDisposable *(id<RACSubscriber> subscriber) {
+            [child dismissViewControllerAnimated:animated completion:^{
+                [subscriber sendCompleted];
+            }];
+            return nil;
         }];
-        return subject;
     }];
     
     
     // Notifications
 
     [self.navigationManager addRuleForHostNodeId:RootNodeId childNodeId:NotificationsNodeId mountBlock:^RACSignal *(UIViewController *parent, UIViewController *child, BOOL animated) {
-        ((UITabBarController *)parent).selectedViewController = child;
-        return nil;
+        return [RACSignal createSignal:^RACDisposable *(id<RACSubscriber> subscriber) {
+            ((UITabBarController *)parent).selectedViewController = child;
+            [subscriber sendCompleted];
+            return nil;
+        }];
     } dismounBlock:^RACSignal *(UIViewController *parent, UIViewController *child, BOOL animated) {
         // no-op
         return nil;
@@ -163,8 +168,11 @@ NSString *const RootNodeId = @"root";
     // Messages
 
     [self.navigationManager addRuleForHostNodeId:RootNodeId childNodeId:MessagesNodeId mountBlock:^RACSignal *(UIViewController *parent, UIViewController *child, BOOL animated) {
-        ((UITabBarController *)parent).selectedViewController = child;
-        return nil;
+        return [RACSignal createSignal:^RACDisposable *(id<RACSubscriber> subscriber) {
+            ((UITabBarController *)parent).selectedViewController = child;
+            [subscriber sendCompleted];
+            return nil;
+        }];
     } dismounBlock:^RACSignal *(UIViewController *parent, UIViewController *child, BOOL animated) {
         return nil;
     }];
@@ -180,19 +188,21 @@ NSString *const RootNodeId = @"root";
 
     // Messages -> Single Message
     [self.navigationManager addRuleForHostNodeId:MessagesNodeId childNodeId:SingleMessageNodeId mountBlock:^RACSignal *(UIViewController *parent, UIViewController *child, BOOL animated) {
-        RACSubject *subject = [RACSubject subject];
-        UINavigationController *navigationController = [[UINavigationController alloc] initWithRootViewController:child];
-        navigationController.navigationBar.barStyle = UIBarStyleBlack;
-        [parent presentViewController:navigationController animated:animated completion:^{
-            [subject sendCompleted];
+        return [RACSignal createSignal:^RACDisposable *(id<RACSubscriber> subscriber) {
+            UINavigationController *navigationController = [[UINavigationController alloc] initWithRootViewController:child];
+            navigationController.navigationBar.barStyle = UIBarStyleBlack;
+            [parent presentViewController:navigationController animated:animated completion:^{
+                [subscriber sendCompleted];
+            }];
+            return nil;
         }];
-        return subject;
     } dismounBlock:^RACSignal *(UIViewController *parent, UIViewController *child, BOOL animated) {
-        RACSubject *subject = [RACSubject subject];
-        [child dismissViewControllerAnimated:animated completion:^{
-            [subject sendCompleted];
+        return [RACSignal createSignal:^RACDisposable *(id<RACSubscriber> subscriber) {
+            [child dismissViewControllerAnimated:animated completion:^{
+                [subscriber sendCompleted];
+            }];
+            return nil;
         }];
-        return subject;
     }];
 
 }
