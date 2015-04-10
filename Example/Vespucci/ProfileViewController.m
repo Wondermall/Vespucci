@@ -8,14 +8,27 @@
 
 #import "ProfileViewController.h"
 
+#import "NavigationService.h"
 #import <ReactiveCocoa/ReactiveCocoa.h>
+
 
 @interface ProfileViewController ()
 @property (weak, nonatomic) IBOutlet UILabel *userIdLabel;
 
 @end
 
+
 @implementation ProfileViewController
+
+#pragma mark - Actions
+
+- (IBAction)_closeButtonAction:(id)sender {
+    [self dismissViewControllerAnimated:YES completion:^{
+        [[NavigationService sharedService] syncStateByRemovingLastNode];
+    }];
+}
+
+#pragma mark - UIViewController
 
 - (void)viewDidLoad {
     [super viewDidLoad];
