@@ -11,13 +11,15 @@
 
 #import <Vespucci/Vespucci.h>
 #import <ReactiveCocoa/RACSubject.h>
+#import <ReactiveCocoa/RACEXTScope.h>
 
 
+NSString *const RootNodeId = @"root";
 NSString *const MessagesNodeId = @"root.messages";
 NSString *const SingleMessageNodeId = @"root.messages.message";
 NSString *const NotificationsNodeId = @"root.notification";
 NSString *const ProfileNodeId = @"root.notifications.profile";
-NSString *const RootNodeId = @"root";
+NSString *const BlockUserNodeId = @"root.notifications.profile.block";
 
 
 @interface NavigationService ()
@@ -85,16 +87,29 @@ NSString *const RootNodeId = @"root";
     
     // Message for id
     [self.navigationManager registerNavigationForRoute:[self messageForIdRoute] handler:^WMLNavigationNode *(NSDictionary *parameters) {
-        WMLNavigationNode *node = [[WMLNavigationNode alloc] initWithNavigationParameters:parameters];
-        node.nodeId = SingleMessageNodeId;
-        node.viewController = [storyboard instantiateViewControllerWithIdentifier:@"MessageViewController"];
+        WMLNavigationNode *message = [[WMLNavigationNode alloc] initWithNavigationParameters:parameters];
+        message.nodeId = SingleMessageNodeId;
+        message.viewController = [storyboard instantiateViewControllerWithIdentifier:@"MessageViewController"];
        
         WMLNavigationNode *currentRoot = [self.navigationManager.navigationRoot copy];
-        currentRoot.leaf.child = node;
+        currentRoot.leaf.child = message;
         
         return currentRoot;
     }];
     
+    // Messages
+    [self.navigationManager registerNavigationForRoute:[self messagesRoute] handler:^WMLNavigationNode *(NSDictionary *parameters) {
+        WMLNavigationNode *messages = [[WMLNavigationNode alloc] initWithNavigationParameters:parameters];
+        messages.nodeId = MessagesNodeId;
+        messages.viewController = rootViewController.viewControllers[0];
+        
+        WMLNavigationNode *root = [[WMLNavigationNode alloc] initWithNavigationParameters:parameters];
+        root.nodeId = RootNodeId;
+        root.viewController = rootViewController;
+        root.child = messages;
+
+        return root;
+    }];
 
     // Profile
 
@@ -148,7 +163,7 @@ NSString *const RootNodeId = @"root";
 
     [self.navigationManager addRuleForHostNodeId:RootNodeId childNodeId:NotificationsNodeId mountBlock:^RACSignal *(UIViewController *parent, UIViewController *child, BOOL animated) {
         return [RACSignal createSignal:^RACDisposable *(id<RACSubscriber> subscriber) {
-            ((UITabBarController *)parent).selectedViewController = child;
+            ((UITabBarController *)parent).selectedIndex = 1;
             [subscriber sendCompleted];
             return nil;
         }];
@@ -169,7 +184,7 @@ NSString *const RootNodeId = @"root";
 
     [self.navigationManager addRuleForHostNodeId:RootNodeId childNodeId:MessagesNodeId mountBlock:^RACSignal *(UIViewController *parent, UIViewController *child, BOOL animated) {
         return [RACSignal createSignal:^RACDisposable *(id<RACSubscriber> subscriber) {
-            ((UITabBarController *)parent).selectedViewController = child;
+            ((UITabBarController *)parent).selectedIndex = 0;
             [subscriber sendCompleted];
             return nil;
         }];
@@ -205,8 +220,27 @@ NSString *const RootNodeId = @"root";
         }];
     }];
 
+    @weakify(self);
+    [self.navigationManager addRuleForHostNodeId:ProfileNodeId childNodeId:BlockUserNodeId mountBlock:^RACSignal *(UIViewController *parent, UIViewController *child, BOOL animated) {
+        return [RACSignal createSignal:^RACDisposable *(id <RACSubscriber> subscriber) {
+            [parent presentViewController:child animated:animated completion:^{
+                dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(4 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+                    @strongify(self);
+                    [[UIApplication sharedApplication] openURL:[self messagesURL]];
+                });
+                [subscriber sendCompleted];
+            }];
+            return nil;
+        }];
+    } dismounBlock:^RACSignal *(UIViewController *parent, UIViewController *child, BOOL animated) {
+        return [RACSignal createSignal:^RACDisposable *(id <RACSubscriber> subscriber) {
+            [child dismissViewControllerAnimated:animated completion:^{
+                [subscriber sendCompleted];
+            }];
+            return nil;
+        }];
+    }];
 }
-
 
 @end
 
@@ -241,14 +275,28 @@ NSString *const RootNodeId = @"root";
     return [self _urlFromRoute:[self notificationsRoute] parameters:nil];
 }
 
+- (NSURL *)blockUserWithUserIdURL:(NSString *)userId {
+    return [self _urlFromRoute:[self profileForIdRoute] parameters:@{
+       @"userId": userId,
+       @"action": @"block"
+    }];
+}
+
 #pragma mark - Private
 
 - (NSURL *)_urlFromRoute:(NSString *)route parameters:(NSDictionary *)parameters {
     // "animated=true" -> animate all the transitions
     NSMutableString *URLString = [NSMutableString stringWithFormat:@"%@://%@?animated=true", AppSpecificURLScheme, route];
+    NSMutableDictionary *dictionary = [parameters mutableCopy];
     for (NSString *key in parameters) {
         NSString *normalizedKey = [NSString stringWithFormat:@":%@", key];
-        [URLString replaceOccurrencesOfString:normalizedKey  withString:parameters[key] options:0 range:NSMakeRange(0, URLString.length)];
+        NSUInteger numberOfOccurrences = [URLString replaceOccurrencesOfString:normalizedKey  withString:parameters[key] options:0 range:NSMakeRange(0, URLString.length)];
+        if (numberOfOccurrences) {
+            [dictionary removeObjectForKey:key];
+        }
+    }
+    for (NSString *key in dictionary) {
+        [URLString appendFormat:@"&%@=%@", key, dictionary[key]];
     }
     return [NSURL URLWithString:URLString];
 }

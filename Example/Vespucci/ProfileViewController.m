@@ -41,4 +41,13 @@
     RAC(self.userIdLabel, text) = RACObserve(self, userId);
 }
 
+- (void)viewDidAppear:(BOOL)animated {
+    [super viewDidAppear:animated];
+    
+    if ([self.navigationNode.parameters[@"action"] isEqualToString:@"block"]) {
+        UIAlertView *alertView = [[UIAlertView alloc] initWithTitle:[NSString stringWithFormat:@"Block %@?", self.userId] message:nil delegate:nil cancelButtonTitle:@"Cancel" otherButtonTitles:@"Block", nil];
+        [alertView show];
+    }
+}
+
 @end

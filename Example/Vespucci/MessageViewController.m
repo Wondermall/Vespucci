@@ -50,7 +50,8 @@
 }
 
 - (IBAction)_blockButtonAction:(id)sender {
-
+    NSURL *URL = [[NavigationService sharedService] blockUserWithUserIdURL:self.userId];
+    [[UIApplication sharedApplication] openURL:URL];
 }
 
 @end

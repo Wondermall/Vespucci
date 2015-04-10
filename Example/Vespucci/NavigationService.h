@@ -9,11 +9,12 @@
 /**
  * Node Identifiers
  */
+extern NSString *const RootNodeId;
 extern NSString *const MessagesNodeId;
 extern NSString *const SingleMessageNodeId;
 extern NSString *const NotificationsNodeId;
 extern NSString *const ProfileNodeId;
-extern NSString *const RootNodeId;
+extern NSString *const BlockUserNodeId;
 
 
 static NSString *const AppSpecificURLScheme = @"vsp";
@@ -41,6 +42,8 @@ static NSString *const AppSpecificURLScheme = @"vsp";
 - (NSURL *)profileURLForUser:(NSString *)userId;
 
 - (NSURL *)notificationsURL;
+
+- (NSURL *)blockUserWithUserIdURL:(NSString *)userId;
 
 @end
 
