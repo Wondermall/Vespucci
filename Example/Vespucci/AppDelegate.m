@@ -23,7 +23,7 @@
     self.window.tintColor = [UIColor whiteColor];
     
     // We don't remove these observers from those only because this is a demo.
-    
+#ifdef DEBUG
     [[NSNotificationCenter defaultCenter] addObserverForName:WMLNavigationManagerDidFinishNavigationNotification object:nil queue:nil usingBlock:^(NSNotification *note) {
         WMLNavigationNode *node = note.userInfo[WMLNavigationManagerNotificationNodeKey];
         NSLog(@"Navigation manager did finish navigation.\nNode: %@\nParameters: %@", node.root, note.userInfo[WMLNavigationManagerNotificationParametersKey]);
@@ -32,6 +32,7 @@
     [[NSNotificationCenter defaultCenter] addObserverForName:WMLNavigationManagerDidFailNavigationNotification object:nil queue:nil usingBlock:^(NSNotification *note) {
         NSLog(@"Navigation manager did FAIL navigation.\nNode: %@\nParameters: %@", note.userInfo[WMLNavigationManagerNotificationNodeKey], note.userInfo[WMLNavigationManagerNotificationParametersKey]);
     }];
+#endif
     
     return YES;
 }

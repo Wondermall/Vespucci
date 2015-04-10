@@ -123,7 +123,7 @@ NSString *const RootNodeId = @"root";
     }];
 
 
-    // Root -> Profile
+    // Notifications -> Profile
 
     [self.navigationManager addRuleForHostNodeId:NotificationsNodeId childNodeId:ProfileNodeId mountBlock:^RACSignal *(UIViewController *parent, UIViewController *child, BOOL animated) {
         RACSubject *subject = [RACSubject subject];
