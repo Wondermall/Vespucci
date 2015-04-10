@@ -250,14 +250,33 @@ NSString *const WMLNavigationManagerNotificationParametersKey = @"WMLNavigationM
 - (RACSignal *)dismountForHost:(WMLNavigationNode *)host animated:(BOOL)animated {
     // TODO: should dismount all children not just immediate one
     // i.e. if there are popups or alerts or something like that, they won't disappear by dismounting immediate child
-    __WMLMountingTuple *tuple = [self _tupleForHostNodeId:host.nodeId childNodeId:host.child.nodeId];
-    WMLNavigationNodeViewControllerDismountHandler dismountBlock = tuple.dismountHandler;
-    NSAssert(!host.child || dismountBlock, @"Don't know how to dismount current child %@", host.child);
+    if (!host.child) {
+        return [RACSignal empty];
+    }
 
-    RACSignal *dismount = dismountBlock ? dismountBlock(host.viewController, host.child.viewController, animated) : nil;
-    dismount = dismount ?: [RACSignal empty];
-    dismount.name = @"dismount";
-    return dismount;
+    RACSignal *result = nil, *currentSignal = nil;
+    WMLNavigationNode *currentHost = host.leaf.parent;
+    do {
+        __WMLMountingTuple *tuple = [self _tupleForHostNodeId:currentHost.nodeId childNodeId:currentHost.child.nodeId];
+        WMLNavigationNodeViewControllerDismountHandler dismountBlock = tuple.dismountHandler;
+        NSAssert(dismountBlock, @"Don't know how to dismount current child %@", host.child);
+        RACSignal *dismount = dismountBlock(host.viewController, host.child.viewController, animated) ?: [RACSignal empty];
+        dismount = dismount ?: [RACSignal empty];
+        dismount.name = @"dismount";
+        
+        if (!result) {
+            result = dismount;
+        }
+        if (currentSignal) {
+            currentSignal = [currentSignal concat:dismount];
+        } else {
+            currentSignal = dismount;
+        }
+        
+        currentHost = currentHost.parent;
+    } while (![currentHost isEqual:host]);
+
+    return currentSignal;
 }
 
 - (RACSignal *)mountForHost:(WMLNavigationNode *)host newChild:(WMLNavigationNode *)child animated:(BOOL)animated {
