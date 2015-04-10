@@ -20,7 +20,7 @@
 #pragma mark - Private
 
 - (void)_openProfile {
-    NSURL *URL = [[NavigationService sharedService] profileURLForUser:[self _randomId]];
+    NSURL *URL = [[NavigationService sharedService] profileURLForUser:@"Johny"];
     [[UIApplication sharedApplication] openURL:URL];
 }
 
@@ -35,7 +35,7 @@
 }
 
 - (NSString *)_randomId {
-    return [NSString stringWithFormat:@"%X %X", arc4random_uniform(0xFFFFFF), arc4random_uniform(0xFFFFFF)];
+    return [NSString stringWithFormat:@"%X-%X", arc4random_uniform(0xFFFFFF), arc4random_uniform(0xFFFFFF)];
 }
 
 #pragma mark - UITableViewControllerDelegate

@@ -290,10 +290,18 @@
                     </navigationItem>
                     <simulatedNavigationBarMetrics key="simulatedTopBarMetrics" prompted="NO"/>
                     <connections>
+                        <outlet property="blockBarButtonItem" destination="fwb-uc-5Fi" id="WS1-m4-ta4"/>
                         <outlet property="messageIdLabel" destination="Ty1-tz-lAY" id="0aj-8g-fKz"/>
+                        <outlet property="profileBarButtonItem" destination="aK1-Rh-aMq" id="SBb-ne-OjG"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="6do-jW-Yhw" userLabel="First Responder" sceneMemberID="firstResponder"/>
+                <barButtonItem title="Block" style="done" id="fwb-uc-5Fi">
+                    <color key="tintColor" red="0.7254902124" green="0.2117647231" blue="0.16862745579999999" alpha="1" colorSpace="deviceRGB"/>
+                    <connections>
+                        <action selector="_blockButtonAction:" destination="mWd-0X-ZUy" id="0Gi-ST-OQr"/>
+                    </connections>
+                </barButtonItem>
             </objects>
             <point key="canvasLocation" x="1767" y="-398"/>
         </scene>
@@ -308,7 +316,7 @@
                         <sections>
                             <tableViewSection id="b7A-GJ-09V">
                                 <cells>
-                                    <tableViewCell contentMode="scaleToFill" selectionStyle="none" indentationWidth="10" textLabel="dyp-zM-TI7" detailTextLabel="aeO-LL-i68" style="IBUITableViewCellStyleSubtitle" id="APB-YQ-Bln">
+                                    <tableViewCell contentMode="scaleToFill" selectionStyle="gray" indentationWidth="10" textLabel="dyp-zM-TI7" detailTextLabel="aeO-LL-i68" style="IBUITableViewCellStyleSubtitle" id="APB-YQ-Bln">
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="APB-YQ-Bln" id="Sfq-27-d2Z">
                                             <autoresizingMask key="autoresizingMask"/>
@@ -344,7 +352,7 @@
                                         </tableViewCellContentView>
                                         <color key="backgroundColor" red="0.55294120309999995" green="0.2078431547" blue="0.69019609689999994" alpha="1" colorSpace="deviceRGB"/>
                                     </tableViewCell>
-                                    <tableViewCell contentMode="scaleToFill" selectionStyle="none" indentationWidth="10" textLabel="Ew9-fu-QoG" detailTextLabel="etm-NK-kAc" style="IBUITableViewCellStyleSubtitle" id="DyM-vV-36m">
+                                    <tableViewCell contentMode="scaleToFill" selectionStyle="gray" indentationWidth="10" textLabel="Ew9-fu-QoG" detailTextLabel="etm-NK-kAc" style="IBUITableViewCellStyleSubtitle" id="DyM-vV-36m">
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="DyM-vV-36m" id="q3k-mt-hwZ">
                                             <autoresizingMask key="autoresizingMask"/>
