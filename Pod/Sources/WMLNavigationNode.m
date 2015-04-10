@@ -66,6 +66,14 @@
     child.parent = self;
 }
 
+- (void)setViewController:(UIViewController *)viewController {
+    _viewController = viewController;
+
+    if ([viewController conformsToProtocol:@protocol(WMLNavigationParametrizedViewController)]) {
+        ((id <WMLNavigationParametrizedViewController>)viewController).navigationNode = self;
+    }
+}
+
 - (WMLNavigationNode *)leaf {
     WMLNavigationNode *node = self;
     while (node.child) {
