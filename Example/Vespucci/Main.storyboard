@@ -33,7 +33,7 @@
                                                         </fragment>
                                                         <fragment content=" ">
                                                             <attributes>
-                                                                <color key="NSColor" cocoaTouchSystemColor="darkTextColor"/>
+                                                                <color key="NSColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
                                                                 <font key="NSFont" size="16" name="HelveticaNeue"/>
                                                                 <paragraphStyle key="NSParagraphStyle" alignment="left" lineBreakMode="wordWrapping" baseWritingDirection="natural"/>
                                                             </attributes>
@@ -75,7 +75,7 @@
                                                         </fragment>
                                                         <fragment content=" ">
                                                             <attributes>
-                                                                <color key="NSColor" cocoaTouchSystemColor="darkTextColor"/>
+                                                                <color key="NSColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
                                                                 <font key="NSFont" size="16" name="HelveticaNeue"/>
                                                                 <paragraphStyle key="NSParagraphStyle" alignment="left" lineBreakMode="wordWrapping" baseWritingDirection="natural"/>
                                                             </attributes>
@@ -117,7 +117,7 @@
                                                         </fragment>
                                                         <fragment content=" ">
                                                             <attributes>
-                                                                <color key="NSColor" cocoaTouchSystemColor="darkTextColor"/>
+                                                                <color key="NSColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
                                                                 <font key="NSFont" size="16" name="HelveticaNeue"/>
                                                                 <paragraphStyle key="NSParagraphStyle" alignment="left" lineBreakMode="wordWrapping" baseWritingDirection="natural"/>
                                                             </attributes>
@@ -228,7 +228,11 @@
                         </constraints>
                     </view>
                     <navigationItem key="navigationItem" title="Profile" id="7N3-WE-yB8">
-                        <barButtonItem key="rightBarButtonItem" title="Close" style="done" id="rYL-Dt-CdB"/>
+                        <barButtonItem key="rightBarButtonItem" title="Close" style="done" id="rYL-Dt-CdB">
+                            <connections>
+                                <action selector="_closeButtonAction:" destination="d8n-mF-jdz" id="pOI-RZ-I4A"/>
+                            </connections>
+                        </barButtonItem>
                     </navigationItem>
                     <simulatedNavigationBarMetrics key="simulatedTopBarMetrics" barStyle="black" prompted="NO"/>
                     <connections>

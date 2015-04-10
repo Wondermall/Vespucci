@@ -14,7 +14,7 @@
 
 @interface ProfileViewController ()
 @property (weak, nonatomic) IBOutlet UILabel *userIdLabel;
-
+@property (nonatomic, copy) NSString *userId;
 @end
 
 
@@ -33,10 +33,12 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     
-    RAC(self.userIdLabel, text) = [RACObserve(self, navigationNode.parameters)
+    RAC(self, userId) = [RACObserve(self, navigationNode.parameters)
         map:^id(NSDictionary *dictionary) {
             return dictionary[@"userId"];
         }];
+    
+    RAC(self.userIdLabel, text) = RACObserve(self, userId);
 }
 
 @end

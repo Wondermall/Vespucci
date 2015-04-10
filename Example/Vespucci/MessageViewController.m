@@ -14,6 +14,7 @@
 
 @interface MessageViewController ()
 @property (weak, nonatomic) IBOutlet UILabel *messageIdLabel;
+@property (nonatomic, copy) NSString *userId;
 @end
 
 @implementation MessageViewController
@@ -21,10 +22,11 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     
-    RAC(self.messageIdLabel, text) = [RACObserve(self, navigationNode)
+    RAC(self, userId) = [RACObserve(self, navigationNode)
         map:^id(WMLNavigationNode *node) {
             return node.parameters[@"messageId"];
         }];
+    RAC(self.messageIdLabel, text) = RACObserve(self, userId);
 }
 
 - (IBAction)_closeButtonAction:(id)sender {
