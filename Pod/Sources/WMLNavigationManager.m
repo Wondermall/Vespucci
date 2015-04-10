@@ -232,29 +232,24 @@ NSString *const WMLNavigationManagerNotificationParametersKey = @"WMLNavigationM
     *child = proposedChild;
     *host = proposedHost;
     
-    RACSignal *dismount = [self dismountForHost:proposedHost animated:animated];
+    RACSignal *dismount = [self _dismountForHost:proposedHost animated:animated];
     dismount = [dismount doCompleted:^{
         proposedHost.child = proposedChild;
-        if ([proposedChild.viewController conformsToProtocol:@protocol(WMLNavigationParametrizedViewController)]) {
-            ((id<WMLNavigationParametrizedViewController>)proposedChild.viewController).navigationNode = proposedChild;
-        }
     }];
 
-    RACSignal *mount = [self mountForHost:proposedHost newChild:proposedChild animated:animated];
+    RACSignal *mount = [self _mountForHost:proposedHost newChild:proposedChild animated:animated];
     [[dismount
         concat:mount]
         subscribe:subject];
     return [subject replayLast];
 }
 
-- (RACSignal *)dismountForHost:(WMLNavigationNode *)host animated:(BOOL)animated {
-    // TODO: should dismount all children not just immediate one
-    // i.e. if there are popups or alerts or something like that, they won't disappear by dismounting immediate child
+- (RACSignal *)_dismountForHost:(WMLNavigationNode *)host animated:(BOOL)animated {
     if (!host.child) {
         return [RACSignal empty];
     }
 
-    RACSignal *result = nil, *currentSignal = nil;
+    RACSignal *result = nil;
     WMLNavigationNode *currentHost = host.leaf.parent;
     do {
         __WMLMountingTuple *tuple = [self _tupleForHostNodeId:currentHost.nodeId childNodeId:currentHost.child.nodeId];
@@ -262,40 +257,31 @@ NSString *const WMLNavigationManagerNotificationParametersKey = @"WMLNavigationM
         NSAssert(dismountBlock, @"Don't know how to dismount current child %@", host.child);
         RACSignal *dismount = dismountBlock(host.viewController, host.child.viewController, animated) ?: [RACSignal empty];
         dismount = dismount ?: [RACSignal empty];
-        dismount.name = @"dismount";
-        
-        if (!result) {
-            result = dismount;
-        }
-        if (currentSignal) {
-            currentSignal = [currentSignal concat:dismount];
+        if (result) {
+            result = [result concat:dismount];
         } else {
-            currentSignal = dismount;
+            result = dismount;
         }
         
         currentHost = currentHost.parent;
     } while (![currentHost isEqual:host]);
 
-    return currentSignal;
+    return result;
 }
 
-- (RACSignal *)mountForHost:(WMLNavigationNode *)host newChild:(WMLNavigationNode *)child animated:(BOOL)animated {
-    RACSignal *result = nil, *currentSignal = nil;
+- (RACSignal *)_mountForHost:(WMLNavigationNode *)host newChild:(WMLNavigationNode *)child animated:(BOOL)animated {
+    RACSignal *result = nil;
 
     while (child) {
-        __WMLMountingTuple * tuple = [self _tupleForHostNodeId:host.nodeId childNodeId:child.nodeId];
+        __WMLMountingTuple *tuple = [self _tupleForHostNodeId:host.nodeId childNodeId:child.nodeId];
         WMLNavigationNodeViewControllerMountHandler mountBlock = tuple.mountHandler;
         NSAssert(!child || mountBlock, @"Don't know hot to mount new child %@", child);
-        // TODO: mount children recursively not just the first one
-        RACSignal *mount = mountBlock(host.viewController, child.viewController, animated) ?: [RACSignal empty];
-        mount.name = @"mount";
+        
         if (!result) {
-            result = mount;
-        }
-        if (currentSignal) {
-            currentSignal = [currentSignal concat:mount];
+            result = mountBlock(host.viewController, child.viewController, animated) ?: [RACSignal empty];
         } else {
-            currentSignal = mount;
+            RACSignal *mount = mountBlock(host.viewController, child.viewController, animated) ?: [RACSignal empty];
+            result = [result concat:mount];
         }
 
         host = child;
