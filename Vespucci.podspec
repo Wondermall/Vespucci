@@ -10,9 +10,9 @@
 Pod::Spec.new do |s|
   s.name             = "Vespucci"
   s.version          = "0.1.0"
-  s.summary          = "Routing made simple. Not only for UINavigationController."
+  s.summary          = "Navigation microframework"
   s.description      = <<-DESC
-                        Routing made simple:
+                        Routing made simple. Not only for UINavigationController.
 
                         1. Register route.
                         2. Explain how to present view controller.
@@ -29,8 +29,6 @@ Pod::Spec.new do |s|
   s.requires_arc = true
 
   s.source_files = 'Pod/Sources/**/*'
-  # s.public_header_files = 'Pod/Classes/**/*.h'
-  # s.frameworks = 'UIKit', 'MapKit'
   s.dependency 'ReactiveCocoa', '~> 2.4'
   s.dependency 'JLRoutes', '~> 1.5.2'
 end
