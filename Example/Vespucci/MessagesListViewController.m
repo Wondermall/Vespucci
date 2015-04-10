@@ -10,7 +10,7 @@
 #import "NavigationService.h"
 
 @interface MessagesListViewController ()
-@property (nonatomic, copy) NSArray *messageIds;
+@property (nonatomic, copy) NSArray *userIds;
 @end
 
 
@@ -21,21 +21,21 @@
     if (!self) {
         return nil;
     }
-    self.messageIds = @[ @"Stephany", @"Johny" ];
+    self.userIds = @[ @"Stephany", @"Johny" ];
     return self;
 }
 
 #pragma mark - Private
 
-- (void)_openMessageForIndex:(NSUInteger)row {
-    NSURL *URL = [[NavigationService sharedService] messageURLForMessageId:self.messageIds[row]];
+- (void)_openConversationAtIndex:(NSUInteger)row {
+    NSURL *URL = [[NavigationService sharedService] messageURLForMessageId:self.userIds[row]];
     [[UIApplication sharedApplication] openURL:URL];
 }
 
 #pragma mark - UITableViewDelegate
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
-    [self _openMessageForIndex:indexPath.row];
+    [self _openConversationAtIndex:indexPath.row];
 }
 
 @end
