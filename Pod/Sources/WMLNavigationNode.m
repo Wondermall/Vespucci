@@ -127,13 +127,6 @@
 @end
 
 
-@implementation WMLNavigationNode (Hosting)
-
-#pragma mark - Public
-
-@end
-
-
 @implementation WMLNavigationNode (Debugging)
 
 - (NSString *)recursiveDescription {
