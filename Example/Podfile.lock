@@ -12,13 +12,11 @@ PODS:
   - Vespucci (0.1.0):
     - JLRoutes (~> 1.5.2)
     - ReactiveCocoa (~> 2.4)
-  - WMLDI (0.1.0)
 
 DEPENDENCIES:
   - Expecta
   - Specta
   - Vespucci (from `../`)
-  - WMLDI (~> 0.1.0)
 
 EXTERNAL SOURCES:
   Vespucci:
@@ -29,7 +27,6 @@ SPEC CHECKSUMS:
   JLRoutes: fc36fd38ab476d5ac3a6a84b05be60e4b1a2bc81
   ReactiveCocoa: eb38dee0a0e698f73a9b25e5c1faea2bb4c79240
   Specta: eb90708ed77569bbda089f8ead10bb99b8e9489e
-  Vespucci: f80c0558a5d2731084642bc851891971f8a290c7
-  WMLDI: a925c2437f38acb5fa32d52addde2b81be7394da
+  Vespucci: 655055520e8b8f0aa0757ccd2f3e6891ba6a41a4
 
 COCOAPODS: 0.36.0
