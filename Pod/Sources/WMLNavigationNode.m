@@ -108,7 +108,7 @@
 }
 
 - (BOOL)isEqualToNode:(WMLNavigationNode *)node {
-    return [self.nodeId isEqual:node.nodeId] && (!self.child || (self.child && [self.child isEqual:node.child]));
+    return [self.nodeId isEqual:node.nodeId] && (!self.child || [self.child isEqual:node.child]);
 }
 
 - (NSUInteger)hash {
@@ -130,19 +130,6 @@
 @implementation WMLNavigationNode (Hosting)
 
 #pragma mark - Public
-
-- (void)addIsDataEqualRule:(WMLNavigationNodeLogicalEqualityRule)rule {
-    [self.logicalEqualityRules addObject:[rule copy]];
-}
-
-- (BOOL)containsSameDataAsNode:(WMLNavigationNode *)node {
-    for (WMLNavigationNodeLogicalEqualityRule rule in self.logicalEqualityRules) {
-        if (rule(self, node)) {
-            return YES;
-        }
-    }
-    return [self.nodeId isEqualToString:node.nodeId];
-}
 
 @end
 

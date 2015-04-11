@@ -194,7 +194,7 @@ NSString *const WMLNavigationManagerNotificationParametersKey = @"WMLNavigationM
     }
     WMLNavigationNode *child = *inOutChild;
     WMLNavigationNode *parent = *inOutParent;
-    if ([parent containsSameDataAsNode:child]) {
+    if ([parent.nodeId isEqualToString:child.nodeId]) {
         WMLNavigationNode *proposedParent = parent.child;
         WMLNavigationNode *grandchild = child.child;
         if ([self _getHost:&proposedParent forChild:&grandchild]) {

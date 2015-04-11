@@ -76,17 +76,6 @@ typedef UIViewController *(^WMLNavigationNodeViewControllerFactory)(NSDictionary
 @end
 
 
-typedef BOOL(^WMLNavigationNodeLogicalEqualityRule)(WMLNavigationNode *node1, WMLNavigationNode *node2);
-
-@interface WMLNavigationNode (Hosting)
-
-- (void)addIsDataEqualRule:(WMLNavigationNodeLogicalEqualityRule)rule;
-
-- (BOOL)containsSameDataAsNode:(WMLNavigationNode *)node;
-
-@end
-
-
 @interface WMLNavigationNode (Debugging)
 
 - (NSString *)recursiveDescription;
