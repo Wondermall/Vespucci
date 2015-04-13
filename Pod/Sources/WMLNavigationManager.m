@@ -99,7 +99,7 @@ NSString *const WMLNavigationManagerNotificationParametersKey = @"WMLNavigationM
 - (BOOL)handleURL:(NSURL *)URL {
     // TODO: add support for relative URLs here
     if ([self.URL isEqual:URL]) {
-        return NO;
+        return YES;
     }
     BOOL didNavigate = [self.router routeURL:URL];
     if (didNavigate) {
