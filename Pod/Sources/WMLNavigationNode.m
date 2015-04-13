@@ -32,10 +32,8 @@
 
 #pragma mark - Lifecycle
 
-+ (instancetype)navigationNodeWithName:(NSString *)name {
-    WMLNavigationNode *item = [WMLNavigationNode new];
-    item.name = name;
-    return item;
++ (instancetype)nodeWithParameters:(NSDictionary *)parameters {
+    return [[WMLNavigationNode alloc] initWithNavigationParameters:parameters];
 }
 
 + (instancetype)node {
