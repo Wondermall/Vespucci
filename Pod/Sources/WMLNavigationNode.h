@@ -27,6 +27,16 @@ typedef UIViewController *(^WMLNavigationNodeViewControllerFactory)(NSDictionary
 @class RACSignal;
 @interface WMLNavigationNode : NSObject <NSCopying>
 
+/**
+ *  Creates a chain of @c WMLNavigationNode with, returns the @c root node.
+ *
+ *  @param parameters navigation parameters passed to each node in the chain
+ *  @param nodeId    @c nodeIds used for creating the chain
+ *
+ *  @return A root of the chain of @c WMLNavigationNode
+ */
++ (instancetype)rootNodeForParameters:(NSDictionary *)parameters nodeIds:(NSString *)nodeId, ... NS_REQUIRES_NIL_TERMINATION;
+
 + (instancetype)nodeWithParameters:(NSDictionary *)parameters;
 
 + (instancetype)node;

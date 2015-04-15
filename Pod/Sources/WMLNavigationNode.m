@@ -32,6 +32,23 @@
 
 #pragma mark - Lifecycle
 
++ (instancetype)rootNodeForParameters:(NSDictionary *)parameters nodeIds:(NSString *)nodeId, ... {
+    WMLNavigationNode *root = [[self alloc] initWithNavigationParameters:parameters];
+    root.nodeId = nodeId;
+    WMLNavigationNode *previousNode = root;
+    va_list list;
+    va_start(list, nodeId);
+    NSString *currentNodeId;
+    while (currentNodeId = va_arg(list, NSString *)) {
+        WMLNavigationNode *node = [[WMLNavigationNode alloc] initWithNavigationParameters:parameters];
+        node.nodeId = currentNodeId;
+        previousNode.child = node;
+        previousNode = node;
+    }
+    va_end(list);
+    return root;
+}
+
 + (instancetype)nodeWithParameters:(NSDictionary *)parameters {
     return [[WMLNavigationNode alloc] initWithNavigationParameters:parameters];
 }
