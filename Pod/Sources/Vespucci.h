@@ -8,3 +8,4 @@
 
 #import "WMLNavigationManager.h"
 #import "WMLNavigationNode.h"
+#import "WMLNavigatable.h"

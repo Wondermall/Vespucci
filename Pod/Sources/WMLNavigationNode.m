@@ -15,7 +15,7 @@
 #import "RACEXTScope.h"
 #import "NSArray+RACSequenceAdditions.h"
 #import "NSError+Vespucci.h"
-
+#import "WMLNavigatable.h"
 
 @interface WMLNavigationNode ()
 
@@ -84,8 +84,8 @@
 - (void)setViewController:(UIViewController *)viewController {
     _viewController = viewController;
 
-    if ([viewController conformsToProtocol:@protocol(WMLNavigationParametrizedViewController)]) {
-        ((id <WMLNavigationParametrizedViewController>)viewController).navigationNode = self;
+    if ([viewController conformsToProtocol:@protocol(WMLNavigatable)]) {
+        ((id <WMLNavigatable>)viewController).navigationNode = self;
     }
 }
 
