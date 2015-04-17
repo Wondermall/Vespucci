@@ -39,7 +39,7 @@
     va_list list;
     va_start(list, nodeId);
     NSString *currentNodeId;
-    while (currentNodeId = va_arg(list, NSString *)) {
+    while ((currentNodeId = va_arg(list, NSString *))) {
         WMLNavigationNode *node = [[WMLNavigationNode alloc] initWithNavigationParameters:parameters];
         node.nodeId = currentNodeId;
         previousNode.child = node;
