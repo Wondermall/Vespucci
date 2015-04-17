@@ -11,6 +11,6 @@
 #import <Vespucci/Vespucci.h>
 
 
-@interface ProfileViewController : UIViewController <WMLNavigationParametrizedViewController>
+@interface ProfileViewController : UIViewController <WMLNavigatable>
 @property (nonatomic, weak) WMLNavigationNode *navigationNode;
 @end

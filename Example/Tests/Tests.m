@@ -8,9 +8,9 @@
 
 #import "WMLNavigationNode.h"
 #import "WMLNavigationManager.h"
+#import "WMLNavigatable.h"
 
-
-@interface ViewController : UIViewController <WMLNavigationParametrizedViewController>
+@interface ViewController : UIViewController <WMLNavigatable>
 @property (nonatomic, weak) WMLNavigationNode *navigationNode;
 @end
 
