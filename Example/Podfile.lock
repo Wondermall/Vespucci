@@ -9,7 +9,7 @@ PODS:
   - ReactiveCocoa/UI (2.4.7):
     - ReactiveCocoa/Core
   - Specta (0.5.0)
-  - Vespucci (0.2.0):
+  - Vespucci (0.2.1):
     - JLRoutes (~> 1.5.2)
     - ReactiveCocoa (~> 2.4)
 
@@ -27,6 +27,6 @@ SPEC CHECKSUMS:
   JLRoutes: fc36fd38ab476d5ac3a6a84b05be60e4b1a2bc81
   ReactiveCocoa: eb38dee0a0e698f73a9b25e5c1faea2bb4c79240
   Specta: eb90708ed77569bbda089f8ead10bb99b8e9489e
-  Vespucci: 38f7695c0ac59a4551236f8d1c57aa5dfff5023b
+  Vespucci: 965e04f2836a08b38ab9cef3cb6220caa8c9c852
 
 COCOAPODS: 0.36.3
