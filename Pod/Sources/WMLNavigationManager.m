@@ -250,8 +250,10 @@ NSString *const WMLNavigationManagerNotificationParametersKey = @"WMLNavigationM
     }
 
     RACSignal *result = nil;
-    WMLNavigationNode *currentHost = host.leaf.parent;
+    WMLNavigationNode *currentHost = host.leaf;
     do {
+        currentHost = currentHost.parent;
+        
         __WMLMountingTuple *tuple = [self _tupleForHostNodeId:currentHost.nodeId childNodeId:currentHost.child.nodeId];
         WMLNavigationNodeViewControllerDismountHandler dismountBlock = tuple.dismountHandler;
         NSAssert(dismountBlock, @"Don't know how to dismount current child %@", host.child);
@@ -263,7 +265,6 @@ NSString *const WMLNavigationManagerNotificationParametersKey = @"WMLNavigationM
             result = dismount;
         }
         
-        currentHost = currentHost.parent;
     } while (![currentHost isEqual:host]);
 
     return result;
