@@ -148,7 +148,7 @@
     if (!self.child) {
         return self.description;
     }
-    return [NSString stringWithFormat:@"%@ → %@", self.description, self.child.debugDescription];
+    return [NSString stringWithFormat:@"%@ → %@", self.description, self.child.recursiveDescription];
 }
 
 @end
