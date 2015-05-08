@@ -91,7 +91,7 @@
 }
 
 - (UIViewController *)viewController {
-    if (!_viewController) {
+    if (!_viewController && self.lazyViewControllerFactory) {
         _viewController = self.lazyViewControllerFactory();
         if ([_viewController conformsToProtocol:@protocol(VSPNavigatable)]) {
             ((id<VSPNavigatable>)_viewController).navigationNode = self;
