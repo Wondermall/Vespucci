@@ -11,8 +11,8 @@
 #import <Vespucci/Vespucci.h>
 
 
-@interface MessageViewController : UIViewController <WMLNavigatable>
+@interface MessageViewController : UIViewController <VSPNavigatable>
 
-@property (nonatomic, weak) WMLNavigationNode *navigationNode;
+@property (nonatomic, weak) VSPNavigationNode *navigationNode;
 
 @end

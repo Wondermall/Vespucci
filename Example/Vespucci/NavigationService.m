@@ -24,7 +24,7 @@ NSString *const BlockUserNodeId = @"root.notifications.profile.block";
 
 @interface NavigationService ()
 
-@property (nonatomic) WMLNavigationManager *navigationManager;
+@property (nonatomic) VSPNavigationManager *navigationManager;
 
 @end
 
@@ -63,7 +63,7 @@ NSString *const BlockUserNodeId = @"root.notifications.profile.block";
         return nil;
     }
 
-    self.navigationManager = [[WMLNavigationManager alloc] initWithURLScheme:AppSpecificURLScheme];
+    self.navigationManager = [[VSPNavigationManager alloc] initWithURLScheme:AppSpecificURLScheme];
 
     return self;
 }
@@ -86,24 +86,24 @@ NSString *const BlockUserNodeId = @"root.notifications.profile.block";
 
     
     // Message for id
-    [self.navigationManager registerNavigationForRoute:[self messageForIdRoute] handler:^WMLNavigationNode *(NSDictionary *parameters) {
-        WMLNavigationNode *message = [[WMLNavigationNode alloc] initWithNavigationParameters:parameters];
+    [self.navigationManager registerNavigationForRoute:[self messageForIdRoute] handler:^VSPNavigationNode *(NSDictionary *parameters) {
+        VSPNavigationNode *message = [[VSPNavigationNode alloc] initWithNavigationParameters:parameters];
         message.nodeId = SingleMessageNodeId;
         message.viewController = [storyboard instantiateViewControllerWithIdentifier:@"MessageViewController"];
        
-        WMLNavigationNode *currentRoot = [self.navigationManager.navigationRoot copy];
+        VSPNavigationNode *currentRoot = [self.navigationManager.root copy];
         currentRoot.leaf.child = message;
         
         return currentRoot;
     }];
     
     // Messages
-    [self.navigationManager registerNavigationForRoute:[self messagesRoute] handler:^WMLNavigationNode *(NSDictionary *parameters) {
-        WMLNavigationNode *messages = [[WMLNavigationNode alloc] initWithNavigationParameters:parameters];
+    [self.navigationManager registerNavigationForRoute:[self messagesRoute] handler:^VSPNavigationNode *(NSDictionary *parameters) {
+        VSPNavigationNode *messages = [[VSPNavigationNode alloc] initWithNavigationParameters:parameters];
         messages.nodeId = MessagesNodeId;
         messages.viewController = rootViewController.viewControllers[0];
         
-        WMLNavigationNode *root = [[WMLNavigationNode alloc] initWithNavigationParameters:parameters];
+        VSPNavigationNode *root = [[VSPNavigationNode alloc] initWithNavigationParameters:parameters];
         root.nodeId = RootNodeId;
         root.viewController = rootViewController;
         root.child = messages;
@@ -113,23 +113,23 @@ NSString *const BlockUserNodeId = @"root.notifications.profile.block";
 
     // Profile
 
-    [self.navigationManager registerNavigationForRoute:[self profileForIdRoute] handler:^WMLNavigationNode *(NSDictionary *parameters) {
+    [self.navigationManager registerNavigationForRoute:[self profileForIdRoute] handler:^VSPNavigationNode *(NSDictionary *parameters) {
         // sample check for valid parameters
         if ([parameters[@"userId"] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]].length == 0) {
             // For debug purposes only!
             NSAssert(NO, @"Invalid user id: %@", parameters[@"userId"]);
             return nil;
         }
-        WMLNavigationNode *profile = [[WMLNavigationNode alloc] initWithNavigationParameters:parameters];
+        VSPNavigationNode *profile = [[VSPNavigationNode alloc] initWithNavigationParameters:parameters];
         profile.nodeId = ProfileNodeId;
         profile.viewController = [storyboard instantiateViewControllerWithIdentifier:@"ProfileViewController"];
 
-        WMLNavigationNode *notifications = [[WMLNavigationNode alloc] initWithNavigationParameters:nil];
+        VSPNavigationNode *notifications = [[VSPNavigationNode alloc] initWithNavigationParameters:nil];
         notifications.nodeId = NotificationsNodeId;
         notifications.viewController = rootViewController.viewControllers[1];
         notifications.child = profile;
         
-        WMLNavigationNode *root = [[WMLNavigationNode alloc] initWithNavigationParameters:nil];
+        VSPNavigationNode *root = [[VSPNavigationNode alloc] initWithNavigationParameters:nil];
         root.nodeId = RootNodeId;
         root.viewController = rootViewController;
         root.child = notifications;
@@ -172,8 +172,8 @@ NSString *const BlockUserNodeId = @"root.notifications.profile.block";
         return nil;
     }];
 
-    [self.navigationManager registerNavigationForRoute:[self notificationsRoute] handler:^WMLNavigationNode *(NSDictionary *parameters) {
-        WMLNavigationNode *node = [[WMLNavigationNode alloc] initWithNavigationParameters:parameters];
+    [self.navigationManager registerNavigationForRoute:[self notificationsRoute] handler:^VSPNavigationNode *(NSDictionary *parameters) {
+        VSPNavigationNode *node = [[VSPNavigationNode alloc] initWithNavigationParameters:parameters];
         node.nodeId = NotificationsNodeId;
         node.viewController = ((UITabBarController *)rootViewController).viewControllers[1];
         return node;
@@ -194,8 +194,8 @@ NSString *const BlockUserNodeId = @"root.notifications.profile.block";
 
     // Root -> Messages
 
-    [self.navigationManager registerNavigationForRoute:[self notificationsRoute] handler:^WMLNavigationNode *(NSDictionary *parameters) {
-        WMLNavigationNode *node = [[WMLNavigationNode alloc] initWithNavigationParameters:parameters];
+    [self.navigationManager registerNavigationForRoute:[self notificationsRoute] handler:^VSPNavigationNode *(NSDictionary *parameters) {
+        VSPNavigationNode *node = [[VSPNavigationNode alloc] initWithNavigationParameters:parameters];
         node.nodeId = MessagesNodeId;
         node.viewController = ((UITabBarController *)rootViewController).viewControllers[0];
         return node;
@@ -336,7 +336,7 @@ NSString *const BlockUserNodeId = @"root.notifications.profile.block";
     NSAssert(selectedViewController.childViewControllers.count == 0, @"Syncronization called in unexpected state");
 
     NSURL *URL;
-    WMLNavigationNode *child = [WMLNavigationNode node];
+    VSPNavigationNode *child = [VSPNavigationNode node];
     if ([selectedViewController isKindOfClass:[MessagesListViewController class]]) {
         URL = [self messagesURL];
         child.nodeId = MessagesNodeId;
@@ -345,7 +345,7 @@ NSString *const BlockUserNodeId = @"root.notifications.profile.block";
         child.nodeId = NotificationsNodeId;
     }
     child.viewController = tabController.selectedViewController;
-    WMLNavigationNode *root = [WMLNavigationNode node];
+    VSPNavigationNode *root = [VSPNavigationNode node];
     root.nodeId = RootNodeId;
     root.child = child;
     root.viewController = tabController;
@@ -358,8 +358,8 @@ NSString *const BlockUserNodeId = @"root.notifications.profile.block";
     components.query = nil;
     components.path = [components.path stringByDeletingLastPathComponent];
     NSURL *URL = components.URL;
-    WMLNavigationNode *node = [self.navigationManager.navigationRoot copy];
-    // TODO: can make it nicer by adding -[WMLNavigationNode removeFromParent]
+    VSPNavigationNode *node = [self.navigationManager.root copy];
+    // TODO: can make it nicer by adding -[VSPNavigationNode removeFromParent]
     node.leaf.parent.child = nil;
     [self.navigationManager setNavigationRoot:node URL:URL];
 }

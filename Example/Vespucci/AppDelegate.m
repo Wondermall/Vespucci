@@ -9,7 +9,7 @@
 #import "AppDelegate.h"
 
 #import "NavigationService.h"
-#import <Vespucci/WMLNavigationManager.h>
+#import <Vespucci/VSPNavigationManager.h>
 
 
 @interface AppDelegate ()
@@ -24,13 +24,13 @@
     
 #ifdef DEBUG
     // Just for the purpose of the demo
-    [[NSNotificationCenter defaultCenter] addObserverForName:WMLNavigationManagerDidFinishNavigationNotification object:nil queue:nil usingBlock:^(NSNotification *note) {
-        WMLNavigationNode *node = note.userInfo[WMLNavigationManagerNotificationNodeKey];
-        NSLog(@"Navigation manager did finish navigation.\nNode: %@\nParameters: %@", node.root, note.userInfo[WMLNavigationManagerNotificationParametersKey]);
+    [[NSNotificationCenter defaultCenter] addObserverForName:VSPNavigationManagerDidFinishNavigationNotification object:nil queue:nil usingBlock:^(NSNotification *note) {
+        VSPNavigationNode *node = note.userInfo[VSPNavigationManagerNotificationNodeKey];
+        NSLog(@"Navigation manager did finish navigation.\nNode: %@\nParameters: %@", node.root, note.userInfo[VSPNavigationManagerNotificationParametersKey]);
     }];
     
-    [[NSNotificationCenter defaultCenter] addObserverForName:WMLNavigationManagerDidFailNavigationNotification object:nil queue:nil usingBlock:^(NSNotification *note) {
-        NSLog(@"Navigation manager did FAIL navigation.\nNode: %@\nParameters: %@", note.userInfo[WMLNavigationManagerNotificationNodeKey], note.userInfo[WMLNavigationManagerNotificationParametersKey]);
+    [[NSNotificationCenter defaultCenter] addObserverForName:VSPNavigationManagerDidFailNavigationNotification object:nil queue:nil usingBlock:^(NSNotification *note) {
+        NSLog(@"Navigation manager did FAIL navigation.\nNode: %@\nParameters: %@", note.userInfo[VSPNavigationManagerNotificationNodeKey], note.userInfo[VSPNavigationManagerNotificationParametersKey]);
     }];
 #endif
     

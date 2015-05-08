@@ -29,7 +29,7 @@
     self.navigationItem.leftBarButtonItems = @[ self.blockBarButtonItem, self.profileBarButtonItem ];
     
     RAC(self, userId) = [RACObserve(self, navigationNode)
-        map:^id(WMLNavigationNode *node) {
+        map:^id(VSPNavigationNode *node) {
             // this is just a demo, right?
             return node.parameters[@"messageId"];
         }];
