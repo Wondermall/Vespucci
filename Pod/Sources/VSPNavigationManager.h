@@ -36,6 +36,7 @@ extern NSString *const VSPNavigationManagerNotificationParametersKey;
 
 @interface VSPNavigationManager (Compatibility)
 
+// TODO: Refactor me into a regular setter of root property
 - (void)setNavigationRoot:(VSPNavigationNode *)navigationRoot;
 
 @end
