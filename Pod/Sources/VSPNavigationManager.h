@@ -18,6 +18,7 @@ extern NSString *const VSPNavigationManagerNotificationParametersKey;
 
 
 @class JLRoutes;
+@class RACSignal;
 @interface VSPNavigationManager : NSObject
 
 @property (nonatomic, readonly) JLRoutes *router;
@@ -30,6 +31,8 @@ extern NSString *const VSPNavigationManagerNotificationParametersKey;
 
 - (BOOL)handleURL:(NSURL *)URL;
 
+- (RACSignal *)navigateWithNewNavigationTree:(VSPNavigationNode *)tree;
+
 @end
 
 
@@ -40,9 +43,8 @@ extern NSString *const VSPNavigationManagerNotificationParametersKey;
 @end
 
 
-@class RACSignal;
-
 typedef RACSignal *(^VSPNavigationNodeViewControllerMountHandler)(UIViewController *parent, UIViewController *child, BOOL animated);
+
 typedef RACSignal *(^VSPNavigationNodeViewControllerDismountHandler)(UIViewController *parent, UIViewController *child, BOOL animated);
 
 

@@ -108,9 +108,14 @@ NSString *const VSPNavigationManagerNotificationParametersKey = @"VSPNavigationM
     return didNavigate;
 }
 
+- (RACSignal *)navigateWithNewNavigationTree:(VSPNavigationNode *)tree {
+    return [self _navigateWithNode:tree parameters:nil];
+}
+
 #pragma mark - Private
 
-- (void)_navigationWithNode:(VSPNavigationNode *)child parameters:(NSDictionary *)parameters {
+// TODO: remove parameters, VSPNavigationNode should have them
+- (RACSignal *)_navigateWithNode:(VSPNavigationNode *)child parameters:(NSDictionary *)parameters {
     NSAssert(self.root, @"No root node installed");
     BOOL animated = NO;
     if (parameters[@"animated"]) {
@@ -128,8 +133,10 @@ NSString *const VSPNavigationManagerNotificationParametersKey = @"VSPNavigationM
         @strongify(self);
         [self _postNotificationNamed:VSPNavigationManagerDidFinishNavigationNotification node:proposedChild.leaf parameters:parameters];
     }];
+    return makeHost;
 }
 
+// TODO: remove parameters, VSPNavigationNode should have them
 - (void)_postNotificationNamed:(NSString *)notificationName node:(VSPNavigationNode *)node parameters:(NSDictionary *)parameters {
     [[NSNotificationCenter defaultCenter] postNotificationName:notificationName object:self userInfo:@{
             VSPNavigationManagerNotificationNodeKey : node ?: [NSNull null],
@@ -137,6 +144,7 @@ NSString *const VSPNavigationManagerNotificationParametersKey = @"VSPNavigationM
     }];
 }
 
+// TODO: remove parameters, VSPNavigationNode should have them
 - (void)_notifyNavigationDidFinishForNode:(VSPNavigationNode *)node parameters:(NSDictionary *)parameters {
     [[NSNotificationCenter defaultCenter] postNotificationName:VSPNavigationManagerDidFinishNavigationNotification object:self userInfo:@{
             VSPNavigationManagerNotificationNodeKey : node ?: [NSNull null],
@@ -160,7 +168,7 @@ NSString *const VSPNavigationManagerNotificationParametersKey = @"VSPNavigationM
         }
         @strongify(self);
         NSAssert(node.viewController, @"No view controller provided, this can't be good!");
-        [self _navigationWithNode:node parameters:parameters];
+        [self _navigateWithNode:node parameters:parameters];
         return YES;
     }];
 }
