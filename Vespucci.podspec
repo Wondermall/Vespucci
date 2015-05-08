@@ -9,7 +9,7 @@
 
 Pod::Spec.new do |s|
   s.name             = "Vespucci"
-  s.version          = "0.2.3"
+  s.version          = "0.2.4"
   s.summary          = "Navigation microframework"
   s.description      = <<-DESC
                         Routing made simple. Not only for UINavigationController.
