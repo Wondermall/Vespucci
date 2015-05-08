@@ -255,6 +255,7 @@ NSString *const VSPNavigationManagerNotificationParametersKey = @"VSPNavigationM
         currentHost = currentHost.parent;
         
         __VSPMountingTuple *tuple = [self _tupleForHostNodeId:currentHost.nodeId childNodeId:currentHost.child.nodeId];
+        NSAssert(tuple, @"No tuple found for pair host: %@; child: %@", currentHost, currentHost.child);
         VSPNavigationNodeViewControllerDismountHandler dismountBlock = tuple.dismountHandler;
         NSAssert(dismountBlock, @"Don't know how to dismount current child %@", host.child);
         RACSignal *dismount = dismountBlock(host.viewController, host.child.viewController, animated) ?: [RACSignal empty];
