@@ -8,6 +8,7 @@
 #import "MessageViewController.h"
 #import "MessagesListViewController.h"
 #import "NotificationsViewController.h"
+#import "VSPNavigationNode.h"
 
 #import <Vespucci/Vespucci.h>
 #import <ReactiveCocoa/RACSubject.h>
@@ -349,19 +350,14 @@ NSString *const BlockUserNodeId = @"root.notifications.profile.block";
     root.nodeId = RootNodeId;
     root.child = child;
     root.viewController = tabController;
-    [self.navigationManager setNavigationRoot:root URL:URL];
+    [self.navigationManager setNavigationRoot:root];
 }
 
 // TODO: this should be replaced with navigation to -[URL URLByDeletingLastPathComponent]
 - (void)syncStateByRemovingLastNode {
-    NSURLComponents *components = [NSURLComponents componentsWithURL:self.navigationManager.URL resolvingAgainstBaseURL:NO];
-    components.query = nil;
-    components.path = [components.path stringByDeletingLastPathComponent];
-    NSURL *URL = components.URL;
     VSPNavigationNode *node = [self.navigationManager.root copy];
-    // TODO: can make it nicer by adding -[VSPNavigationNode removeFromParent]
-    node.leaf.parent.child = nil;
-    [self.navigationManager setNavigationRoot:node URL:URL];
+    [node.leaf removeFromParent];
+    [self.navigationManager setNavigationRoot:node];
 }
 
 @end

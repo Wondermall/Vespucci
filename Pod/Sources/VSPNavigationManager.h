@@ -25,8 +25,6 @@ extern NSString *const VSPNavigationManagerNotificationParametersKey;
 
 @property (nonatomic, readonly) VSPNavigationNode *root;
 
-@property (nonatomic, readonly) NSURL *URL;
-
 - (instancetype)initWithURLScheme:(NSString *)URLScheme NS_DESIGNATED_INITIALIZER;
 
 - (BOOL)handleURL:(NSURL *)URL;
@@ -38,7 +36,7 @@ extern NSString *const VSPNavigationManagerNotificationParametersKey;
 
 @interface VSPNavigationManager (Compatibility)
 
-- (void)setNavigationRoot:(VSPNavigationNode *)navigationRoot URL:(NSURL *)URL;
+- (void)setNavigationRoot:(VSPNavigationNode *)navigationRoot;
 
 @end
 

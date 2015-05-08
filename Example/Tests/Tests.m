@@ -86,10 +86,6 @@ describe(@"VSPNavigationManager", ^{
     });
     
     context(@"initial state", ^{
-        it(@"URL should contain just the scheme", ^{
-            expect(manager.URL).to.equal([NSURL URLWithString:@"test://"]);
-        });
-        
         it(@"should have no URL and no navigation root", ^{
             expect(manager.root).to.beNil();
         });
@@ -97,9 +93,7 @@ describe(@"VSPNavigationManager", ^{
         it(@"should set navigation root and URL correctly", ^{
             VSPNavigationNode *node = [VSPNavigationNode node];
             node.nodeId = @"my-node-id";
-            NSURL *URL = [NSURL URLWithString:@"test://example/"];
-            [manager setNavigationRoot:node URL:URL];
-            expect(manager.URL).to.equal([NSURL URLWithString:@"test://example/"]);
+            [manager setNavigationRoot:node];
             expect(manager.root).to.equal(node);
         });
     });
@@ -126,7 +120,7 @@ describe(@"VSPNavigationManager", ^{
                     beforeEach(^{
                         VSPNavigationNode *node = [VSPNavigationNode node];
                         node.viewController = [UIViewController new];
-                        [manager setNavigationRoot:node URL:[NSURL URLWithString:@"test://"]];
+                        [manager setNavigationRoot:node];
                     });
                     
                     it(@"should navigate successfully if route is registered and returns a node", ^{

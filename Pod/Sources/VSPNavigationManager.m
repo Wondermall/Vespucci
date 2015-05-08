@@ -58,8 +58,6 @@ NSString *const VSPNavigationManagerNotificationParametersKey = @"VSPNavigationM
 
 @property (nonatomic) JLRoutes *router;
 
-@property (nonatomic) NSURL *URL;
-
 @property (nonatomic) VSPNavigationNode *root;
 
 @property (nonatomic) NSMutableDictionary *hostingRules;
@@ -83,8 +81,6 @@ NSString *const VSPNavigationManagerNotificationParametersKey = @"VSPNavigationM
     [router removeAllRoutes];
     self.router = router;
 
-    self.URL = [NSURL URLWithString:[NSString stringWithFormat:@"%@://", URLScheme]];
-
     self.hostingRules = [NSMutableDictionary dictionary];
 
     return self;
@@ -97,15 +93,7 @@ NSString *const VSPNavigationManagerNotificationParametersKey = @"VSPNavigationM
 #pragma mark - Public
 
 - (BOOL)handleURL:(NSURL *)URL {
-    // TODO: add support for relative URLs here
-    if ([self.URL isEqual:URL]) {
-        return YES;
-    }
-    BOOL didNavigate = [self.router routeURL:URL];
-    if (didNavigate) {
-        self.URL = URL;
-    }
-    return didNavigate;
+    return [self.router routeURL:URL];
 }
 
 - (RACSignal *)navigateWithNewNavigationTree:(VSPNavigationNode *)tree {
@@ -305,9 +293,8 @@ NSString *const VSPNavigationManagerNotificationParametersKey = @"VSPNavigationM
 
 @implementation VSPNavigationManager (Compatibility)
 
-- (void)setNavigationRoot:(VSPNavigationNode *)navigationRoot URL:(NSURL *)URL {
+- (void)setNavigationRoot:(VSPNavigationNode *)navigationRoot {
     self.root = navigationRoot;
-    self.URL = URL;
 }
 
 @end
