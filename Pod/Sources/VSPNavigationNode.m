@@ -163,3 +163,12 @@
 }
 
 @end
+
+
+@implementation VSPNavigationNode (Hierarchy)
+
+- (void)removeFromParent {
+    self.parent.child = nil;
+}
+
+@end
