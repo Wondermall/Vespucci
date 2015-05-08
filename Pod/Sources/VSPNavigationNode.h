@@ -1,5 +1,5 @@
 //
-//  WMLNavigationNode.h
+//  VSPNavigationNode.h
 //  Wondermall
 //
 //  Created by Sash Zats on 3/30/15.
@@ -13,15 +13,15 @@ typedef UIViewController *(^WMLNavigationNodeViewControllerFactory)(NSDictionary
 
 
 @class RACSignal;
-@interface WMLNavigationNode : NSObject <NSCopying>
+@interface VSPNavigationNode : NSObject <NSCopying>
 
 /**
- *  Creates a chain of @c WMLNavigationNode with, returns the @c root node.
+ *  Creates a chain of @c VSPNavigationNode with, returns the @c root node.
  *
  *  @param parameters navigation parameters passed to each node in the chain
  *  @param nodeId    @c nodeIds used for creating the chain
  *
- *  @return A root of the chain of @c WMLNavigationNode
+ *  @return A root of the chain of @c VSPNavigationNode
  */
 + (instancetype)rootNodeForParameters:(NSDictionary *)parameters nodeIds:(NSString *)nodeId, ... NS_REQUIRES_NIL_TERMINATION;
 
@@ -37,17 +37,19 @@ typedef UIViewController *(^WMLNavigationNodeViewControllerFactory)(NSDictionary
 /**
  *  Next item in the navigation stack
  */
-@property (nonatomic) WMLNavigationNode *child;
+@property (nonatomic) VSPNavigationNode *child;
 
 /**
  *  Parent
  */
-@property (nonatomic, weak, readonly) WMLNavigationNode *parent;
+@property (nonatomic, weak, readonly) VSPNavigationNode *parent;
 
 /**
  *  View controller corresponding with the current navigation item.
  */
 @property (nonatomic) UIViewController *viewController;
+
+@property (nonatomic, copy) UIViewController *(^lazyViewControllerFactory)(void);
 
 
 /**
@@ -63,18 +65,18 @@ typedef UIViewController *(^WMLNavigationNodeViewControllerFactory)(NSDictionary
 @end
 
 
-@interface WMLNavigationNode (Hierarchy)
+@interface VSPNavigationNode (Hierarchy)
 
-@property (nonatomic, readonly) BOOL isRootNode;
+@property (nonatomic, readonly, getter=isRootNode) BOOL rootNode;
 
-@property (nonatomic, readonly) WMLNavigationNode *root;
+@property (nonatomic, readonly) VSPNavigationNode *root;
 
-@property (nonatomic, readonly) WMLNavigationNode *leaf;
+@property (nonatomic, readonly) VSPNavigationNode *leaf;
 
 @end
 
 
-@interface WMLNavigationNode (Debugging)
+@interface VSPNavigationNode (Debugging)
 
 - (NSString *)recursiveDescription;
 

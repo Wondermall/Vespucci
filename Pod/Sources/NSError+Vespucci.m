@@ -9,18 +9,18 @@
 #import "NSError+Vespucci.h"
 
 
-NSString *const WMLVespucciErrorDomain = @"WMLVespucciErrorDomain";
+NSString *const VSPVespucciErrorDomain = @"VSPVespucciErrorDomain";
 
 
 @implementation NSError (Vespucci)
 
-+ (instancetype)wml_vespuciErrorWithCode:(NSUInteger)code message:(NSString *)format, ... {
-    NSParameterAssert(format);
++ (instancetype)vsp_vespucciErrorWithCode:(NSUInteger)code message:(NSString *)message, ... {
+    NSParameterAssert(message);
     va_list list;
-    va_start(list, format);
-    NSString *message = [[NSString alloc] initWithFormat:format arguments:list];
+    va_start(list, message);
+    NSString *messageString = [[NSString alloc] initWithFormat:message arguments:list];
     va_end(list);
-    return [NSError errorWithDomain:WMLVespucciErrorDomain code:code userInfo:@{ NSLocalizedDescriptionKey: message }];
+    return [NSError errorWithDomain:VSPVespucciErrorDomain code:code userInfo:@{NSLocalizedDescriptionKey : messageString}];
 }
 
 @end

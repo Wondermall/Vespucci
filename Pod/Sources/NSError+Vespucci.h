@@ -9,11 +9,11 @@
 #import <Foundation/Foundation.h>
 
 
-extern NSString *const WMLVespucciErrorDomain;
+extern NSString *const VSPVespucciErrorDomain;
 
 
 @interface NSError (Vespucci)
 
-+ (instancetype)wml_vespuciErrorWithCode:(NSUInteger)code message:(NSString *)messsage, ... NS_FORMAT_FUNCTION(2, 3);
++ (instancetype)vsp_vespucciErrorWithCode:(NSUInteger)code message:(NSString *)message, ... NS_FORMAT_FUNCTION(2, 3);
 
 @end

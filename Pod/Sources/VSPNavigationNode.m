@@ -1,12 +1,12 @@
 //
-//  WMLNavigationNode.m
+//  VSPNavigationNode.m
 //  Wondermall
 //
 //  Created by Sash Zats on 3/30/15.
 //  Copyright (c) 2015 Wondermall Inc. All rights reserved.
 //
 
-#import "WMLNavigationNode.h"
+#import "VSPNavigationNode.h"
 
 #import "RACSignal.h"
 #import "RACSignal+Operations.h"
@@ -15,11 +15,11 @@
 #import "RACEXTScope.h"
 #import "NSArray+RACSequenceAdditions.h"
 #import "NSError+Vespucci.h"
-#import "WMLNavigatable.h"
+#import "VSPNavigatable.h"
 
-@interface WMLNavigationNode ()
+@interface VSPNavigationNode ()
 
-@property (nonatomic, weak) WMLNavigationNode *parent;
+@property (nonatomic, weak) VSPNavigationNode *parent;
 @property (nonatomic, copy) NSDictionary *parameters;
 
 @property (nonatomic) NSMutableArray *logicalEqualityRules;
@@ -28,19 +28,20 @@
 @end
 
 
-@implementation WMLNavigationNode
+@implementation VSPNavigationNode
+@synthesize viewController = _viewController;
 
 #pragma mark - Lifecycle
 
 + (instancetype)rootNodeForParameters:(NSDictionary *)parameters nodeIds:(NSString *)nodeId, ... {
-    WMLNavigationNode *root = [[self alloc] initWithNavigationParameters:parameters];
+    VSPNavigationNode *root = [[self alloc] initWithNavigationParameters:parameters];
     root.nodeId = nodeId;
-    WMLNavigationNode *previousNode = root;
+    VSPNavigationNode *previousNode = root;
     va_list list;
     va_start(list, nodeId);
     NSString *currentNodeId;
     while ((currentNodeId = va_arg(list, NSString *))) {
-        WMLNavigationNode *node = [[WMLNavigationNode alloc] initWithNavigationParameters:parameters];
+        VSPNavigationNode *node = [[VSPNavigationNode alloc] initWithNavigationParameters:parameters];
         node.nodeId = currentNodeId;
         previousNode.child = node;
         previousNode = node;
@@ -50,7 +51,7 @@
 }
 
 + (instancetype)nodeWithParameters:(NSDictionary *)parameters {
-    return [[WMLNavigationNode alloc] initWithNavigationParameters:parameters];
+    return [[VSPNavigationNode alloc] initWithNavigationParameters:parameters];
 }
 
 + (instancetype)node {
@@ -75,7 +76,7 @@
 
 #pragma mark - Public
 
-- (void)setChild:(WMLNavigationNode *)child {
+- (void)setChild:(VSPNavigationNode *)child {
     self.child.parent = nil;
     _child = child;
     child.parent = self;
@@ -84,13 +85,23 @@
 - (void)setViewController:(UIViewController *)viewController {
     _viewController = viewController;
 
-    if ([viewController conformsToProtocol:@protocol(WMLNavigatable)]) {
-        ((id <WMLNavigatable>)viewController).navigationNode = self;
+    if ([viewController conformsToProtocol:@protocol(VSPNavigatable)]) {
+        ((id <VSPNavigatable>)viewController).navigationNode = self;
     }
 }
 
-- (WMLNavigationNode *)leaf {
-    WMLNavigationNode *node = self;
+- (UIViewController *)viewController {
+    if (!_viewController) {
+        _viewController = self.lazyViewControllerFactory();
+        if ([_viewController conformsToProtocol:@protocol(VSPNavigatable)]) {
+            ((id<VSPNavigatable>)_viewController).navigationNode = self;
+        }
+    }
+    return _viewController;
+}
+
+- (VSPNavigationNode *)leaf {
+    VSPNavigationNode *node = self;
     while (node.child) {
         node = node.child;
     }
@@ -101,8 +112,8 @@
     return self.parent == nil;
 }
 
-- (WMLNavigationNode *)root {
-    WMLNavigationNode *node = self;
+- (VSPNavigationNode *)root {
+    VSPNavigationNode *node = self;
     while (node.parent) {
         node = node.parent;
     }
@@ -116,13 +127,13 @@
 }
 
 - (BOOL)isEqual:(id)object {
-    if (![object isKindOfClass:[WMLNavigationNode class]]) {
+    if (![object isKindOfClass:[VSPNavigationNode class]]) {
         return [super isEqual:object];
     }
     return [self isEqualToNode:object];
 }
 
-- (BOOL)isEqualToNode:(WMLNavigationNode *)node {
+- (BOOL)isEqualToNode:(VSPNavigationNode *)node {
     return [self.nodeId isEqual:node.nodeId] && (!self.child || [self.child isEqual:node.child]);
 }
 
@@ -132,7 +143,7 @@
 }
 
 - (id)copyWithZone:(NSZone *)zone {
-    WMLNavigationNode *node = [[WMLNavigationNode allocWithZone:zone] initWithNavigationParameters:self.parameters];
+    VSPNavigationNode *node = [[VSPNavigationNode allocWithZone:zone] initWithNavigationParameters:self.parameters];
     node.viewController = self.viewController;
     node.nodeId = self.nodeId;
     node.child = [self.child copy];
@@ -142,7 +153,7 @@
 @end
 
 
-@implementation WMLNavigationNode (Debugging)
+@implementation VSPNavigationNode (Debugging)
 
 - (NSString *)recursiveDescription {
     if (!self.child) {

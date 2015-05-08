@@ -6,6 +6,6 @@
 //  Copyright (c) 2015 Sash Zats. All rights reserved.
 //
 
-#import "WMLNavigationManager.h"
-#import "WMLNavigationNode.h"
-#import "WMLNavigatable.h"
+#import "VSPNavigationManager.h"
+#import "VSPNavigationNode.h"
+#import "VSPNavigatable.h"
