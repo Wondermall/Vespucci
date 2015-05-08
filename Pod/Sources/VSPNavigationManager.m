@@ -185,6 +185,12 @@ NSString *const VSPNavigationManagerNotificationParametersKey = @"VSPNavigationM
 @implementation VSPNavigationManager (NodeHostingInternal)
 
 - (BOOL)_getHost:(inout VSPNavigationNode **)inOutParent forChild:(inout VSPNavigationNode **)inOutChild {
+    // special case: we have to dismiss all parent's children
+    if (inOutParent && *inOutParent && inOutChild && !*inOutChild) {
+        *inOutChild = nil;
+        return YES;
+    }
+    
     if (!inOutParent || !*inOutParent || !inOutChild || !*inOutChild) {
         return NO;
     }
