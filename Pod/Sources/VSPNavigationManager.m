@@ -75,14 +75,8 @@ NSString *const VSPNavigationManagerNotificationParametersKey = @"VSPNavigationM
     if (!self) {
         return nil;
     }
-
-    // just in case
-    JLRoutes *router = [JLRoutes routesForScheme:URLScheme];
-    [router removeAllRoutes];
-    self.router = router;
-
+    self.router = [JLRoutes routesForScheme:URLScheme];
     self.hostingRules = [NSMutableDictionary dictionary];
-
     return self;
 }
 
