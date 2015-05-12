@@ -109,8 +109,10 @@ describe(@"VSPNavigationManager", ^{
                     [manager handleURL:[NSURL URLWithString:@"test://route/123"]];
                 });
             });
-            
-            context(@"navigation", ^{
+
+            pending(@"Navigation tests have to be rewritten");
+            xcontext(@"navigation", ^{
+                
                 context(@"without root node set", ^{
                     it(@"should raise an exception", ^{
                         
