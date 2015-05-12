@@ -21,6 +21,8 @@ NSString *const VSPNavigationManagerDidFailNavigationNotification = @"VSPNavigat
 NSString *const VSPNavigationManagerNotificationNodeKey = @"VSPNavigationManagerNotificationNodeKey";
 NSString *const VSPNavigationManagerNotificationParametersKey = @"VSPNavigationManagerNotificationParametersKey";
 
+NSString *const VSPHostingRuleAnyNodeId = @"VSPHostingRuleAnyNodeId";
+
 
 @interface __VSPMountingTuple : NSObject
 
@@ -91,46 +93,46 @@ NSString *const VSPNavigationManagerNotificationParametersKey = @"VSPNavigationM
 }
 
 - (RACSignal *)navigateWithNewNavigationTree:(VSPNavigationNode *)tree {
-    return [self _navigateWithNode:tree parameters:nil];
+    return [self _navigateWithNode:tree];
 }
 
 #pragma mark - Private
 
 // TODO: remove parameters, VSPNavigationNode should have them
-- (RACSignal *)_navigateWithNode:(VSPNavigationNode *)child parameters:(NSDictionary *)parameters {
+- (RACSignal *)_navigateWithNode:(VSPNavigationNode *)child {
     NSAssert(self.root, @"No root node installed");
     BOOL animated = NO;
-    if (parameters[@"animated"]) {
-        NSString *animatedString = [parameters[@"animated"] lowercaseString];
+    if (child.parameters[@"animated"]) {
+        NSString *animatedString = [child.parameters[@"animated"] lowercaseString];
         animated = [animatedString isEqual:@"true"] || [animatedString isEqual:@"yes"] || [animatedString isEqual:@"1"];
     }
     @weakify(self);
-    VSPNavigationNode *proposedRoot = self.root;
+    VSPNavigationNode *proposedHost = self.root;
     VSPNavigationNode *proposedChild = child;
-    RACSignal *makeHost = [self _makeHostNode:&proposedRoot hostChildNode:&proposedChild animated:animated];
+    RACSignal *makeHost = [self _makeHostNode:&proposedHost hostChildNode:&proposedChild animated:animated];
     [makeHost subscribeError:^(NSError *error) {
         @strongify(self);
-        [self _postNotificationNamed:VSPNavigationManagerDidFailNavigationNotification node:proposedChild.leaf parameters:parameters];
+        [self _postNotificationNamed:VSPNavigationManagerDidFailNavigationNotification node:proposedChild.leaf];
     } completed:^{
         @strongify(self);
-        [self _postNotificationNamed:VSPNavigationManagerDidFinishNavigationNotification node:proposedChild.leaf parameters:parameters];
+        [self _postNotificationNamed:VSPNavigationManagerDidFinishNavigationNotification node:proposedChild.leaf];
     }];
     return makeHost;
 }
 
 // TODO: remove parameters, VSPNavigationNode should have them
-- (void)_postNotificationNamed:(NSString *)notificationName node:(VSPNavigationNode *)node parameters:(NSDictionary *)parameters {
+- (void)_postNotificationNamed:(NSString *)notificationName node:(VSPNavigationNode *)node {
     [[NSNotificationCenter defaultCenter] postNotificationName:notificationName object:self userInfo:@{
-            VSPNavigationManagerNotificationNodeKey : node ?: [NSNull null],
-            VSPNavigationManagerNotificationParametersKey : parameters ?: [NSNull null]
+        VSPNavigationManagerNotificationNodeKey : node ?: [NSNull null],
+        VSPNavigationManagerNotificationParametersKey : node.parameters ?: [NSNull null]
     }];
 }
 
 // TODO: remove parameters, VSPNavigationNode should have them
-- (void)_notifyNavigationDidFinishForNode:(VSPNavigationNode *)node parameters:(NSDictionary *)parameters {
+- (void)_notifyNavigationDidFinishForNode:(VSPNavigationNode *)node {
     [[NSNotificationCenter defaultCenter] postNotificationName:VSPNavigationManagerDidFinishNavigationNotification object:self userInfo:@{
-            VSPNavigationManagerNotificationNodeKey : node ?: [NSNull null],
-            VSPNavigationManagerNotificationParametersKey : parameters ?: [NSNull null]
+        VSPNavigationManagerNotificationNodeKey : node ?: [NSNull null],
+        VSPNavigationManagerNotificationParametersKey : node.parameters ?: [NSNull null]
     }];
 }
 
@@ -150,7 +152,7 @@ NSString *const VSPNavigationManagerNotificationParametersKey = @"VSPNavigationM
         }
         @strongify(self);
         NSAssert(node.viewController, @"No view controller provided, this can't be good!");
-        [self _navigateWithNode:node parameters:parameters];
+        [self _navigateWithNode:node];
         return YES;
     }];
 }
@@ -170,7 +172,22 @@ NSString *const VSPNavigationManagerNotificationParametersKey = @"VSPNavigationM
     if (!hostNodeId || !childNodeId) {
         return nil;
     }
-    return self.hostingRules[hostNodeId][childNodeId];
+    id result = self.hostingRules[hostNodeId][childNodeId];
+    if (result) {
+        return result;
+    }
+    // any host
+    result = self.hostingRules[VSPHostingRuleAnyNodeId][childNodeId];
+    if (result) {
+        return result;
+    }
+    // any child
+    result = self.hostingRules[hostNodeId][VSPHostingRuleAnyNodeId];
+    if (result) {
+        return result;
+    }
+    // any any
+    return self.hostingRules[VSPHostingRuleAnyNodeId][VSPHostingRuleAnyNodeId];
 }
 
 @end
@@ -179,34 +196,23 @@ NSString *const VSPNavigationManagerNotificationParametersKey = @"VSPNavigationM
 @implementation VSPNavigationManager (NodeHostingInternal)
 
 - (BOOL)_getHost:(inout VSPNavigationNode **)inOutParent forChild:(inout VSPNavigationNode **)inOutChild {
-    // special case: we have to dismiss all parent's children
-    if (inOutParent && *inOutParent && inOutChild && !*inOutChild) {
+    VSPNavigationNode *oldNode = *inOutParent, *newNode = *inOutChild;
+    NSAssert([oldNode.nodeId isEqualToString:newNode.nodeId], @"Can't find host for roots without a common ancestor");
+    if (![oldNode.nodeId isEqualToString:newNode.nodeId]) {
+        *inOutParent = nil;
         *inOutChild = nil;
-        return YES;
-    }
-    
-    if (!inOutParent || !*inOutParent || !inOutChild || !*inOutChild) {
         return NO;
     }
-    VSPNavigationNode *child = *inOutChild;
-    VSPNavigationNode *parent = *inOutParent;
-    if ([parent.nodeId isEqualToString:child.nodeId]) {
-        VSPNavigationNode *proposedParent = parent.child;
-        VSPNavigationNode *grandchild = child.child;
-        if ([self _getHost:&proposedParent forChild:&grandchild]) {
-            *inOutParent = proposedParent;
-            *inOutChild = grandchild;
-            return YES;
-        } else if ([self _getHost:inOutParent forChild:&grandchild]) {
-            *inOutChild = grandchild;
-            return YES;
-        }
-    } else if ([self _canParent:parent hostChild:child]) {
-        *inOutParent = parent;
-        *inOutChild = child;
-        return YES;
+    
+    while ([oldNode.child.nodeId isEqual:newNode.child.nodeId] && oldNode.child && newNode.child) {
+        oldNode = oldNode.child;
+        newNode = newNode.child;
+        
     }
-    return NO;
+    
+    *inOutParent = oldNode;
+    *inOutChild = newNode.child;
+    return YES;
 }
 
 - (BOOL)_canParent:(VSPNavigationNode *)parent hostChild:(VSPNavigationNode *)child {
@@ -237,6 +243,7 @@ NSString *const VSPNavigationManagerNotificationParametersKey = @"VSPNavigationM
     [[dismount
         concat:mount]
         subscribe:subject];
+    mount.name = [NSString stringWithFormat:@"%@; %@", dismount.name, mount.name];
     return [subject replayLast];
 }
 
@@ -254,7 +261,7 @@ NSString *const VSPNavigationManagerNotificationParametersKey = @"VSPNavigationM
         NSAssert(tuple, @"No tuple found for pair host: %@; child: %@", currentHost, currentHost.child);
         VSPNavigationNodeViewControllerDismountHandler dismountBlock = tuple.dismountHandler;
         NSAssert(dismountBlock, @"Don't know how to dismount current child %@", host.child);
-        RACSignal *dismount = dismountBlock(host.viewController, host.child.viewController, animated) ?: [RACSignal empty];
+        RACSignal *dismount = dismountBlock(host, host.child, animated) ?: [RACSignal empty];
         dismount = dismount ?: [RACSignal empty];
         if (result) {
             result = [result concat:dismount];
@@ -263,28 +270,31 @@ NSString *const VSPNavigationManagerNotificationParametersKey = @"VSPNavigationM
         }
         
     } while (![currentHost isEqual:host]);
-
+    result.name = [NSString stringWithFormat:@"Dismounting all %@", host.nodeId];
     return result;
 }
 
-- (RACSignal *)_mountForHost:(VSPNavigationNode *)host newChild:(VSPNavigationNode *)child animated:(BOOL)animated {
-    RACSignal *result = nil;
-
+- (RACSignal *)_mountForHost:(VSPNavigationNode *)host newChild:(VSPNavigationNode *)proposedChild animated:(BOOL)animated {
+    NSParameterAssert(host);
+    NSParameterAssert(proposedChild);
+    RACSignal *result = [RACSignal empty];
+    VSPNavigationNode *child = proposedChild;
     while (child) {
         __VSPMountingTuple *tuple = [self _tupleForHostNodeId:host.nodeId childNodeId:child.nodeId];
         VSPNavigationNodeViewControllerMountHandler mountBlock = tuple.mountHandler;
-        NSAssert(!child || mountBlock, @"Don't know hot to mount new child %@", child);
-        
-        if (!result) {
-            result = mountBlock(host.viewController, child.viewController, animated) ?: [RACSignal empty];
-        } else {
-            RACSignal *mount = mountBlock(host.viewController, child.viewController, animated) ?: [RACSignal empty];
-            result = [result concat:mount];
+        if (child && !mountBlock) {
+            [[NSException exceptionWithName:NSInternalInconsistencyException
+                                     reason:[NSString stringWithFormat:@"Don't know hot to mount %@ on %@", child.nodeId, host.nodeId]
+                                   userInfo:nil] raise];
         }
+
+        RACSignal *mount = mountBlock(host, child, animated) ?: [RACSignal empty];
+        result = [result concat:mount];
 
         host = child;
         child = child.child;        
     }
+    result.name = [NSString stringWithFormat:@"Mount %@ on %@", proposedChild.nodeId, host.nodeId];
     return result;
 }
 

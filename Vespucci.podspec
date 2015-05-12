@@ -9,13 +9,13 @@
 
 Pod::Spec.new do |s|
   s.name             = "Vespucci"
-  s.version          = "0.2.6"
+  s.version          = "0.3"
   s.summary          = "Navigation microframework"
   s.description      = <<-DESC
                         Routing made simple. Not only for UINavigationController.
 
-                        1. Register route.
-                        2. Explain how to present view controller.
+                        1. Register a route.
+                        2. Explain how to present a view controller.
                         3. Explain how to dismiss it.
 
                         That's it. Framework takes care of all the transition permutations!

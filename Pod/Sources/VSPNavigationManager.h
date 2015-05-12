@@ -16,6 +16,7 @@ extern NSString *const VSPNavigationManagerDidFailNavigationNotification;
 extern NSString *const VSPNavigationManagerNotificationNodeKey;
 extern NSString *const VSPNavigationManagerNotificationParametersKey;
 
+extern NSString *const VSPHostingRuleAnyNodeId;
 
 @class JLRoutes;
 @class RACSignal;
@@ -42,14 +43,14 @@ extern NSString *const VSPNavigationManagerNotificationParametersKey;
 @end
 
 
-typedef RACSignal *(^VSPNavigationNodeViewControllerMountHandler)(UIViewController *parent, UIViewController *child, BOOL animated);
+typedef RACSignal *(^VSPNavigationNodeViewControllerMountHandler)(VSPNavigationNode *parent, VSPNavigationNode *child, BOOL animated);
 
-typedef RACSignal *(^VSPNavigationNodeViewControllerDismountHandler)(UIViewController *parent, UIViewController *child, BOOL animated);
+typedef RACSignal *(^VSPNavigationNodeViewControllerDismountHandler)(VSPNavigationNode *parent, VSPNavigationNode *child, BOOL animated);
 
 
 @interface VSPNavigationManager (NodeHosting)
 
-- (void)registerNavigationForRoute:(NSString *)string handler:(VSPNavigationNode *(^)(NSDictionary *parameters))handler;
+- (void)registerNavigationForRoute:(NSString *)route handler:(VSPNavigationNode *(^)(NSDictionary *parameters))handler;
 
 - (void)addRuleForHostNodeId:(NSString *)hostNodeId childNodeId:(NSString *)childNodeId mountBlock:(VSPNavigationNodeViewControllerMountHandler)mountBlock dismounBlock:(VSPNavigationNodeViewControllerDismountHandler)dismountBlock;
 
