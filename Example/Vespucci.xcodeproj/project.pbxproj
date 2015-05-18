@@ -12,10 +12,14 @@
 		38EFEC48DA8AF0676921CE74 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 38EFE5D79F5B70D872BD7AF9 /* Main.storyboard */; };
 		38EFEE04ECB0EFF1818A19BA /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 38EFE0A4F1AB58BAB477F413 /* Images.xcassets */; };
 		38EFEFC4DB76CCA53681F19D /* NavigationService.m in Sources */ = {isa = PBXBuildFile; fileRef = 38EFEE8E8DB2250672DEAF53 /* NavigationService.m */; };
+		5C1C0B691B0A6ECC00AEA2F7 /* EXPMatchers+NodeQuality.m in Sources */ = {isa = PBXBuildFile; fileRef = 5C1C0B681B0A6ECC00AEA2F7 /* EXPMatchers+NodeQuality.m */; };
 		5C96047E1AD5B0020044A899 /* NotificationsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 5C96047D1AD5B0020044A899 /* NotificationsViewController.m */; };
 		5C9604871AD5CBE00044A899 /* MessageViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 5C9604861AD5CBE00044A899 /* MessageViewController.m */; };
 		5C96048A1AD5CBEC0044A899 /* MessagesListViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 5C9604891AD5CBEC0044A899 /* MessagesListViewController.m */; };
 		5CCCA9C61AD60A8E009BA90A /* ProfileViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 5CCCA9C51AD60A8E009BA90A /* ProfileViewController.m */; };
+		5CF6FEE81B0A5E3F00B43CB2 /* VSPNavigationNodeSpec.m in Sources */ = {isa = PBXBuildFile; fileRef = 5CF6FEE71B0A5E3E00B43CB2 /* VSPNavigationNodeSpec.m */; };
+		5CF6FEED1B0A5E7200B43CB2 /* TestHelpers.m in Sources */ = {isa = PBXBuildFile; fileRef = 5CF6FEEC1B0A5E7200B43CB2 /* TestHelpers.m */; };
+		5CF6FEEF1B0A5FAF00B43CB2 /* VSPNavigationManagerSpec.m in Sources */ = {isa = PBXBuildFile; fileRef = 5CF6FEEE1B0A5FAF00B43CB2 /* VSPNavigationManagerSpec.m */; };
 		6003F58E195388D20070C39A /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6003F58D195388D20070C39A /* Foundation.framework */; };
 		6003F590195388D20070C39A /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6003F58F195388D20070C39A /* CoreGraphics.framework */; };
 		6003F592195388D20070C39A /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6003F591195388D20070C39A /* UIKit.framework */; };
@@ -26,7 +30,7 @@
 		6003F5B1195388D20070C39A /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6003F58D195388D20070C39A /* Foundation.framework */; };
 		6003F5B2195388D20070C39A /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6003F591195388D20070C39A /* UIKit.framework */; };
 		6003F5BA195388D20070C39A /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 6003F5B8195388D20070C39A /* InfoPlist.strings */; };
-		6003F5BC195388D20070C39A /* Tests.m in Sources */ = {isa = PBXBuildFile; fileRef = 6003F5BB195388D20070C39A /* Tests.m */; };
+		6003F5BC195388D20070C39A /* BehaviourSpec.m in Sources */ = {isa = PBXBuildFile; fileRef = 6003F5BB195388D20070C39A /* BehaviourSpec.m */; };
 		AC089CC7F768C03172A3099C /* libPods-Tests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = E91CD06F5535E9E16B2D8B55 /* libPods-Tests.a */; };
 /* End PBXBuildFile section */
 
@@ -53,6 +57,8 @@
 		3B05AF2B570D04854F9BC26D /* Vespucci.podspec */ = {isa = PBXFileReference; explicitFileType = text.script.ruby; includeInIndex = 1; name = Vespucci.podspec; path = ../Vespucci.podspec; sourceTree = "<group>"; };
 		415B5AD4514D5292ACDA4783 /* libPods-Vespucci.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-Vespucci.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		5322B7466EBF6C66DD11E33E /* Pods-Tests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Tests.debug.xcconfig"; path = "Pods/Target Support Files/Pods-Tests/Pods-Tests.debug.xcconfig"; sourceTree = "<group>"; };
+		5C1C0B671B0A6ECC00AEA2F7 /* EXPMatchers+NodeQuality.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "EXPMatchers+NodeQuality.h"; sourceTree = "<group>"; };
+		5C1C0B681B0A6ECC00AEA2F7 /* EXPMatchers+NodeQuality.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "EXPMatchers+NodeQuality.m"; sourceTree = "<group>"; };
 		5C96047C1AD5B0020044A899 /* NotificationsViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NotificationsViewController.h; sourceTree = "<group>"; };
 		5C96047D1AD5B0020044A899 /* NotificationsViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NotificationsViewController.m; sourceTree = "<group>"; };
 		5C9604851AD5CBE00044A899 /* MessageViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MessageViewController.h; sourceTree = "<group>"; };
@@ -61,6 +67,10 @@
 		5C9604891AD5CBEC0044A899 /* MessagesListViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MessagesListViewController.m; sourceTree = "<group>"; };
 		5CCCA9C41AD60A8E009BA90A /* ProfileViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ProfileViewController.h; sourceTree = "<group>"; };
 		5CCCA9C51AD60A8E009BA90A /* ProfileViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ProfileViewController.m; sourceTree = "<group>"; };
+		5CF6FEE71B0A5E3E00B43CB2 /* VSPNavigationNodeSpec.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VSPNavigationNodeSpec.m; sourceTree = "<group>"; };
+		5CF6FEEB1B0A5E7200B43CB2 /* TestHelpers.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TestHelpers.h; sourceTree = "<group>"; };
+		5CF6FEEC1B0A5E7200B43CB2 /* TestHelpers.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TestHelpers.m; sourceTree = "<group>"; };
+		5CF6FEEE1B0A5FAF00B43CB2 /* VSPNavigationManagerSpec.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VSPNavigationManagerSpec.m; sourceTree = "<group>"; };
 		6003F58A195388D20070C39A /* Vespucci.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Vespucci.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		6003F58D195388D20070C39A /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		6003F58F195388D20070C39A /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
@@ -75,7 +85,7 @@
 		6003F5AF195388D20070C39A /* XCTest.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = XCTest.framework; path = Library/Frameworks/XCTest.framework; sourceTree = DEVELOPER_DIR; };
 		6003F5B7195388D20070C39A /* Tests-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "Tests-Info.plist"; sourceTree = "<group>"; };
 		6003F5B9195388D20070C39A /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
-		6003F5BB195388D20070C39A /* Tests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; lineEnding = 0; path = Tests.m; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objc; };
+		6003F5BB195388D20070C39A /* BehaviourSpec.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; lineEnding = 0; path = BehaviourSpec.m; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objc; };
 		606FC2411953D9B200FFA9A0 /* Tests-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Tests-Prefix.pch"; sourceTree = "<group>"; };
 		6E172E739FCC70393AFD9375 /* README.md */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = net.daringfireball.markdown; name = README.md; path = ../README.md; sourceTree = "<group>"; };
 		81B2C47301E2F1ED48B13B48 /* Pods-Vespucci.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Vespucci.release.xcconfig"; path = "Pods/Target Support Files/Pods-Vespucci/Pods-Vespucci.release.xcconfig"; sourceTree = "<group>"; };
@@ -115,6 +125,17 @@
 				38EFE0A4F1AB58BAB477F413 /* Images.xcassets */,
 			);
 			name = Resources;
+			sourceTree = "<group>";
+		};
+		5C1C0B6A1B0A6ED100AEA2F7 /* Utilities */ = {
+			isa = PBXGroup;
+			children = (
+				5CF6FEEB1B0A5E7200B43CB2 /* TestHelpers.h */,
+				5CF6FEEC1B0A5E7200B43CB2 /* TestHelpers.m */,
+				5C1C0B671B0A6ECC00AEA2F7 /* EXPMatchers+NodeQuality.h */,
+				5C1C0B681B0A6ECC00AEA2F7 /* EXPMatchers+NodeQuality.m */,
+			);
+			name = Utilities;
 			sourceTree = "<group>";
 		};
 		5C96047F1AD5C9C30044A899 /* Navigation */ = {
@@ -205,7 +226,10 @@
 		6003F5B5195388D20070C39A /* Tests */ = {
 			isa = PBXGroup;
 			children = (
-				6003F5BB195388D20070C39A /* Tests.m */,
+				6003F5BB195388D20070C39A /* BehaviourSpec.m */,
+				5CF6FEE71B0A5E3E00B43CB2 /* VSPNavigationNodeSpec.m */,
+				5CF6FEEE1B0A5FAF00B43CB2 /* VSPNavigationManagerSpec.m */,
+				5C1C0B6A1B0A6ED100AEA2F7 /* Utilities */,
 				6003F5B6195388D20070C39A /* Supporting Files */,
 			);
 			path = Tests;
@@ -422,7 +446,11 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				6003F5BC195388D20070C39A /* Tests.m in Sources */,
+				5C1C0B691B0A6ECC00AEA2F7 /* EXPMatchers+NodeQuality.m in Sources */,
+				5CF6FEEF1B0A5FAF00B43CB2 /* VSPNavigationManagerSpec.m in Sources */,
+				6003F5BC195388D20070C39A /* BehaviourSpec.m in Sources */,
+				5CF6FEED1B0A5E7200B43CB2 /* TestHelpers.m in Sources */,
+				5CF6FEE81B0A5E3F00B43CB2 /* VSPNavigationNodeSpec.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
