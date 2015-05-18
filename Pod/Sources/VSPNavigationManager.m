@@ -7,13 +7,13 @@
 //
 
 #import "VSPNavigationManager.h"
+#import "VSPNavigationNode+Internal.h"
 
 #import "NSError+Vespucci.h"
-#import "VSPNavigationNode.h"
 #import <JLROutes/JLRoutes.h>
 #import <ReactiveCocoa/RACExtScope.h>
 #import <ReactiveCocoa/ReactiveCocoa.h>
-#import "VSPNavigationManager.h"
+#import <Vespucci/Vespucci.h>
 
 
 NSString *const VSPNavigationManagerDidFinishNavigationNotification = @"VSPNavigationManagerDidFinishNavigationNotification";
@@ -104,17 +104,24 @@ NSString *const VSPHostingRuleAnyNodeId = @"VSPHostingRuleAnyNodeId";
 
 #pragma mark - Private
 
-// TODO: remove parameters, VSPNavigationNode should have them
-- (RACSignal *)_navigateWithNode:(VSPNavigationNode *)child {
+- (RACSignal *)_navigateWithNode:(VSPNavigationNode *)node {
     NSAssert(self.root, @"No root node installed");
+
+    if (![self.root.nodeId isEqual:node.nodeId]) {
+        // this is a relative path
+        VSPNavigationNode *rootCopy = [self.root copy];
+        rootCopy.leaf.child = node;
+        node = rootCopy;
+    }
+    
     BOOL animated = NO;
-    if (child.parameters[@"animated"]) {
-        NSString *animatedString = [child.parameters[@"animated"] lowercaseString];
+    if (node.parameters[@"animated"]) {
+        NSString *animatedString = [node.parameters[@"animated"] lowercaseString];
         animated = [animatedString isEqual:@"true"] || [animatedString isEqual:@"yes"] || [animatedString isEqual:@"1"];
     }
     @weakify(self);
     VSPNavigationNode *proposedHost = self.root;
-    VSPNavigationNode *proposedChild = child;
+    VSPNavigationNode *proposedChild = node;
     RACSignal *makeHost = [self _makeHostNode:&proposedHost hostChildNode:&proposedChild animated:animated];
     [makeHost subscribeError:^(NSError *error) {
         @strongify(self);
@@ -126,7 +133,6 @@ NSString *const VSPHostingRuleAnyNodeId = @"VSPHostingRuleAnyNodeId";
     return makeHost;
 }
 
-// TODO: remove parameters, VSPNavigationNode should have them
 - (void)_postNotificationNamed:(NSString *)notificationName node:(VSPNavigationNode *)node {
     [[NSNotificationCenter defaultCenter] postNotificationName:notificationName object:self userInfo:@{
         VSPNavigationManagerNotificationNodeKey : node ?: [NSNull null],
@@ -134,7 +140,6 @@ NSString *const VSPHostingRuleAnyNodeId = @"VSPHostingRuleAnyNodeId";
     }];
 }
 
-// TODO: remove parameters, VSPNavigationNode should have them
 - (void)_notifyNavigationDidFinishForNode:(VSPNavigationNode *)node {
     [[NSNotificationCenter defaultCenter] postNotificationName:VSPNavigationManagerDidFinishNavigationNotification object:self userInfo:@{
         VSPNavigationManagerNotificationNodeKey : node ?: [NSNull null],
@@ -158,8 +163,17 @@ NSString *const VSPHostingRuleAnyNodeId = @"VSPHostingRuleAnyNodeId";
         }
         @strongify(self);
         NSAssert(node.viewController, @"No view controller provided, this can't be good!");
-        [self _navigateWithNode:node];
-        return YES;
+        RACSignal *navigation = [self _navigateWithNode:node];
+        if (!navigation) {
+            return NO;
+        }
+        
+        __block BOOL isSuccessfull = YES;
+        [navigation subscribeError:^(NSError *error) {
+            isSuccessfull = NO;
+        }];
+        
+        return isSuccessfull;
     }];
 }
 
@@ -226,6 +240,9 @@ NSString *const VSPHostingRuleAnyNodeId = @"VSPHostingRuleAnyNodeId";
 }
 
 - (RACSignal *)_makeHostNode:(VSPNavigationNode **)host hostChildNode:(VSPNavigationNode **)child animated:(BOOL)animated {
+    // we need to capture new parameters before child will be modified
+    NSDictionary *parameters = (*child).parameters;
+
     RACSubject *subject = [RACSubject subject];
 
     // Calculate actual host and actual child
@@ -241,15 +258,22 @@ NSString *const VSPHostingRuleAnyNodeId = @"VSPHostingRuleAnyNodeId";
     *host = proposedHost;
     
     RACSignal *dismount = [self _dismountForHost:proposedHost animated:animated];
-    dismount = [dismount doCompleted:^{
-        proposedHost.child = proposedChild;
-    }];
+    if (proposedChild) {
+        @weakify(self);
+        dismount = [dismount doCompleted:^{
+            @strongify(self);
+            [self _updateTree:proposedHost.root withParameters:parameters];
+            proposedHost.child = proposedChild;
+        }];
 
-    RACSignal *mount = [self _mountForHost:proposedHost newChild:proposedChild animated:animated];
-    [[dismount
-        concat:mount]
-        subscribe:subject];
-    mount.name = [NSString stringWithFormat:@"%@; %@", dismount.name, mount.name];
+        RACSignal *mount = [self _mountForHost:proposedHost newChild:proposedChild animated:animated];
+        [[dismount
+            concat:mount]
+            subscribe:subject];
+    } else {
+        [self _updateTree:proposedHost.root withParameters:parameters];
+        [dismount subscribe:subject];
+    }
     return [subject replayLast];
 }
 
@@ -262,7 +286,6 @@ NSString *const VSPHostingRuleAnyNodeId = @"VSPHostingRuleAnyNodeId";
     VSPNavigationNode *currentHost = host.leaf;
     do {
         currentHost = currentHost.parent;
-        
         __VSPMountingTuple *tuple = [self _tupleForHostNodeId:currentHost.nodeId childNodeId:currentHost.child.nodeId];
         NSAssert(tuple, @"No tuple found for pair host: %@; child: %@", currentHost, currentHost.child);
         VSPNavigationNodeViewControllerDismountHandler dismountBlock = tuple.dismountHandler;
@@ -274,13 +297,16 @@ NSString *const VSPHostingRuleAnyNodeId = @"VSPHostingRuleAnyNodeId";
         } else {
             result = dismount;
         }
-        
     } while (![currentHost isEqual:host]);
     result.name = [NSString stringWithFormat:@"Dismounting all %@", host.nodeId];
     return result;
 }
 
 - (RACSignal *)_mountForHost:(VSPNavigationNode *)host newChild:(VSPNavigationNode *)proposedChild animated:(BOOL)animated {
+    if (!proposedChild) {
+        // nothing to mount
+        return [RACSignal empty];
+    }
     NSParameterAssert(host);
     NSParameterAssert(proposedChild);
     RACSignal *result = [RACSignal empty];
@@ -290,7 +316,7 @@ NSString *const VSPHostingRuleAnyNodeId = @"VSPHostingRuleAnyNodeId";
         VSPNavigationNodeViewControllerMountHandler mountBlock = tuple.mountHandler;
         if (child && !mountBlock) {
             [[NSException exceptionWithName:NSInternalInconsistencyException
-                                     reason:[NSString stringWithFormat:@"Don't know hot to mount %@ on %@", child.nodeId, host.nodeId]
+                                     reason:[NSString stringWithFormat:@"\"%@\" doesn't know how to mount \"%@\"", host.nodeId, child.nodeId]
                                    userInfo:nil] raise];
         }
 
@@ -302,6 +328,15 @@ NSString *const VSPHostingRuleAnyNodeId = @"VSPHostingRuleAnyNodeId";
     }
     result.name = [NSString stringWithFormat:@"Mount %@ on %@", proposedChild.nodeId, host.nodeId];
     return result;
+}
+
+- (void)_updateTree:(VSPNavigationNode *)node withParameters:(NSDictionary *)parameters {
+    while (node) {
+        NSMutableDictionary *newParamters = [node.parameters mutableCopy];
+        [newParamters addEntriesFromDictionary:parameters];
+        node.parameters = newParamters;
+        node = node.child;
+    }
 }
 
 @end

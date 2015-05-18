@@ -1,82 +1,7 @@
-//
-//  VespucciTests.m
-//  VespucciTests
-//
-//  Created by Sash Zats on 04/08/2015.
-//  Copyright (c) 2014 Sash Zats. All rights reserved.
-//
+#import "TestHelpers.h"
+#import <Vespucci/Vespucci.h>
 
-#import "VSPNavigationNode.h"
-#import "VSPNavigationManager.h"
-#import "VSPNavigatable.h"
-
-@interface ViewController : UIViewController <VSPNavigatable>
-@property (nonatomic, weak) VSPNavigationNode *navigationNode;
-@end
-
-@implementation ViewController
-@end
-
-
-SpecBegin(InitialSpecs)
-
-describe(@"VSPNavigationNode", ^{
-    context(@"isRootNode", ^{
-        it(@"should return true if has no parent", ^{
-            VSPNavigationNode *node = [VSPNavigationNode node];
-            node.child = [VSPNavigationNode node];
-            expect(node.isRootNode).to.beTruthy();
-        });
-        
-        it(@"should be falsy has a parent", ^{
-            VSPNavigationNode *node = [VSPNavigationNode node];
-            node.child = [VSPNavigationNode node];
-            expect(node.child.isRootNode).to.beFalsy();
-        });
-    });
-    
-    context(@"root", ^{
-        it(@"should report itself if has no parent", ^{
-            VSPNavigationNode *node = [VSPNavigationNode node];
-            node.child = [VSPNavigationNode node];
-            expect(node.root).to.beIdenticalTo(node);
-        });
-        
-        it(@"should report its parent if it has no parent", ^{
-            VSPNavigationNode *node = [VSPNavigationNode node];
-            node.child = [VSPNavigationNode node];
-            expect(node.child.root).to.beIdenticalTo(node);
-        });
-    });
-    
-    context(@"leaf", ^{
-        it(@"should report itself if has no child", ^{
-            VSPNavigationNode *node = [VSPNavigationNode node];
-            expect(node.leaf).to.beIdenticalTo(node);
-        });
-        
-        it(@"should report its furthest descent if has children", ^{
-            VSPNavigationNode *node = [VSPNavigationNode node];
-            node.child = [VSPNavigationNode node];
-            expect(node.leaf).to.beIdenticalTo(node.child);
-        });
-    });
-    
-    context(@"viewController", ^{
-        it(@"should set view controller's node if conforms VSPNavigationParametrizedViewController", ^{
-            VSPNavigationNode *node = [VSPNavigationNode node];
-            node.viewController = [ViewController new];
-            expect(((ViewController *)node.viewController).navigationNode).to.beIdenticalTo(node);
-        });
-        
-        it(@"should stil works for view controller not conforming VSPNavigationParametrizedViewController", ^{
-            VSPNavigationNode *node = [VSPNavigationNode node];
-            expect(^{
-                node.viewController = [ViewController new];
-            }).notTo.raiseAny();
-        });
-    });
-});
+SpecBegin(VSPNavigationManager)
 
 describe(@"VSPNavigationManager", ^{
     __block VSPNavigationManager *manager;
@@ -99,6 +24,21 @@ describe(@"VSPNavigationManager", ^{
     });
     
     context(@"Hosting", ^{
+        context(@"Registering routes", ^{
+            it(@"should parse parameters correctly", ^{
+                waitUntil(^(DoneCallback done) {
+                    [manager registerNavigationForRoute:@"/route/:route_id" handler:^VSPNavigationNode *(NSDictionary *parameters) {
+                        expect(parameters[@"route_id"]).to.equal(@"123");
+                        done();
+                        return nil;
+                    }];
+                    [manager handleURL:[NSURL URLWithString:@"test://route/123"]];
+                });
+            });
+        });
+    });
+    
+    context(@"Hosting", ^{
         describe(@"registering routes", ^{
             context(@"parameters", ^{
                 it(@"should parse parameters correctly", ^{
@@ -109,7 +49,7 @@ describe(@"VSPNavigationManager", ^{
                     [manager handleURL:[NSURL URLWithString:@"test://route/123"]];
                 });
             });
-
+            
             pending(@"Navigation tests have to be rewritten");
             xcontext(@"navigation", ^{
                 
@@ -165,6 +105,5 @@ describe(@"VSPNavigationManager", ^{
         });
     });
 });
-
 
 SpecEnd
