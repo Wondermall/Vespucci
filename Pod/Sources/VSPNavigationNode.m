@@ -7,20 +7,15 @@
 //
 
 #import "VSPNavigationNode.h"
+#import "VSPNavigationNode+Internal.h"
 
-#import "RACSignal.h"
-#import "RACSignal+Operations.h"
-#import "RACSequence.h"
-#import "RACSubject.h"
-#import "RACEXTScope.h"
-#import "NSArray+RACSequenceAdditions.h"
-#import "NSError+Vespucci.h"
-#import "VSPNavigatable.h"
+#import <ReactiveCocoa/ReactiveCocoa.h>
+#import <Vespucci/Vespucci.h>
+
 
 @interface VSPNavigationNode ()
 
 @property (nonatomic, weak) VSPNavigationNode *parent;
-@property (nonatomic, copy) NSDictionary *parameters;
 
 @property (nonatomic) NSMutableArray *logicalEqualityRules;
 @property (nonatomic) NSMutableArray *hostingRules;
@@ -160,6 +155,10 @@
         return self.description;
     }
     return [NSString stringWithFormat:@"%@ → %@", self.description, self.child.recursiveDescription];
+}
+
+- (NSString *)debugDescription {
+    return [self recursiveDescription];
 }
 
 @end
