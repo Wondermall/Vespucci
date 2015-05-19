@@ -17,8 +17,6 @@
 
 @property (nonatomic, weak) VSPNavigationNode *parent;
 
-@property (nonatomic) NSMutableArray *logicalEqualityRules;
-@property (nonatomic) NSMutableArray *hostingRules;
 @property (nonatomic, copy) NSDictionary *parameters;
 
 @end
@@ -60,8 +58,6 @@
         return nil;
     }
     self.parameters = dictionary;
-    self.hostingRules = [NSMutableArray array];
-    self.logicalEqualityRules = [NSMutableArray array];
 
     return self;
 }
