@@ -252,22 +252,15 @@ NSString *const VSPHostingRuleAnyNodeId = @"VSPHostingRuleAnyNodeId";
     *host = proposedHost;
     
     RACSignal *dismount = [self _dismountForHost:proposedHost animated:animated];
-    if (proposedChild) {
-        @weakify(self);
-        dismount = [dismount doCompleted:^{
-            @strongify(self);
-            [self _updateTree:proposedHost.root withParameters:parameters];
-            proposedHost.child = proposedChild;
-        }];
-
-        RACSignal *mount = [self _mountForHost:proposedHost newChild:proposedChild animated:animated];
-        [[dismount
-            concat:mount]
-            subscribe:subject];
-    } else {
-        [self _updateTree:proposedHost.root withParameters:parameters];
-        [dismount subscribe:subject];
-    }
+    dismount = [dismount doCompleted:^{
+        [proposedHost.root updateParametersRecursively:parameters];
+        proposedHost.child = proposedChild;
+    }];
+    
+    RACSignal *mount = [self _mountForHost:proposedHost newChild:proposedChild animated:animated];
+    [[dismount
+        concat:mount]
+        subscribe:subject];
     return [subject replayLast];
 }
 
@@ -322,15 +315,6 @@ NSString *const VSPHostingRuleAnyNodeId = @"VSPHostingRuleAnyNodeId";
     }
     result.name = [NSString stringWithFormat:@"Mount %@ on %@", proposedChild.nodeId, host.nodeId];
     return result;
-}
-
-- (void)_updateTree:(VSPNavigationNode *)node withParameters:(NSDictionary *)parameters {
-    while (node) {
-        NSMutableDictionary *newParamters = [node.parameters mutableCopy];
-        [newParamters addEntriesFromDictionary:parameters];
-        node.parameters = newParamters;
-        node = node.child;
-    }
 }
 
 @end
