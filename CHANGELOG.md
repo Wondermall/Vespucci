@@ -1,3 +1,7 @@
+# 0.3.2
+
+1. Fixed the regression when navigation stack would become corrupted after dismissing last node.
+
 # 0.3.1
 
 1. Added support for relative nodes. As long as node doesn't point to the same root it is treated as a relative path

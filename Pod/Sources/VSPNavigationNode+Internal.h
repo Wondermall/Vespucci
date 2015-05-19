@@ -11,6 +11,7 @@
 
 @interface VSPNavigationNode ()
 
-@property (nonatomic, copy) NSDictionary *parameters;
+
+- (void)updateParametersRecursively:(NSDictionary *)parameters;
 
 @end
