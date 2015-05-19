@@ -167,6 +167,9 @@ SpecEnd
 - (void)addSimpleRuleForHostNodeId:(NSString *)hostNodeId childNodeId:(NSString *)childNodeId {
     [self addRuleForHostNodeId:hostNodeId childNodeId:childNodeId mountBlock:^RACSignal *(VSPNavigationNode *parent, VSPNavigationNode *child, BOOL animated) {
         return [RACSignal createSignal:^RACDisposable *(id<RACSubscriber> subscriber) {
+            [parent.viewController presentViewController:child.viewController animated:animated completion:^{
+                [subscriber sendCompleted];
+            }];
             [parent.viewController addChildViewController:child.viewController];
             child.viewController.view.frame = parent.viewController.view.bounds;
             child.viewController.view.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
@@ -174,7 +177,7 @@ SpecEnd
             [subscriber sendCompleted];
             return nil;
         }];
-    } dismounBlock:^RACSignal *(VSPNavigationNode *parent, VSPNavigationNode *child, BOOL animated) {
+    } unmounBlock:^RACSignal *(VSPNavigationNode *parent, VSPNavigationNode *child, BOOL animated) {
         return [RACSignal createSignal:^RACDisposable *(id<RACSubscriber> subscriber) {
             [child.viewController willMoveToParentViewController:nil];
             [child.viewController.view removeFromSuperview];

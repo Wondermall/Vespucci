@@ -52,6 +52,6 @@ typedef RACSignal *(^VSPNavigationNodeViewControllerDismountHandler)(VSPNavigati
 
 - (void)registerNavigationForRoute:(NSString *)route handler:(VSPNavigationNode *(^)(NSDictionary *parameters))handler;
 
-- (void)addRuleForHostNodeId:(NSString *)hostNodeId childNodeId:(NSString *)childNodeId mountBlock:(VSPNavigationNodeViewControllerMountHandler)mountBlock dismounBlock:(VSPNavigationNodeViewControllerDismountHandler)dismountBlock;
+- (void)addRuleForHostNodeId:(NSString *)hostNodeId childNodeId:(NSString *)childNodeId mountBlock:(VSPNavigationNodeViewControllerMountHandler)mountBlock unmounBlock:(VSPNavigationNodeViewControllerDismountHandler)dismountBlock;
 
 @end

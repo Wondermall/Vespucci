@@ -171,7 +171,7 @@ NSString *const VSPHostingRuleAnyNodeId = @"VSPHostingRuleAnyNodeId";
     }];
 }
 
-- (void)addRuleForHostNodeId:(NSString *)hostNodeId childNodeId:(NSString *)childNodeId mountBlock:(VSPNavigationNodeViewControllerMountHandler)mountBlock dismounBlock:(VSPNavigationNodeViewControllerDismountHandler)dismountBlock {
+- (void)addRuleForHostNodeId:(NSString *)hostNodeId childNodeId:(NSString *)childNodeId mountBlock:(VSPNavigationNodeViewControllerMountHandler)mountBlock unmounBlock:(VSPNavigationNodeViewControllerDismountHandler)dismountBlock {
     NSMutableDictionary *hostRules = [self _rulesForHostNodeId:hostNodeId];
     hostRules[childNodeId] = [__VSPMountingTuple tupleWithMountBlock:mountBlock dismountBlock:dismountBlock];
 }
