@@ -57,7 +57,7 @@
     if (!self) {
         return nil;
     }
-    self.parameters = dictionary;
+    self.parameters = dictionary ?: [NSDictionary dictionary];
 
     return self;
 }
