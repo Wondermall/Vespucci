@@ -1,3 +1,7 @@
+# 0.4.1
+
+1. Added `VSPNavigationManagerWillNavigateNotification`.
+
 # 0.4
 
 1. Removed `VSPNavigationManagerNotificationParametersKey` from notifcations, use `node.parameters` instead.
