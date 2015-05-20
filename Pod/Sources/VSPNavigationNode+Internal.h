@@ -11,7 +11,6 @@
 
 @interface VSPNavigationNode ()
 
-
 - (void)updateParametersRecursively:(NSDictionary *)parameters;
 
 @end
