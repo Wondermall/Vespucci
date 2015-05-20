@@ -16,6 +16,7 @@
 #import <Vespucci/Vespucci.h>
 
 
+NSString *const VSPNavigationManagerWillNavigateNotification = @"VSPNavigationManagerWillNavigateNotification";
 NSString *const VSPNavigationManagerDidFinishNavigationNotification = @"VSPNavigationManagerDidFinishNavigationNotification";
 NSString *const VSPNavigationManagerDidFailNavigationNotification = @"VSPNavigationManagerDidFailNavigationNotification";
 NSString *const VSPNavigationManagerNotificationNodeKey = @"VSPNavigationManagerNotificationNodeKey";
@@ -116,6 +117,7 @@ NSString *const VSPHostingRuleAnyNodeId = @"VSPHostingRuleAnyNodeId";
     VSPNavigationNode *proposedHost = self.root;
     VSPNavigationNode *proposedChild = node;
     RACSignal *makeHost = [self _makeHostNode:&proposedHost hostChildNode:&proposedChild animated:animated];
+    [self _postNotificationNamed:VSPNavigationManagerWillNavigateNotification node:proposedChild.leaf];
     [makeHost subscribeError:^(NSError *error) {
         @strongify(self);
         [self _postNotificationNamed:VSPNavigationManagerDidFailNavigationNotification node:proposedChild.leaf];
@@ -255,7 +257,7 @@ NSString *const VSPHostingRuleAnyNodeId = @"VSPHostingRuleAnyNodeId";
     [[dismount
         concat:mount]
         subscribe:subject];
-    return [subject replayLast];
+    return subject;
 }
 
 - (RACSignal *)_dismountForHost:(VSPNavigationNode *)host animated:(BOOL)animated {
