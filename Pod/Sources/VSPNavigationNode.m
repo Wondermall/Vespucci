@@ -78,7 +78,7 @@
     _viewController = viewController;
 
     if ([viewController conformsToProtocol:@protocol(VSPNavigatable)] &&
-        [((id <VSPNavigatable>)viewController).navigationNode isEqual:self]) {
+        ![((id <VSPNavigatable>)viewController).navigationNode isEqual:self]) {
         ((id <VSPNavigatable>)viewController).navigationNode = self;
     }
 }
