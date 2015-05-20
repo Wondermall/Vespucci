@@ -14,7 +14,6 @@
 extern NSString *const VSPNavigationManagerDidFinishNavigationNotification;
 extern NSString *const VSPNavigationManagerDidFailNavigationNotification;
 extern NSString *const VSPNavigationManagerNotificationNodeKey;
-extern NSString *const VSPNavigationManagerNotificationParametersKey;
 
 extern NSString *const VSPHostingRuleAnyNodeId;
 
@@ -52,6 +51,6 @@ typedef RACSignal *(^VSPNavigationNodeViewControllerDismountHandler)(VSPNavigati
 
 - (void)registerNavigationForRoute:(NSString *)route handler:(VSPNavigationNode *(^)(NSDictionary *parameters))handler;
 
-- (void)addRuleForHostNodeId:(NSString *)hostNodeId childNodeId:(NSString *)childNodeId mountBlock:(VSPNavigationNodeViewControllerMountHandler)mountBlock dismounBlock:(VSPNavigationNodeViewControllerDismountHandler)dismountBlock;
+- (void)addRuleForHostNodeId:(NSString *)hostNodeId childNodeId:(NSString *)childNodeId mountBlock:(VSPNavigationNodeViewControllerMountHandler)mountBlock unmounBlock:(VSPNavigationNodeViewControllerDismountHandler)dismountBlock;
 
 @end

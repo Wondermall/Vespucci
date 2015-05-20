@@ -1,3 +1,10 @@
+# 0.4
+
+1. Removed `VSPNavigationManagerNotificationParametersKey` from notifcations, use `node.parameters` instead.
+1. Renamed `addRuleForHostNodeId:childNodeId:mountBlock:unmountBlock:`
+1. Making sure `navigationNode` on a `VSPNavigatable` view controller won't be reassigned if it didn't change.
+1. Making sure `parameters` on `VSPNavigationNode` won't be reassigned if they didn't change.
+
 # 0.3.2
 
 1. Fixed the regression when navigation stack would become corrupted after dismissing last node.

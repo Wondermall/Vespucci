@@ -19,7 +19,6 @@
 NSString *const VSPNavigationManagerDidFinishNavigationNotification = @"VSPNavigationManagerDidFinishNavigationNotification";
 NSString *const VSPNavigationManagerDidFailNavigationNotification = @"VSPNavigationManagerDidFailNavigationNotification";
 NSString *const VSPNavigationManagerNotificationNodeKey = @"VSPNavigationManagerNotificationNodeKey";
-NSString *const VSPNavigationManagerNotificationParametersKey = @"VSPNavigationManagerNotificationParametersKey";
 
 NSString *const VSPHostingRuleAnyNodeId = @"VSPHostingRuleAnyNodeId";
 
@@ -128,17 +127,12 @@ NSString *const VSPHostingRuleAnyNodeId = @"VSPHostingRuleAnyNodeId";
 }
 
 - (void)_postNotificationNamed:(NSString *)notificationName node:(VSPNavigationNode *)node {
-    [[NSNotificationCenter defaultCenter] postNotificationName:notificationName object:self userInfo:@{
-        VSPNavigationManagerNotificationNodeKey : node ?: [NSNull null],
-        VSPNavigationManagerNotificationParametersKey : node.parameters ?: [NSNull null]
-    }];
-}
-
-- (void)_notifyNavigationDidFinishForNode:(VSPNavigationNode *)node {
-    [[NSNotificationCenter defaultCenter] postNotificationName:VSPNavigationManagerDidFinishNavigationNotification object:self userInfo:@{
-        VSPNavigationManagerNotificationNodeKey : node ?: [NSNull null],
-        VSPNavigationManagerNotificationParametersKey : node.parameters ?: [NSNull null]
-    }];
+    NSAssert(node, @"No node specified to deliver in notification");
+    if (node) {
+        [[NSNotificationCenter defaultCenter] postNotificationName:notificationName object:self userInfo:@{
+            VSPNavigationManagerNotificationNodeKey: node
+        }];
+    }
 }
 
 @end
@@ -171,7 +165,7 @@ NSString *const VSPHostingRuleAnyNodeId = @"VSPHostingRuleAnyNodeId";
     }];
 }
 
-- (void)addRuleForHostNodeId:(NSString *)hostNodeId childNodeId:(NSString *)childNodeId mountBlock:(VSPNavigationNodeViewControllerMountHandler)mountBlock dismounBlock:(VSPNavigationNodeViewControllerDismountHandler)dismountBlock {
+- (void)addRuleForHostNodeId:(NSString *)hostNodeId childNodeId:(NSString *)childNodeId mountBlock:(VSPNavigationNodeViewControllerMountHandler)mountBlock unmounBlock:(VSPNavigationNodeViewControllerDismountHandler)dismountBlock {
     NSMutableDictionary *hostRules = [self _rulesForHostNodeId:hostNodeId];
     hostRules[childNodeId] = [__VSPMountingTuple tupleWithMountBlock:mountBlock dismountBlock:dismountBlock];
 }

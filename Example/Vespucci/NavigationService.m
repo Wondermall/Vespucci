@@ -150,7 +150,7 @@ NSString *const BlockUserNodeId = @"root.notifications.profile.block";
             }];
             return nil;
         }];
-    } dismounBlock:^RACSignal *(VSPNavigationNode *parent, VSPNavigationNode *child, BOOL animated) {
+    } unmounBlock:^RACSignal *(VSPNavigationNode *parent, VSPNavigationNode *child, BOOL animated) {
         return [RACSignal createSignal:^RACDisposable *(id<RACSubscriber> subscriber) {
             [child.viewController dismissViewControllerAnimated:animated completion:^{
                 [subscriber sendCompleted];
@@ -168,7 +168,7 @@ NSString *const BlockUserNodeId = @"root.notifications.profile.block";
             [subscriber sendCompleted];
             return nil;
         }];
-    } dismounBlock:^RACSignal *(VSPNavigationNode *parent, VSPNavigationNode *child, BOOL animated) {
+    } unmounBlock:^RACSignal *(VSPNavigationNode *parent, VSPNavigationNode *child, BOOL animated) {
         // no-op
         return nil;
     }];
@@ -189,7 +189,7 @@ NSString *const BlockUserNodeId = @"root.notifications.profile.block";
             [subscriber sendCompleted];
             return nil;
         }];
-    } dismounBlock:^RACSignal *(VSPNavigationNode *parent, VSPNavigationNode *child, BOOL animated) {
+    } unmounBlock:^RACSignal *(VSPNavigationNode *parent, VSPNavigationNode *child, BOOL animated) {
         return nil;
     }];
 
@@ -212,7 +212,7 @@ NSString *const BlockUserNodeId = @"root.notifications.profile.block";
             }];
             return nil;
         }];
-    } dismounBlock:^RACSignal *(VSPNavigationNode *parent, VSPNavigationNode *child, BOOL animated) {
+    } unmounBlock:^RACSignal *(VSPNavigationNode *parent, VSPNavigationNode *child, BOOL animated) {
         return [RACSignal createSignal:^RACDisposable *(id<RACSubscriber> subscriber) {
             [child.viewController dismissViewControllerAnimated:animated completion:^{
                 [subscriber sendCompleted];
@@ -233,7 +233,7 @@ NSString *const BlockUserNodeId = @"root.notifications.profile.block";
             }];
             return nil;
         }];
-    } dismounBlock:^RACSignal *(VSPNavigationNode *parent, VSPNavigationNode *child, BOOL animated) {
+    } unmounBlock:^RACSignal *(VSPNavigationNode *parent, VSPNavigationNode *child, BOOL animated) {
         return [RACSignal createSignal:^RACDisposable *(id <RACSubscriber> subscriber) {
             [child.viewController dismissViewControllerAnimated:animated completion:^{
                 [subscriber sendCompleted];

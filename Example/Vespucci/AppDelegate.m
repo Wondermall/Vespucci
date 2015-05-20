@@ -26,11 +26,11 @@
     // Just for the purpose of the demo
     [[NSNotificationCenter defaultCenter] addObserverForName:VSPNavigationManagerDidFinishNavigationNotification object:nil queue:nil usingBlock:^(NSNotification *note) {
         VSPNavigationNode *node = note.userInfo[VSPNavigationManagerNotificationNodeKey];
-        NSLog(@"Navigation manager did finish navigation.\nNode: %@\nParameters: %@", node.root, note.userInfo[VSPNavigationManagerNotificationParametersKey]);
+        NSLog(@"Navigation manager did finish navigation.\nNode: %@", node.root);
     }];
     
     [[NSNotificationCenter defaultCenter] addObserverForName:VSPNavigationManagerDidFailNavigationNotification object:nil queue:nil usingBlock:^(NSNotification *note) {
-        NSLog(@"Navigation manager did FAIL navigation.\nNode: %@\nParameters: %@", note.userInfo[VSPNavigationManagerNotificationNodeKey], note.userInfo[VSPNavigationManagerNotificationParametersKey]);
+        NSLog(@"Navigation manager did FAIL navigation.\nNode: %@", note.userInfo[VSPNavigationManagerNotificationNodeKey]);
     }];
 #endif
     

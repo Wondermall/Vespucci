@@ -57,7 +57,7 @@
     if (!self) {
         return nil;
     }
-    self.parameters = dictionary;
+    self.parameters = dictionary ?: [NSDictionary dictionary];
 
     return self;
 }
@@ -77,7 +77,8 @@
 - (void)setViewController:(UIViewController *)viewController {
     _viewController = viewController;
 
-    if ([viewController conformsToProtocol:@protocol(VSPNavigatable)]) {
+    if ([viewController conformsToProtocol:@protocol(VSPNavigatable)] &&
+        ![((id <VSPNavigatable>)viewController).navigationNode isEqual:self]) {
         ((id <VSPNavigatable>)viewController).navigationNode = self;
     }
 }
@@ -115,7 +116,9 @@
 - (void)updateParametersRecursively:(NSDictionary *)parameters {
     NSMutableDictionary *newParamters = [self.parameters mutableCopy];
     [newParamters addEntriesFromDictionary:parameters];
-    self.parameters = newParamters;
+    if (![self.parameters isEqualToDictionary:newParamters]) {
+        self.parameters = newParamters;
+    }
     [self.child updateParametersRecursively:parameters];
 }
 
