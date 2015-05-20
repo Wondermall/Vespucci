@@ -255,7 +255,7 @@ NSString *const VSPHostingRuleAnyNodeId = @"VSPHostingRuleAnyNodeId";
     [[dismount
         concat:mount]
         subscribe:subject];
-    return [subject replayLast];
+    return subject;
 }
 
 - (RACSignal *)_dismountForHost:(VSPNavigationNode *)host animated:(BOOL)animated {
