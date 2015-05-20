@@ -129,7 +129,6 @@ NSString *const VSPHostingRuleAnyNodeId = @"VSPHostingRuleAnyNodeId";
 }
 
 - (void)_postNotificationNamed:(NSString *)notificationName node:(VSPNavigationNode *)node {
-    NSAssert(node, @"No node specified to deliver in notification");
     if (node) {
         [[NSNotificationCenter defaultCenter] postNotificationName:notificationName object:self userInfo:@{
             VSPNavigationManagerNotificationNodeKey: node
