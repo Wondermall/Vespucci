@@ -62,6 +62,8 @@ typedef UIViewController *(^WMLNavigationNodeViewControllerFactory)(NSDictionary
 
 - (instancetype)initWithNavigationParameters:(NSDictionary *)dictionary NS_DESIGNATED_INITIALIZER;
 
+- (BOOL)isEqualToNode:(VSPNavigationNode *)node;
+
 @end
 
 
