@@ -158,6 +158,49 @@ describe(@"Navigation rules", ^{
             });
         });
     });
+    
+    context(@"Notifications", ^{
+       context(@"did finish navigation", ^{
+           it(@"should post notification when navigation is complete", ^{
+               expect(^{
+                   NSURL *URL = [NSURL URLWithFormat:@"%@://%@", URLScheme, [ProfileRoute stringByReplacingKey:@"user_id" withValue:@"abc"]];
+                   [manager handleURL:URL];
+               }).will.postNotification(VSPNavigationManagerDidFinishNavigationNotification);
+           });
+           
+           it(@"notification should point to the manager", ^{
+               waitUntil(^(DoneCallback done) {
+                   __block id observer = [[NSNotificationCenter defaultCenter] addObserverForName:VSPNavigationManagerDidFinishNavigationNotification object:nil queue:nil usingBlock:^(NSNotification *note) {
+                       [[NSNotificationCenter defaultCenter] removeObserver:observer];
+                       expect(note.object).to.beIdenticalTo(manager);                       
+                       done();
+                   }];
+                   
+                   NSURL *URL = [NSURL URLWithFormat:@"%@://%@", URLScheme, [ProfileRoute stringByReplacingKey:@"user_id" withValue:@"abc"]];
+                   [manager handleURL:URL];
+               });
+           });
+           
+           it(@"should contain both old and a new tree when navigation is complete", ^{
+               waitUntil(^(DoneCallback done) {
+                   __block VSPNavigationNode *oldTreeCopy = [manager.root copy];
+                   
+                   __block id observer = [[NSNotificationCenter defaultCenter] addObserverForName:VSPNavigationManagerDidFinishNavigationNotification object:nil queue:nil usingBlock:^(NSNotification *note) {
+                       [[NSNotificationCenter defaultCenter] removeObserver:observer];
+                       
+                       expect(note.userInfo[VSPNavigationManagerNotificationSourceNodeKey]).to.equal(oldTreeCopy);
+
+                       expect(note.userInfo[VSPNavigationManagerNotificationNodeKey]).to.equal(manager.root.leaf);
+                       
+                       done();
+                   }];
+                   
+                   NSURL *URL = [NSURL URLWithFormat:@"%@://%@", URLScheme, [ProfileRoute stringByReplacingKey:@"user_id" withValue:@"abc"]];
+                   [manager handleURL:URL];
+               });
+           });
+       });
+    });
 });
 
 SpecEnd
