@@ -63,4 +63,7 @@
     instance.nodeId = nodeId;
     return instance;
 }
+- (NSString *)description {
+    return [NSString stringWithFormat:@"<%@: %p> {nodeId = %@}", [self class], self, self.nodeId];
+}
 @end
