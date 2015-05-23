@@ -236,38 +236,24 @@ NSString *const VSPHostingRuleAnyNodeId = @"VSPHostingRuleAnyNodeId";
     // we need to capture new parameters before child will be modified
     NSDictionary *parameters = (*child).parameters;
 
-    RACSubject *subject = [RACSubject subject];
-
     // Calculate actual host and actual child
     VSPNavigationNode *proposedChild = (*child).root;
     VSPNavigationNode *proposedHost = (*host).root;
     if (![self _getHost:&proposedHost forChild:&proposedChild]) {
-        [subject sendError:[NSError vsp_vespucciErrorWithCode:0 message:@"Failed to find the host for %@", *child]];
-        return subject;
+        return [RACSignal error:[NSError vsp_vespucciErrorWithCode:0 message:@"Failed to find the host for %@", *child]];
     }
 
     // Update original pointers with calculated host and child
     *child = proposedChild;
     *host = proposedHost;
     
-    RACSignal *dismount = [self _dismountForHost:proposedHost animated:animated];
-    dismount = [dismount doCompleted:^{
+    RACSignal *unmount = [self _dismountForHost:proposedHost animated:animated];
+    unmount = [unmount doCompleted:^{
         [proposedHost.root updateParametersRecursively:parameters];
         proposedHost.child = proposedChild;
     }];
-    
     RACSignal *mount = [self _mountForHost:proposedHost newChild:proposedChild animated:animated];
-    [[dismount
-        concat:mount]
-        subscribe:subject];
-    [subject subscribeNext:^(id x) {
-        
-    } error:^(NSError *error) {
-        
-    } completed:^{
-        
-    }];
-    return subject;
+    return [unmount concat:mount];
 }
 
 - (RACSignal *)_dismountForHost:(VSPNavigationNode *)host animated:(BOOL)animated {
