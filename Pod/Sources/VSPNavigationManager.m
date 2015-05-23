@@ -19,7 +19,7 @@
 NSString *const VSPNavigationManagerWillNavigateNotification = @"VSPNavigationManagerWillNavigateNotification";
 NSString *const VSPNavigationManagerDidFinishNavigationNotification = @"VSPNavigationManagerDidFinishNavigationNotification";
 NSString *const VSPNavigationManagerDidFailNavigationNotification = @"VSPNavigationManagerDidFailNavigationNotification";
-NSString *const VSPNavigationManagerNotificationNodeKey = @"VSPNavigationManagerNotificationNodeKey";
+NSString *const VSPNavigationManagerNotificationDestinationNodeKey = @"VSPNavigationManagerNotificationDestinationNodeKey";
 NSString *const VSPNavigationManagerNotificationSourceNodeKey = @"VSPNavigationManagerNotificationSourceNodeKey";
 
 NSString *const VSPHostingRuleAnyNodeId = @"VSPHostingRuleAnyNodeId";
@@ -132,7 +132,7 @@ NSString *const VSPHostingRuleAnyNodeId = @"VSPHostingRuleAnyNodeId";
 - (void)_postNotificationNamed:(NSString *)notificationName destination:(VSPNavigationNode *)node source:(VSPNavigationNode *)source {
     NSMutableDictionary *userInfo = [NSMutableDictionary dictionary];
     if (node) {
-        userInfo[VSPNavigationManagerNotificationNodeKey] = node;
+        userInfo[VSPNavigationManagerNotificationDestinationNodeKey] = node;
     }
     if (source) {
         userInfo[VSPNavigationManagerNotificationSourceNodeKey] = source;

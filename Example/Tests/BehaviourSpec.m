@@ -190,7 +190,7 @@ describe(@"Navigation rules", ^{
                        
                        expect(note.userInfo[VSPNavigationManagerNotificationSourceNodeKey]).to.equal(oldTreeCopy);
 
-                       expect(note.userInfo[VSPNavigationManagerNotificationNodeKey]).to.equal(manager.root.leaf);
+                       expect(note.userInfo[VSPNavigationManagerNotificationDestinationNodeKey]).to.equal(manager.root.leaf);
                        
                        done();
                    }];
