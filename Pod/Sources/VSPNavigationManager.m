@@ -119,15 +119,14 @@ NSString *const VSPHostingRuleAnyNodeId = @"VSPHostingRuleAnyNodeId";
     VSPNavigationNode *proposedChild = node;
     RACSignal *navigation = [self _navigateWithHost:&proposedHost newChild:&proposedChild animated:animated];
     [self _postNotificationNamed:VSPNavigationManagerWillNavigateNotification destination:proposedChild.leaf source:oldTree];
-    [navigation doError:^(NSError *error) {
+    [navigation subscribeError:^(NSError *error) {
         @strongify(self);
         [self _postNotificationNamed:VSPNavigationManagerDidFailNavigationNotification destination:proposedChild.leaf source:oldTree];
-    }];
-    [navigation doCompleted:^{
+    } completed:^{
         @strongify(self);
         [self _postNotificationNamed:VSPNavigationManagerDidFinishNavigationNotification destination:proposedChild.leaf source:oldTree];
     }];
-    return [navigation replayLast];
+    return navigation;
 }
 
 - (void)_postNotificationNamed:(NSString *)notificationName destination:(VSPNavigationNode *)node source:(VSPNavigationNode *)source {
