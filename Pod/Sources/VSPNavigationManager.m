@@ -121,10 +121,10 @@ NSString *const VSPHostingRuleAnyNodeId = @"VSPHostingRuleAnyNodeId";
     [self _postNotificationNamed:VSPNavigationManagerWillNavigateNotification destination:proposedChild.leaf source:oldTree];
     [navigation subscribeError:^(NSError *error) {
         @strongify(self);
-        [self _postNotificationNamed:VSPNavigationManagerDidFailNavigationNotification destination:proposedChild.leaf source:oldTree];
+        [self _postNotificationNamed:VSPNavigationManagerDidFailNavigationNotification destination:self.root source:oldTree];
     } completed:^{
         @strongify(self);
-        [self _postNotificationNamed:VSPNavigationManagerDidFinishNavigationNotification destination:proposedChild.leaf source:oldTree];
+        [self _postNotificationNamed:VSPNavigationManagerDidFinishNavigationNotification destination:self.root source:oldTree];
     }];
     return navigation;
 }
