@@ -158,6 +158,49 @@ describe(@"Navigation rules", ^{
             });
         });
     });
+    
+    context(@"Notifications", ^{
+       context(@"did finish navigation", ^{
+           it(@"should post notification when navigation is complete", ^{
+               expect(^{
+                   NSURL *URL = [NSURL URLWithFormat:@"%@://%@", URLScheme, [ProfileRoute stringByReplacingKey:@"user_id" withValue:@"abc"]];
+                   [manager handleURL:URL];
+               }).will.postNotification(VSPNavigationManagerDidFinishNavigationNotification);
+           });
+           
+           it(@"notification should point to the manager", ^{
+               waitUntil(^(DoneCallback done) {
+                   __block id observer = [[NSNotificationCenter defaultCenter] addObserverForName:VSPNavigationManagerDidFinishNavigationNotification object:nil queue:nil usingBlock:^(NSNotification *note) {
+                       [[NSNotificationCenter defaultCenter] removeObserver:observer];
+                       expect(note.object).to.beIdenticalTo(manager);                       
+                       done();
+                   }];
+                   
+                   NSURL *URL = [NSURL URLWithFormat:@"%@://%@", URLScheme, [ProfileRoute stringByReplacingKey:@"user_id" withValue:@"abc"]];
+                   [manager handleURL:URL];
+               });
+           });
+           
+           it(@"should contain both old and a new tree when navigation is complete", ^{
+               waitUntil(^(DoneCallback done) {
+                   __block VSPNavigationNode *oldTreeCopy = [manager.root copy];
+                   
+                   __block id observer = [[NSNotificationCenter defaultCenter] addObserverForName:VSPNavigationManagerDidFinishNavigationNotification object:nil queue:nil usingBlock:^(NSNotification *note) {
+                       [[NSNotificationCenter defaultCenter] removeObserver:observer];
+                       
+                       expect(note.userInfo[VSPNavigationManagerNotificationSourceNodeKey]).to.equal(oldTreeCopy);
+
+                       expect(note.userInfo[VSPNavigationManagerNotificationDestinationNodeKey]).to.equal(manager.root);
+                       
+                       done();
+                   }];
+                   
+                   NSURL *URL = [NSURL URLWithFormat:@"%@://%@", URLScheme, [ProfileRoute stringByReplacingKey:@"user_id" withValue:@"abc"]];
+                   [manager handleURL:URL];
+               });
+           });
+       });
+    });
 });
 
 SpecEnd
@@ -167,13 +210,13 @@ SpecEnd
 - (void)addSimpleRuleForHostNodeId:(NSString *)hostNodeId childNodeId:(NSString *)childNodeId {
     [self addRuleForHostNodeId:hostNodeId childNodeId:childNodeId mountBlock:^RACSignal *(VSPNavigationNode *parent, VSPNavigationNode *child, BOOL animated) {
         return [RACSignal createSignal:^RACDisposable *(id<RACSubscriber> subscriber) {
-            [parent.viewController presentViewController:child.viewController animated:animated completion:^{
-                [subscriber sendCompleted];
-            }];
-            [parent.viewController addChildViewController:child.viewController];
-            child.viewController.view.frame = parent.viewController.view.bounds;
-            child.viewController.view.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
-            [parent.viewController.view addSubview:child.viewController.view];
+            UIViewController *parentController = parent.viewController;
+            UIViewController *childController = child.viewController;
+            [parentController addChildViewController:childController];
+            childController.view.frame = parentController.view.bounds;
+            childController.view.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
+            [parentController.view addSubview:childController.view];
+            [childController didMoveToParentViewController:parentController];
             [subscriber sendCompleted];
             return nil;
         }];

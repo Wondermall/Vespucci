@@ -22,17 +22,15 @@
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
     self.window.tintColor = [UIColor whiteColor];
     
-#ifdef DEBUG
     // Just for the purpose of the demo
     [[NSNotificationCenter defaultCenter] addObserverForName:VSPNavigationManagerDidFinishNavigationNotification object:nil queue:nil usingBlock:^(NSNotification *note) {
-        VSPNavigationNode *node = note.userInfo[VSPNavigationManagerNotificationNodeKey];
+        VSPNavigationNode *node = note.userInfo[VSPNavigationManagerNotificationDestinationNodeKey];
         NSLog(@"Navigation manager did finish navigation.\nNode: %@", node.root);
     }];
     
     [[NSNotificationCenter defaultCenter] addObserverForName:VSPNavigationManagerDidFailNavigationNotification object:nil queue:nil usingBlock:^(NSNotification *note) {
-        NSLog(@"Navigation manager did FAIL navigation.\nNode: %@", note.userInfo[VSPNavigationManagerNotificationNodeKey]);
+        NSLog(@"Navigation manager did FAIL navigation.\nNode: %@", note.userInfo[VSPNavigationManagerNotificationDestinationNodeKey]);
     }];
-#endif
     
     return YES;
 }

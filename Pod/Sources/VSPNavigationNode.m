@@ -173,6 +173,17 @@
 
 @implementation VSPNavigationNode (Hierarchy)
 
+- (BOOL)containsNodeWithId:(NSString *)nodeId {
+    VSPNavigationNode *node = self;
+    while (node) {
+        if ([node.nodeId isEqualToString:nodeId]) {
+            return YES;
+        }
+        node = node.child;
+    }
+    return NO;
+}
+
 - (void)removeFromParent {
     self.parent.child = nil;
 }

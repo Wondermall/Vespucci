@@ -1,3 +1,7 @@
+# 0.4.3
+
+1. Replaced logic of notification: `VSPNavigationManagerNotificationSourceNodeKey` points to the old tree, `VSPNavigationManagerNotificationDestinationNodeKey` points to the new tree.
+
 # 0.4.1
 
 1. Added `VSPNavigationManagerWillNavigateNotification`.

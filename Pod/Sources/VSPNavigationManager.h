@@ -14,7 +14,8 @@
 extern NSString *const VSPNavigationManagerWillNavigateNotification;
 extern NSString *const VSPNavigationManagerDidFinishNavigationNotification;
 extern NSString *const VSPNavigationManagerDidFailNavigationNotification;
-extern NSString *const VSPNavigationManagerNotificationNodeKey;
+extern NSString *const VSPNavigationManagerNotificationDestinationNodeKey;
+extern NSString *const VSPNavigationManagerNotificationSourceNodeKey;
 
 extern NSString *const VSPHostingRuleAnyNodeId;
 

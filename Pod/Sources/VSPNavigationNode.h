@@ -75,6 +75,8 @@ typedef UIViewController *(^WMLNavigationNodeViewControllerFactory)(NSDictionary
 
 @property (nonatomic, readonly) VSPNavigationNode *leaf;
 
+- (BOOL)containsNodeWithId:(NSString *)nodeId;
+
 - (void)removeFromParent;
 
 @end

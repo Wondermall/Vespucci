@@ -19,7 +19,8 @@
 NSString *const VSPNavigationManagerWillNavigateNotification = @"VSPNavigationManagerWillNavigateNotification";
 NSString *const VSPNavigationManagerDidFinishNavigationNotification = @"VSPNavigationManagerDidFinishNavigationNotification";
 NSString *const VSPNavigationManagerDidFailNavigationNotification = @"VSPNavigationManagerDidFailNavigationNotification";
-NSString *const VSPNavigationManagerNotificationNodeKey = @"VSPNavigationManagerNotificationNodeKey";
+NSString *const VSPNavigationManagerNotificationDestinationNodeKey = @"VSPNavigationManagerNotificationDestinationNodeKey";
+NSString *const VSPNavigationManagerNotificationSourceNodeKey = @"VSPNavigationManagerNotificationSourceNodeKey";
 
 NSString *const VSPHostingRuleAnyNodeId = @"VSPHostingRuleAnyNodeId";
 
@@ -51,7 +52,7 @@ NSString *const VSPHostingRuleAnyNodeId = @"VSPHostingRuleAnyNodeId";
 
 - (BOOL)_getHost:(inout VSPNavigationNode **)inOutParent forChild:(inout VSPNavigationNode **)inOutChild;
 
-- (RACSignal *)_makeHostNode:(inout VSPNavigationNode **)host hostChildNode:(inout VSPNavigationNode **)child animated:(BOOL)animated;
+- (RACSignal *)_navigateWithHost:(inout VSPNavigationNode **)host newChild:(inout VSPNavigationNode **)child animated:(BOOL)animated;
 
 @end
 
@@ -100,7 +101,7 @@ NSString *const VSPHostingRuleAnyNodeId = @"VSPHostingRuleAnyNodeId";
 
 - (RACSignal *)_navigateWithNode:(VSPNavigationNode *)node {
     NSAssert(self.root, @"No root node installed");
-
+    VSPNavigationNode *oldTree = [self.root copy];
     if (![self.root.nodeId isEqual:node.nodeId]) {
         // this is a relative path
         VSPNavigationNode *rootCopy = [self.root copy];
@@ -116,24 +117,27 @@ NSString *const VSPHostingRuleAnyNodeId = @"VSPHostingRuleAnyNodeId";
     @weakify(self);
     VSPNavigationNode *proposedHost = self.root;
     VSPNavigationNode *proposedChild = node;
-    RACSignal *makeHost = [self _makeHostNode:&proposedHost hostChildNode:&proposedChild animated:animated];
-    [self _postNotificationNamed:VSPNavigationManagerWillNavigateNotification node:proposedChild.leaf];
-    [makeHost subscribeError:^(NSError *error) {
+    RACSignal *navigation = [self _navigateWithHost:&proposedHost newChild:&proposedChild animated:animated];
+    [self _postNotificationNamed:VSPNavigationManagerWillNavigateNotification destination:proposedChild.leaf source:oldTree];
+    [navigation subscribeError:^(NSError *error) {
         @strongify(self);
-        [self _postNotificationNamed:VSPNavigationManagerDidFailNavigationNotification node:proposedChild.leaf];
+        [self _postNotificationNamed:VSPNavigationManagerDidFailNavigationNotification destination:self.root source:oldTree];
     } completed:^{
         @strongify(self);
-        [self _postNotificationNamed:VSPNavigationManagerDidFinishNavigationNotification node:proposedChild.leaf];
+        [self _postNotificationNamed:VSPNavigationManagerDidFinishNavigationNotification destination:self.root source:oldTree];
     }];
-    return makeHost;
+    return navigation;
 }
 
-- (void)_postNotificationNamed:(NSString *)notificationName node:(VSPNavigationNode *)node {
+- (void)_postNotificationNamed:(NSString *)notificationName destination:(VSPNavigationNode *)node source:(VSPNavigationNode *)source {
+    NSMutableDictionary *userInfo = [NSMutableDictionary dictionary];
     if (node) {
-        [[NSNotificationCenter defaultCenter] postNotificationName:notificationName object:self userInfo:@{
-            VSPNavigationManagerNotificationNodeKey: node
-        }];
+        userInfo[VSPNavigationManagerNotificationDestinationNodeKey] = node;
     }
+    if (source) {
+        userInfo[VSPNavigationManagerNotificationSourceNodeKey] = source;
+    }
+    [[NSNotificationCenter defaultCenter] postNotificationName:notificationName object:self userInfo:userInfo];
 }
 
 @end
@@ -228,35 +232,28 @@ NSString *const VSPHostingRuleAnyNodeId = @"VSPHostingRuleAnyNodeId";
     return [self _tupleForHostNodeId:parent.nodeId childNodeId:child.nodeId] != nil;
 }
 
-- (RACSignal *)_makeHostNode:(VSPNavigationNode **)host hostChildNode:(VSPNavigationNode **)child animated:(BOOL)animated {
+- (RACSignal *)_navigateWithHost:(VSPNavigationNode **)host newChild:(VSPNavigationNode **)child animated:(BOOL)animated {
     // we need to capture new parameters before child will be modified
     NSDictionary *parameters = (*child).parameters;
-
-    RACSubject *subject = [RACSubject subject];
 
     // Calculate actual host and actual child
     VSPNavigationNode *proposedChild = (*child).root;
     VSPNavigationNode *proposedHost = (*host).root;
     if (![self _getHost:&proposedHost forChild:&proposedChild]) {
-        [subject sendError:[NSError vsp_vespucciErrorWithCode:0 message:@"Failed to find the host for %@", *child]];
-        return subject;
+        return [RACSignal error:[NSError vsp_vespucciErrorWithCode:0 message:@"Failed to find the host for %@", *child]];
     }
 
     // Update original pointers with calculated host and child
     *child = proposedChild;
     *host = proposedHost;
     
-    RACSignal *dismount = [self _dismountForHost:proposedHost animated:animated];
-    dismount = [dismount doCompleted:^{
+    RACSignal *unmount = [self _dismountForHost:proposedHost animated:animated];
+    unmount = [unmount doCompleted:^{
         [proposedHost.root updateParametersRecursively:parameters];
         proposedHost.child = proposedChild;
     }];
-    
     RACSignal *mount = [self _mountForHost:proposedHost newChild:proposedChild animated:animated];
-    [[dismount
-        concat:mount]
-        subscribe:subject];
-    return subject;
+    return [unmount concat:mount];
 }
 
 - (RACSignal *)_dismountForHost:(VSPNavigationNode *)host animated:(BOOL)animated {
