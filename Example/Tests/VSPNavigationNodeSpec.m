@@ -60,6 +60,25 @@ describe(@"VSPNavigationNode", ^{
             }).notTo.raiseAny();
         });
     });
+    
+    context(@"containsNodeWithId:", ^{
+        __block VSPNavigationNode *node;
+        beforeAll(^{
+            node = [VSPNavigationNode rootNodeForParameters:nil nodeIds:@"a", @"b", @"c", nil];
+        });
+        
+        it(@"should pass if root.nodeId is the same as the passed one", ^{
+            expect([node containsNodeWithId:@"a"]).to.beTruthy();
+        });
+
+        it(@"should pass if leaf.nodeId is the same as the passed one", ^{
+            expect([node containsNodeWithId:@"c"]).to.beTruthy();
+        });
+
+        it(@"should fail if leaf.nodeId is the same as the passed one", ^{
+            expect([node containsNodeWithId:@"not-in-the-tree"]).to.beFalsy();
+        });
+    });
 });
 
 SpecEnd
