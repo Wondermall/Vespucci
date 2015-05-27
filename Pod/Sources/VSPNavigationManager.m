@@ -128,10 +128,11 @@ NSString *const VSPHostingRuleAnyNodeId = @"VSPHostingRuleAnyNodeId";
         RACSignal *navigation = [self _navigateWithHost:&proposedHost newChild:&proposedChild animated:animated];
         RACMulticastConnection *connection = [navigation multicast:[RACReplaySubject subject]];
         RACDisposable *disposable = [connection connect];
-        [navigation subscribeCompleted:^{
+        RACSignal *signal = connection.signal;
+        [signal subscribeCompleted:^{
             [disposable dispose];
         }];
-        connection.signal;
+        signal;
     });
     self.navigationIngflight = navigation;
     
