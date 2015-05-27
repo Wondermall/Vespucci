@@ -94,12 +94,12 @@ NSString *const VSPHostingRuleAnyNodeId = @"VSPHostingRuleAnyNodeId";
 }
 
 - (RACSignal *)navigateWithNewNavigationTree:(VSPNavigationNode *)tree {
-    return [self _navigateWithNode:tree];
+    return [self _navigateToNode:tree];
 }
 
 #pragma mark - Private
 
-- (RACSignal *)_navigateWithNode:(VSPNavigationNode *)node {
+- (RACSignal *)_navigateToNode:(VSPNavigationNode *)node {
     NSAssert(self.root, @"No root node installed");
     VSPNavigationNode *oldTree = [self.root copy];
     if (![self.root.nodeId isEqual:node.nodeId]) {
@@ -156,7 +156,7 @@ NSString *const VSPHostingRuleAnyNodeId = @"VSPHostingRuleAnyNodeId";
         }
         @strongify(self);
         NSAssert(node.viewController, @"No view controller provided, this can't be good!");
-        RACSignal *navigation = [self _navigateWithNode:node];
+        RACSignal *navigation = [self _navigateToNode:node];
         if (!navigation) {
             return NO;
         }
