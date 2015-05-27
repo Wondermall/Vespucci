@@ -2,6 +2,7 @@
 
 1. Disallow concurrent navigations.
 1. `[VSPNavigationNode copy]` doesn't reassign `viewController`.
+1. Fixed reactive of navigate to node.
 
 # 0.4.4
 
