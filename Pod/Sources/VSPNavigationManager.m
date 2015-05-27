@@ -27,21 +27,21 @@ NSString *const VSPHostingRuleAnyNodeId = @"VSPHostingRuleAnyNodeId";
 
 @interface __VSPMountingTuple : NSObject
 
-+ (instancetype)tupleWithMountBlock:(VSPNavigationNodeViewControllerMountHandler)mountBlock dismountBlock:(VSPNavigationNodeViewControllerDismountHandler)dismountBlock;
++ (instancetype)tupleWithMountBlock:(VSPNavigationNodeViewControllerMountHandler)mountBlock unmountBlock:(VSPNavigationNodeViewControllerDismountHandler)unmountBlock;
 
 @property (nonatomic, copy) VSPNavigationNodeViewControllerMountHandler mountHandler;
 
-@property (nonatomic, copy) VSPNavigationNodeViewControllerDismountHandler dismountHandler;
+@property (nonatomic, copy) VSPNavigationNodeViewControllerDismountHandler unmountHandler;
 
 @end
 
 
 @implementation __VSPMountingTuple
 
-+ (instancetype)tupleWithMountBlock:(VSPNavigationNodeViewControllerMountHandler)mountBlock dismountBlock:(VSPNavigationNodeViewControllerDismountHandler)dismountBlock {
++ (instancetype)tupleWithMountBlock:(VSPNavigationNodeViewControllerMountHandler)mountBlock unmountBlock:(VSPNavigationNodeViewControllerDismountHandler)unmountBlock {
     __VSPMountingTuple *tuple = [[self alloc] init];
     tuple.mountHandler = mountBlock;
-    tuple.dismountHandler = dismountBlock;
+    tuple.unmountHandler = unmountBlock;
     return tuple;
 }
 
@@ -188,7 +188,7 @@ NSString *const VSPHostingRuleAnyNodeId = @"VSPHostingRuleAnyNodeId";
 
 - (void)addRuleForHostNodeId:(NSString *)hostNodeId childNodeId:(NSString *)childNodeId mountBlock:(VSPNavigationNodeViewControllerMountHandler)mountBlock unmounBlock:(VSPNavigationNodeViewControllerDismountHandler)dismountBlock {
     NSMutableDictionary *hostRules = [self _rulesForHostNodeId:hostNodeId];
-    hostRules[childNodeId] = [__VSPMountingTuple tupleWithMountBlock:mountBlock dismountBlock:dismountBlock];
+    hostRules[childNodeId] = [__VSPMountingTuple tupleWithMountBlock:mountBlock unmountBlock:dismountBlock];
 }
 
 #pragma mark - Private
@@ -283,8 +283,8 @@ NSString *const VSPHostingRuleAnyNodeId = @"VSPHostingRuleAnyNodeId";
         currentHost = currentHost.parent;
         __VSPMountingTuple *tuple = [self _tupleForHostNodeId:currentHost.nodeId childNodeId:currentHost.child.nodeId];
         NSAssert(tuple, @"No tuple found for pair host: %@; child: %@", currentHost, currentHost.child);
-        NSAssert(tuple.dismountHandler, @"Don't know how to dismount current child %@", host.child);
-        RACSignal *dismount = tuple.dismountHandler(host, host.child, animated) ?: [RACSignal empty];
+        NSAssert(tuple.unmountHandler, @"Don't know how to dismount current child %@", host.child);
+        RACSignal *dismount = tuple.unmountHandler(host, host.child, animated) ?: [RACSignal empty];
         dismount = dismount ?: [RACSignal empty];
         result = result ? [result concat:dismount] : dismount;
     } while (![currentHost isEqual:host]);
