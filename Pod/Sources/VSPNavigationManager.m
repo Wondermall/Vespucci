@@ -117,7 +117,7 @@ NSString *const VSPHostingRuleAnyNodeId = @"VSPHostingRuleAnyNodeId";
     @weakify(self);
     VSPNavigationNode *proposedHost = self.root;
     VSPNavigationNode *proposedChild = node;
-    RACSignal *navigation = [self _navigateWithHost:&proposedHost newChild:&proposedChild animated:animated];
+    RACSignal *navigation = [[self _navigateWithHost:&proposedHost newChild:&proposedChild animated:animated] replayLast];
     [self _postNotificationNamed:VSPNavigationManagerWillNavigateNotification destination:proposedChild.leaf source:oldTree];
     [navigation subscribeError:^(NSError *error) {
         @strongify(self);
