@@ -65,6 +65,8 @@ NSString *const VSPHostingRuleAnyNodeId = @"VSPHostingRuleAnyNodeId";
 
 @property (nonatomic) NSMutableDictionary *hostingRules;
 
+@property (nonatomic, weak) RACSignal *navigationIngflight;
+
 @end
 
 
@@ -100,6 +102,10 @@ NSString *const VSPHostingRuleAnyNodeId = @"VSPHostingRuleAnyNodeId";
 #pragma mark - Private
 
 - (RACSignal *)_navigateToNode:(VSPNavigationNode *)node {
+    if (self.navigationIngflight) {
+        return [RACSignal error:[NSError vsp_vespucciErrorWithCode:VSPErrorCodeAnotherNavigationInProgress message:@"Another navigation is in progress"]];
+    }
+    
     NSAssert(self.root, @"No root node installed");
     VSPNavigationNode *oldTree = [self.root copy];
     if (![self.root.nodeId isEqual:node.nodeId]) {
@@ -118,6 +124,8 @@ NSString *const VSPHostingRuleAnyNodeId = @"VSPHostingRuleAnyNodeId";
     VSPNavigationNode *proposedHost = self.root;
     VSPNavigationNode *proposedChild = node;
     RACSignal *navigation = [[self _navigateWithHost:&proposedHost newChild:&proposedChild animated:animated] replayLast];
+    self.navigationIngflight = navigation;
+    
     [self _postNotificationNamed:VSPNavigationManagerWillNavigateNotification destination:proposedChild.leaf source:oldTree];
     [navigation subscribeError:^(NSError *error) {
         @strongify(self);
