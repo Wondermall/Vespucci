@@ -247,7 +247,7 @@ NSString *const VSPHostingRuleAnyNodeId = @"VSPHostingRuleAnyNodeId";
     *child = proposedChild;
     *host = proposedHost;
     
-    RACSignal *unmount = [self _dismountForHost:proposedHost animated:animated];
+    RACSignal *unmount = [self _unmountForHost:proposedHost animated:animated];
     unmount = [unmount doCompleted:^{
         [proposedHost.root updateParametersRecursively:parameters];
         proposedHost.child = proposedChild;
@@ -256,7 +256,7 @@ NSString *const VSPHostingRuleAnyNodeId = @"VSPHostingRuleAnyNodeId";
     return [unmount concat:mount];
 }
 
-- (RACSignal *)_dismountForHost:(VSPNavigationNode *)host animated:(BOOL)animated {
+- (RACSignal *)_unmountForHost:(VSPNavigationNode *)host animated:(BOOL)animated {
     if (!host.child) {
         return [RACSignal empty];
     }
