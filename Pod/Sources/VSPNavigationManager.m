@@ -240,7 +240,7 @@ NSString *const VSPHostingRuleAnyNodeId = @"VSPHostingRuleAnyNodeId";
     VSPNavigationNode *proposedChild = (*child).root;
     VSPNavigationNode *proposedHost = (*host).root;
     if (![self _getHost:&proposedHost forChild:&proposedChild]) {
-        return [RACSignal error:[NSError vsp_vespucciErrorWithCode:0 message:@"Failed to find the host for %@", *child]];
+        return [RACSignal error:[NSError vsp_vespucciErrorWithCode:VSPErrorCodeNoHostFound message:@"Failed to find the host for %@", *child]];
     }
 
     // Update original pointers with calculated host and child
