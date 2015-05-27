@@ -283,17 +283,12 @@ NSString *const VSPHostingRuleAnyNodeId = @"VSPHostingRuleAnyNodeId";
         currentHost = currentHost.parent;
         __VSPMountingTuple *tuple = [self _tupleForHostNodeId:currentHost.nodeId childNodeId:currentHost.child.nodeId];
         NSAssert(tuple, @"No tuple found for pair host: %@; child: %@", currentHost, currentHost.child);
-        VSPNavigationNodeViewControllerDismountHandler dismountBlock = tuple.dismountHandler;
-        NSAssert(dismountBlock, @"Don't know how to dismount current child %@", host.child);
-        RACSignal *dismount = dismountBlock(host, host.child, animated) ?: [RACSignal empty];
+        NSAssert(tuple.dismountHandler, @"Don't know how to dismount current child %@", host.child);
+        RACSignal *dismount = tuple.dismountHandler(host, host.child, animated) ?: [RACSignal empty];
         dismount = dismount ?: [RACSignal empty];
-        if (result) {
-            result = [result concat:dismount];
-        } else {
-            result = dismount;
-        }
+        result = result ? [result concat:dismount] : dismount;
     } while (![currentHost isEqual:host]);
-    result.name = [NSString stringWithFormat:@"Dismounting all %@", host.nodeId];
+    result.name = [NSString stringWithFormat:@"Unmounting all children of %@", host.nodeId];
     return result;
 }
 
