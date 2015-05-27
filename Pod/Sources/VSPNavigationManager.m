@@ -121,19 +121,27 @@ NSString *const VSPHostingRuleAnyNodeId = @"VSPHostingRuleAnyNodeId";
         animated = [animatedString isEqual:@"true"] || [animatedString isEqual:@"yes"] || [animatedString isEqual:@"1"];
     }
     @weakify(self);
-    VSPNavigationNode *proposedHost = self.root;
-    VSPNavigationNode *proposedChild = node;
-    RACSignal *navigation = [[self _navigateWithHost:&proposedHost newChild:&proposedChild animated:animated] replayLast];
+
+    VSPNavigationNode *proposedHost = self.root, *proposedChild = node;
+    
+    RACSignal *navigation = ({
+        RACMulticastConnection *connection = [[self _navigateWithHost:&proposedHost newChild:&proposedChild animated:animated] publish];
+        [connection connect];
+        connection.signal;
+    });
     self.navigationIngflight = navigation;
     
     [self _postNotificationNamed:VSPNavigationManagerWillNavigateNotification destination:proposedChild.leaf source:oldTree];
-    [navigation subscribeError:^(NSError *error) {
+    
+    [navigation doError:^(NSError *error) {
         @strongify(self);
         [self _postNotificationNamed:VSPNavigationManagerDidFailNavigationNotification destination:self.root source:oldTree];
-    } completed:^{
+    }];
+    [navigation doCompleted:^{
         @strongify(self);
         [self _postNotificationNamed:VSPNavigationManagerDidFinishNavigationNotification destination:self.root source:oldTree];
     }];
+    
     return navigation;
 }
 
