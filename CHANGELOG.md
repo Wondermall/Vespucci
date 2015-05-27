@@ -1,3 +1,8 @@
+# 0.4.5
+
+1. Disallow concurrent navigations.
+1. `[VSPNavigationNode copy]` doesn't reassign `viewController`.
+
 # 0.4.4
 
 1. Fixed navigation signal replaying several times.
@@ -12,7 +17,7 @@
 
 # 0.4
 
-1. Removed `VSPNavigationManagerNotificationParametersKey` from notifcations, use `node.parameters` instead.
+1. Removed `VSPNavigationManagerNotificationParametersKey` from notifications, use `node.parameters` instead.
 1. Renamed `addRuleForHostNodeId:childNodeId:mountBlock:unmountBlock:`
 1. Making sure `navigationNode` on a `VSPNavigatable` view controller won't be reassigned if it didn't change.
 1. Making sure `parameters` on `VSPNavigationNode` won't be reassigned if they didn't change.
