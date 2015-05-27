@@ -27,21 +27,21 @@ NSString *const VSPHostingRuleAnyNodeId = @"VSPHostingRuleAnyNodeId";
 
 @interface __VSPMountingTuple : NSObject
 
-+ (instancetype)tupleWithMountBlock:(VSPNavigationNodeViewControllerMountHandler)mountBlock dismountBlock:(VSPNavigationNodeViewControllerDismountHandler)dismountBlock;
++ (instancetype)tupleWithMountBlock:(VSPNavigationNodeViewControllerMountHandler)mountBlock unmountBlock:(VSPNavigationNodeViewControllerDismountHandler)unmountBlock;
 
 @property (nonatomic, copy) VSPNavigationNodeViewControllerMountHandler mountHandler;
 
-@property (nonatomic, copy) VSPNavigationNodeViewControllerDismountHandler dismountHandler;
+@property (nonatomic, copy) VSPNavigationNodeViewControllerDismountHandler unmountHandler;
 
 @end
 
 
 @implementation __VSPMountingTuple
 
-+ (instancetype)tupleWithMountBlock:(VSPNavigationNodeViewControllerMountHandler)mountBlock dismountBlock:(VSPNavigationNodeViewControllerDismountHandler)dismountBlock {
++ (instancetype)tupleWithMountBlock:(VSPNavigationNodeViewControllerMountHandler)mountBlock unmountBlock:(VSPNavigationNodeViewControllerDismountHandler)unmountBlock {
     __VSPMountingTuple *tuple = [[self alloc] init];
     tuple.mountHandler = mountBlock;
-    tuple.dismountHandler = dismountBlock;
+    tuple.unmountHandler = unmountBlock;
     return tuple;
 }
 
@@ -64,6 +64,8 @@ NSString *const VSPHostingRuleAnyNodeId = @"VSPHostingRuleAnyNodeId";
 @property (nonatomic) VSPNavigationNode *root;
 
 @property (nonatomic) NSMutableDictionary *hostingRules;
+
+@property (nonatomic, weak) RACSignal *navigationIngflight;
 
 @end
 
@@ -94,12 +96,16 @@ NSString *const VSPHostingRuleAnyNodeId = @"VSPHostingRuleAnyNodeId";
 }
 
 - (RACSignal *)navigateWithNewNavigationTree:(VSPNavigationNode *)tree {
-    return [self _navigateWithNode:tree];
+    return [self _navigateToNode:tree];
 }
 
 #pragma mark - Private
 
-- (RACSignal *)_navigateWithNode:(VSPNavigationNode *)node {
+- (RACSignal *)_navigateToNode:(VSPNavigationNode *)node {
+    if (self.navigationIngflight) {
+        return [RACSignal error:[NSError vsp_vespucciErrorWithCode:VSPErrorCodeAnotherNavigationInProgress message:@"Another navigation is in progress"]];
+    }
+    
     NSAssert(self.root, @"No root node installed");
     VSPNavigationNode *oldTree = [self.root copy];
     if (![self.root.nodeId isEqual:node.nodeId]) {
@@ -115,17 +121,32 @@ NSString *const VSPHostingRuleAnyNodeId = @"VSPHostingRuleAnyNodeId";
         animated = [animatedString isEqual:@"true"] || [animatedString isEqual:@"yes"] || [animatedString isEqual:@"1"];
     }
     @weakify(self);
-    VSPNavigationNode *proposedHost = self.root;
-    VSPNavigationNode *proposedChild = node;
-    RACSignal *navigation = [[self _navigateWithHost:&proposedHost newChild:&proposedChild animated:animated] replayLast];
+
+    VSPNavigationNode *proposedHost = self.root, *proposedChild = node;
+    
+    RACSignal *navigation = ({
+        RACSignal *navigation = [self _navigateWithHost:&proposedHost newChild:&proposedChild animated:animated];
+        RACMulticastConnection *connection = [navigation multicast:[RACReplaySubject subject]];
+        RACDisposable *disposable = [connection connect];
+        RACSignal *signal = connection.signal;
+        [signal subscribeCompleted:^{
+            [disposable dispose];
+        }];
+        signal;
+    });
+    self.navigationIngflight = navigation;
+    
     [self _postNotificationNamed:VSPNavigationManagerWillNavigateNotification destination:proposedChild.leaf source:oldTree];
+    
     [navigation subscribeError:^(NSError *error) {
         @strongify(self);
+        self.navigationIngflight = nil;
         [self _postNotificationNamed:VSPNavigationManagerDidFailNavigationNotification destination:self.root source:oldTree];
     } completed:^{
         @strongify(self);
+        self.navigationIngflight = nil;
         [self _postNotificationNamed:VSPNavigationManagerDidFinishNavigationNotification destination:self.root source:oldTree];
-    }];
+    }];    
     return navigation;
 }
 
@@ -156,7 +177,7 @@ NSString *const VSPHostingRuleAnyNodeId = @"VSPHostingRuleAnyNodeId";
         }
         @strongify(self);
         NSAssert(node.viewController, @"No view controller provided, this can't be good!");
-        RACSignal *navigation = [self _navigateWithNode:node];
+        RACSignal *navigation = [self _navigateToNode:node];
         if (!navigation) {
             return NO;
         }
@@ -172,7 +193,7 @@ NSString *const VSPHostingRuleAnyNodeId = @"VSPHostingRuleAnyNodeId";
 
 - (void)addRuleForHostNodeId:(NSString *)hostNodeId childNodeId:(NSString *)childNodeId mountBlock:(VSPNavigationNodeViewControllerMountHandler)mountBlock unmounBlock:(VSPNavigationNodeViewControllerDismountHandler)dismountBlock {
     NSMutableDictionary *hostRules = [self _rulesForHostNodeId:hostNodeId];
-    hostRules[childNodeId] = [__VSPMountingTuple tupleWithMountBlock:mountBlock dismountBlock:dismountBlock];
+    hostRules[childNodeId] = [__VSPMountingTuple tupleWithMountBlock:mountBlock unmountBlock:dismountBlock];
 }
 
 #pragma mark - Private
@@ -240,14 +261,14 @@ NSString *const VSPHostingRuleAnyNodeId = @"VSPHostingRuleAnyNodeId";
     VSPNavigationNode *proposedChild = (*child).root;
     VSPNavigationNode *proposedHost = (*host).root;
     if (![self _getHost:&proposedHost forChild:&proposedChild]) {
-        return [RACSignal error:[NSError vsp_vespucciErrorWithCode:0 message:@"Failed to find the host for %@", *child]];
+        return [RACSignal error:[NSError vsp_vespucciErrorWithCode:VSPErrorCodeNoHostFound message:@"Failed to find the host for %@", *child]];
     }
 
     // Update original pointers with calculated host and child
     *child = proposedChild;
     *host = proposedHost;
     
-    RACSignal *unmount = [self _dismountForHost:proposedHost animated:animated];
+    RACSignal *unmount = [self _unmountForHost:proposedHost animated:animated];
     unmount = [unmount doCompleted:^{
         [proposedHost.root updateParametersRecursively:parameters];
         proposedHost.child = proposedChild;
@@ -256,7 +277,7 @@ NSString *const VSPHostingRuleAnyNodeId = @"VSPHostingRuleAnyNodeId";
     return [unmount concat:mount];
 }
 
-- (RACSignal *)_dismountForHost:(VSPNavigationNode *)host animated:(BOOL)animated {
+- (RACSignal *)_unmountForHost:(VSPNavigationNode *)host animated:(BOOL)animated {
     if (!host.child) {
         return [RACSignal empty];
     }
@@ -267,17 +288,12 @@ NSString *const VSPHostingRuleAnyNodeId = @"VSPHostingRuleAnyNodeId";
         currentHost = currentHost.parent;
         __VSPMountingTuple *tuple = [self _tupleForHostNodeId:currentHost.nodeId childNodeId:currentHost.child.nodeId];
         NSAssert(tuple, @"No tuple found for pair host: %@; child: %@", currentHost, currentHost.child);
-        VSPNavigationNodeViewControllerDismountHandler dismountBlock = tuple.dismountHandler;
-        NSAssert(dismountBlock, @"Don't know how to dismount current child %@", host.child);
-        RACSignal *dismount = dismountBlock(host, host.child, animated) ?: [RACSignal empty];
+        NSAssert(tuple.unmountHandler, @"Don't know how to dismount current child %@", host.child);
+        RACSignal *dismount = tuple.unmountHandler(host, host.child, animated) ?: [RACSignal empty];
         dismount = dismount ?: [RACSignal empty];
-        if (result) {
-            result = [result concat:dismount];
-        } else {
-            result = dismount;
-        }
+        result = result ? [result concat:dismount] : dismount;
     } while (![currentHost isEqual:host]);
-    result.name = [NSString stringWithFormat:@"Dismounting all %@", host.nodeId];
+    result.name = [NSString stringWithFormat:@"Unmounting all children of %@", host.nodeId];
     return result;
 }
 
