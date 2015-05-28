@@ -52,7 +52,7 @@ NSString *const VSPHostingRuleAnyNodeId = @"VSPHostingRuleAnyNodeId";
 
 - (BOOL)_getHost:(inout VSPNavigationNode **)inOutParent forChild:(inout VSPNavigationNode **)inOutChild;
 
-- (RACSignal *)_navigateWithHost:(inout VSPNavigationNode **)host newChild:(inout VSPNavigationNode **)child animated:(BOOL)animated;
+- (RACSignal *)_navigationWithHost:(inout VSPNavigationNode **)host newChild:(inout VSPNavigationNode **)child animated:(BOOL)animated;
 
 @end
 
@@ -125,7 +125,7 @@ NSString *const VSPHostingRuleAnyNodeId = @"VSPHostingRuleAnyNodeId";
     VSPNavigationNode *proposedHost = self.root, *proposedChild = node;
     
     RACSignal *navigation = ({
-        RACSignal *navigation = [self _navigateWithHost:&proposedHost newChild:&proposedChild animated:animated];
+        RACSignal *navigation = [self _navigationWithHost:&proposedHost newChild:&proposedChild animated:animated];
         RACMulticastConnection *connection = [navigation multicast:[RACReplaySubject subject]];
         RACDisposable *disposable = [connection connect];
         RACSignal *signal = connection.signal;
@@ -253,7 +253,7 @@ NSString *const VSPHostingRuleAnyNodeId = @"VSPHostingRuleAnyNodeId";
     return [self _tupleForHostNodeId:parent.nodeId childNodeId:child.nodeId] != nil;
 }
 
-- (RACSignal *)_navigateWithHost:(VSPNavigationNode **)host newChild:(VSPNavigationNode **)child animated:(BOOL)animated {
+- (RACSignal *)_navigationWithHost:(VSPNavigationNode **)host newChild:(VSPNavigationNode **)child animated:(BOOL)animated {
     // we need to capture new parameters before child will be modified
     NSDictionary *parameters = (*child).parameters;
 
