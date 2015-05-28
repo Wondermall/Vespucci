@@ -1,3 +1,7 @@
+# 0.4.6
+
+1. Fixed unmount logic not addressing right nodes.
+
 # 0.4.5
 
 1. Disallow concurrent navigations.
