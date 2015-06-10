@@ -182,12 +182,12 @@ NSString *const VSPHostingRuleAnyNodeId = @"VSPHostingRuleAnyNodeId";
             return NO;
         }
         
-        __block BOOL isSuccessfull = YES;
+        __block BOOL isSuccessful = YES;
         [navigation subscribeError:^(NSError *error) {
-            isSuccessfull = NO;
+            isSuccessful = NO;
         }];
         
-        return isSuccessfull;
+        return isSuccessful;
     }];
 }
 
