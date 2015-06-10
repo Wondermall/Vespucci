@@ -48,11 +48,19 @@ typedef RACSignal *(^VSPNavigationNodeViewControllerMountHandler)(VSPNavigationN
 
 typedef RACSignal *(^VSPNavigationNodeViewControllerDismountHandler)(VSPNavigationNode *parent, VSPNavigationNode *child, BOOL animated);
 
+typedef UIViewController *(^VSPViewControllerFactory)(VSPNavigationNode *node);
+
 
 @interface VSPNavigationManager (NodeHosting)
 
 - (void)registerNavigationForRoute:(NSString *)route handler:(VSPNavigationNode *(^)(NSDictionary *parameters))handler;
 
 - (void)addRuleForHostNodeId:(NSString *)hostNodeId childNodeId:(NSString *)childNodeId mountBlock:(VSPNavigationNodeViewControllerMountHandler)mountBlock unmounBlock:(VSPNavigationNodeViewControllerDismountHandler)dismountBlock;
+
+/*
+ * Allows you to register view controller factory called upon node with specified
+ * id is about to be inserted into navigation stack.
+ */
+- (void)registerFactoryForNodeId:(NSString *)nodeId factory:(VSPViewControllerFactory)factory;
 
 @end
