@@ -77,6 +77,8 @@ typedef UIViewController *(^WMLNavigationNodeViewControllerFactory)(NSDictionary
 
 - (BOOL)containsNodeWithId:(NSString *)nodeId;
 
+- (instancetype)nodeForId:(NSString *)nodeId;
+
 - (void)removeFromParent;
 
 @end
