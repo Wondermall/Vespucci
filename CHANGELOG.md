@@ -1,3 +1,7 @@
+# 0.4.7
+
+1. Added `-[VSPNavigationNode nodeForId:]`.
+
 # 0.4.6
 
 1. Fixed unmount logic not addressing right nodes.

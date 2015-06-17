@@ -183,6 +183,17 @@
     return NO;
 }
 
+- (instancetype)nodeForId:(NSString *)nodeId {
+    VSPNavigationNode *node = self;
+    while (node) {
+        if ([node.nodeId isEqualToString:nodeId]) {
+            return node;
+        }
+        node = node.child;
+    }
+    return nil;
+}
+
 - (void)removeFromParent {
     self.parent.child = nil;
 }

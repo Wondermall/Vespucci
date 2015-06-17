@@ -79,6 +79,26 @@ describe(@"VSPNavigationNode", ^{
             expect([node containsNodeWithId:@"not-in-the-tree"]).to.beFalsy();
         });
     });
+    
+    context(@"nodeForId", ^{
+        __block VSPNavigationNode *node;
+        beforeAll(^{
+            node = [VSPNavigationNode rootNodeForParameters:nil nodeIds:@"a", @"b", @"c", @"d", nil];
+        });
+        
+        it(@"should return self if id matches", ^{
+            expect([node nodeForId:@"a"]).to.beIdenticalTo(node);
+        });
+
+        it(@"should return correct node if id matches", ^{
+            expect([node nodeForId:@"d"]).to.beIdenticalTo(node.leaf);
+        });
+        
+        it(@"should return nil if id is not present", ^{
+            expect([node nodeForId:@"z"]).to.beNil();
+        });
+        
+    });
 });
 
 SpecEnd

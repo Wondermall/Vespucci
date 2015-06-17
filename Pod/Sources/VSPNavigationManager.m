@@ -66,6 +66,7 @@ NSString *const VSPHostingRuleAnyNodeId = @"VSPHostingRuleAnyNodeId";
 @property (nonatomic) NSMutableDictionary *hostingRules;
 
 @property (nonatomic, weak) RACSignal *navigationIngflight;
+@property (nonatomic) NSMutableDictionary *viewControllerFactories;
 
 @end
 
@@ -82,6 +83,7 @@ NSString *const VSPHostingRuleAnyNodeId = @"VSPHostingRuleAnyNodeId";
     }
     self.router = [JLRoutes routesForScheme:URLScheme];
     self.hostingRules = [NSMutableDictionary dictionary];
+    self.viewControllerFactories = [NSMutableDictionary dictionary];
     return self;
 }
 
@@ -182,18 +184,22 @@ NSString *const VSPHostingRuleAnyNodeId = @"VSPHostingRuleAnyNodeId";
             return NO;
         }
         
-        __block BOOL isSuccessfull = YES;
+        __block BOOL isSuccessful = YES;
         [navigation subscribeError:^(NSError *error) {
-            isSuccessfull = NO;
+            isSuccessful = NO;
         }];
         
-        return isSuccessfull;
+        return isSuccessful;
     }];
 }
 
 - (void)addRuleForHostNodeId:(NSString *)hostNodeId childNodeId:(NSString *)childNodeId mountBlock:(VSPNavigationNodeViewControllerMountHandler)mountBlock unmounBlock:(VSPNavigationNodeViewControllerDismountHandler)dismountBlock {
     NSMutableDictionary *hostRules = [self _rulesForHostNodeId:hostNodeId];
     hostRules[childNodeId] = [__VSPMountingTuple tupleWithMountBlock:mountBlock unmountBlock:dismountBlock];
+}
+
+- (void)registerFactoryForNodeId:(NSString *)nodeId factory:(VSPViewControllerFactory)factory {
+    self.viewControllerFactories[nodeId] = [factory copy];
 }
 
 #pragma mark - Private
@@ -332,6 +338,15 @@ NSString *const VSPHostingRuleAnyNodeId = @"VSPHostingRuleAnyNodeId";
 
 - (void)setNavigationRoot:(VSPNavigationNode *)navigationRoot {
     self.root = navigationRoot;
+}
+
+@end
+
+
+@implementation VSPNavigationManager (Internal)
+
+- (VSPViewControllerFactory)viewControllerFactoryForNodeId:(NSString *)nodeId {
+    return self.viewControllerFactories[nodeId];
 }
 
 @end
