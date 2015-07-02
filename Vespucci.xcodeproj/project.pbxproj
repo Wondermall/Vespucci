@@ -6,9 +6,32 @@
 	objectVersion = 46;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		5C5ADA401B45E28300ED25A3 /* NSError+Vespucci.h in Headers */ = {isa = PBXBuildFile; fileRef = 5C5ADA361B45E28300ED25A3 /* NSError+Vespucci.h */; };
+		5C5ADA411B45E28300ED25A3 /* NSError+Vespucci.m in Sources */ = {isa = PBXBuildFile; fileRef = 5C5ADA371B45E28300ED25A3 /* NSError+Vespucci.m */; };
+		5C5ADA421B45E28300ED25A3 /* Vespucci.h in Headers */ = {isa = PBXBuildFile; fileRef = 5C5ADA381B45E28300ED25A3 /* Vespucci.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		5C5ADA431B45E28300ED25A3 /* VSPNavigatable.h in Headers */ = {isa = PBXBuildFile; fileRef = 5C5ADA391B45E28300ED25A3 /* VSPNavigatable.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		5C5ADA441B45E28300ED25A3 /* VSPNavigationManager.h in Headers */ = {isa = PBXBuildFile; fileRef = 5C5ADA3A1B45E28300ED25A3 /* VSPNavigationManager.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		5C5ADA451B45E28300ED25A3 /* VSPNavigationManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 5C5ADA3B1B45E28300ED25A3 /* VSPNavigationManager.m */; };
+		5C5ADA461B45E28300ED25A3 /* VSPNavigationManager+Internal.h in Headers */ = {isa = PBXBuildFile; fileRef = 5C5ADA3C1B45E28300ED25A3 /* VSPNavigationManager+Internal.h */; };
+		5C5ADA471B45E28300ED25A3 /* VSPNavigationNode.h in Headers */ = {isa = PBXBuildFile; fileRef = 5C5ADA3D1B45E28300ED25A3 /* VSPNavigationNode.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		5C5ADA481B45E28300ED25A3 /* VSPNavigationNode.m in Sources */ = {isa = PBXBuildFile; fileRef = 5C5ADA3E1B45E28300ED25A3 /* VSPNavigationNode.m */; };
+		5C5ADA491B45E28300ED25A3 /* VSPNavigationNode+Internal.h in Headers */ = {isa = PBXBuildFile; fileRef = 5C5ADA3F1B45E28300ED25A3 /* VSPNavigationNode+Internal.h */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXFileReference section */
 		5C5ADA1C1B45E22000ED25A3 /* Vespucci.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Vespucci.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		5C5ADA201B45E22000ED25A3 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		5C5ADA361B45E28300ED25A3 /* NSError+Vespucci.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "NSError+Vespucci.h"; path = "Pod/Sources/NSError+Vespucci.h"; sourceTree = SOURCE_ROOT; };
+		5C5ADA371B45E28300ED25A3 /* NSError+Vespucci.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = "NSError+Vespucci.m"; path = "Pod/Sources/NSError+Vespucci.m"; sourceTree = SOURCE_ROOT; };
+		5C5ADA381B45E28300ED25A3 /* Vespucci.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Vespucci.h; path = Pod/Sources/Vespucci.h; sourceTree = SOURCE_ROOT; };
+		5C5ADA391B45E28300ED25A3 /* VSPNavigatable.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = VSPNavigatable.h; path = Pod/Sources/VSPNavigatable.h; sourceTree = SOURCE_ROOT; };
+		5C5ADA3A1B45E28300ED25A3 /* VSPNavigationManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = VSPNavigationManager.h; path = Pod/Sources/VSPNavigationManager.h; sourceTree = SOURCE_ROOT; };
+		5C5ADA3B1B45E28300ED25A3 /* VSPNavigationManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = VSPNavigationManager.m; path = Pod/Sources/VSPNavigationManager.m; sourceTree = SOURCE_ROOT; };
+		5C5ADA3C1B45E28300ED25A3 /* VSPNavigationManager+Internal.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "VSPNavigationManager+Internal.h"; path = "Pod/Sources/VSPNavigationManager+Internal.h"; sourceTree = SOURCE_ROOT; };
+		5C5ADA3D1B45E28300ED25A3 /* VSPNavigationNode.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = VSPNavigationNode.h; path = Pod/Sources/VSPNavigationNode.h; sourceTree = SOURCE_ROOT; };
+		5C5ADA3E1B45E28300ED25A3 /* VSPNavigationNode.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = VSPNavigationNode.m; path = Pod/Sources/VSPNavigationNode.m; sourceTree = SOURCE_ROOT; };
+		5C5ADA3F1B45E28300ED25A3 /* VSPNavigationNode+Internal.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "VSPNavigationNode+Internal.h"; path = "Pod/Sources/VSPNavigationNode+Internal.h"; sourceTree = SOURCE_ROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -41,6 +64,16 @@
 		5C5ADA1E1B45E22000ED25A3 /* Vespucci */ = {
 			isa = PBXGroup;
 			children = (
+				5C5ADA361B45E28300ED25A3 /* NSError+Vespucci.h */,
+				5C5ADA371B45E28300ED25A3 /* NSError+Vespucci.m */,
+				5C5ADA381B45E28300ED25A3 /* Vespucci.h */,
+				5C5ADA391B45E28300ED25A3 /* VSPNavigatable.h */,
+				5C5ADA3A1B45E28300ED25A3 /* VSPNavigationManager.h */,
+				5C5ADA3B1B45E28300ED25A3 /* VSPNavigationManager.m */,
+				5C5ADA3C1B45E28300ED25A3 /* VSPNavigationManager+Internal.h */,
+				5C5ADA3D1B45E28300ED25A3 /* VSPNavigationNode.h */,
+				5C5ADA3E1B45E28300ED25A3 /* VSPNavigationNode.m */,
+				5C5ADA3F1B45E28300ED25A3 /* VSPNavigationNode+Internal.h */,
 				5C5ADA1F1B45E22000ED25A3 /* Supporting Files */,
 			);
 			path = Vespucci;
@@ -61,6 +94,13 @@
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				5C5ADA441B45E28300ED25A3 /* VSPNavigationManager.h in Headers */,
+				5C5ADA431B45E28300ED25A3 /* VSPNavigatable.h in Headers */,
+				5C5ADA421B45E28300ED25A3 /* Vespucci.h in Headers */,
+				5C5ADA491B45E28300ED25A3 /* VSPNavigationNode+Internal.h in Headers */,
+				5C5ADA401B45E28300ED25A3 /* NSError+Vespucci.h in Headers */,
+				5C5ADA471B45E28300ED25A3 /* VSPNavigationNode.h in Headers */,
+				5C5ADA461B45E28300ED25A3 /* VSPNavigationManager+Internal.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -130,6 +170,9 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				5C5ADA411B45E28300ED25A3 /* NSError+Vespucci.m in Sources */,
+				5C5ADA481B45E28300ED25A3 /* VSPNavigationNode.m in Sources */,
+				5C5ADA451B45E28300ED25A3 /* VSPNavigationManager.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
