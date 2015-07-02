@@ -17,6 +17,9 @@
 		5C5ADA471B45E28300ED25A3 /* VSPNavigationNode.h in Headers */ = {isa = PBXBuildFile; fileRef = 5C5ADA3D1B45E28300ED25A3 /* VSPNavigationNode.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		5C5ADA481B45E28300ED25A3 /* VSPNavigationNode.m in Sources */ = {isa = PBXBuildFile; fileRef = 5C5ADA3E1B45E28300ED25A3 /* VSPNavigationNode.m */; };
 		5C5ADA491B45E28300ED25A3 /* VSPNavigationNode+Internal.h in Headers */ = {isa = PBXBuildFile; fileRef = 5C5ADA3F1B45E28300ED25A3 /* VSPNavigationNode+Internal.h */; };
+		5C5ADA4E1B45E53D00ED25A3 /* Box.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5C5ADA4B1B45E53D00ED25A3 /* Box.framework */; };
+		5C5ADA4F1B45E53D00ED25A3 /* JLRoutes.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5C5ADA4C1B45E53D00ED25A3 /* JLRoutes.framework */; };
+		5C5ADA501B45E53D00ED25A3 /* Result.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5C5ADA4D1B45E53D00ED25A3 /* Result.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -32,6 +35,9 @@
 		5C5ADA3D1B45E28300ED25A3 /* VSPNavigationNode.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = VSPNavigationNode.h; path = Pod/Sources/VSPNavigationNode.h; sourceTree = SOURCE_ROOT; };
 		5C5ADA3E1B45E28300ED25A3 /* VSPNavigationNode.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = VSPNavigationNode.m; path = Pod/Sources/VSPNavigationNode.m; sourceTree = SOURCE_ROOT; };
 		5C5ADA3F1B45E28300ED25A3 /* VSPNavigationNode+Internal.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "VSPNavigationNode+Internal.h"; path = "Pod/Sources/VSPNavigationNode+Internal.h"; sourceTree = SOURCE_ROOT; };
+		5C5ADA4B1B45E53D00ED25A3 /* Box.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Box.framework; path = Carthage/Build/iOS/Box.framework; sourceTree = "<group>"; };
+		5C5ADA4C1B45E53D00ED25A3 /* JLRoutes.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JLRoutes.framework; path = Carthage/Build/iOS/JLRoutes.framework; sourceTree = "<group>"; };
+		5C5ADA4D1B45E53D00ED25A3 /* Result.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Result.framework; path = Carthage/Build/iOS/Result.framework; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -39,6 +45,9 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				5C5ADA501B45E53D00ED25A3 /* Result.framework in Frameworks */,
+				5C5ADA4F1B45E53D00ED25A3 /* JLRoutes.framework in Frameworks */,
+				5C5ADA4E1B45E53D00ED25A3 /* Box.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -48,6 +57,7 @@
 		5C5ADA101B45E1C900ED25A3 = {
 			isa = PBXGroup;
 			children = (
+				5C5ADA4A1B45E53000ED25A3 /* Frameworks */,
 				5C5ADA1E1B45E22000ED25A3 /* Vespucci */,
 				5C5ADA1D1B45E22000ED25A3 /* Products */,
 			);
@@ -85,6 +95,16 @@
 				5C5ADA201B45E22000ED25A3 /* Info.plist */,
 			);
 			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
+		5C5ADA4A1B45E53000ED25A3 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				5C5ADA4B1B45E53D00ED25A3 /* Box.framework */,
+				5C5ADA4C1B45E53D00ED25A3 /* JLRoutes.framework */,
+				5C5ADA4D1B45E53D00ED25A3 /* Result.framework */,
+			);
+			name = Frameworks;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -217,6 +237,10 @@
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/Carthage/Build/iOS",
+				);
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_NO_COMMON_BLOCKS = YES;
@@ -274,6 +298,10 @@
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/Carthage/Build/iOS",
+				);
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_NO_COMMON_BLOCKS = YES;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;

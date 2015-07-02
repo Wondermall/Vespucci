@@ -1,0 +1,4 @@
+github "robrix/Box" "1.2.2"
+github "zats/JLRoutes" "cadc146a3cbaa399303a8d88f136a10f7662ee13"
+github "antitypical/Result" "0.4.4"
+github "ReactiveCocoa/ReactiveCocoa" "b89e1b73f2d1c6a99e0916f699ab6dcda71c74b5"
