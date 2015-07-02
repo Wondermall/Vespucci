@@ -11,7 +11,6 @@
 
 #import "NSError+Vespucci.h"
 #import <JLROutes/JLRoutes.h>
-#import <ReactiveCocoa/RACExtScope.h>
 #import <ReactiveCocoa/ReactiveCocoa.h>
 #import <Vespucci/Vespucci.h>
 
