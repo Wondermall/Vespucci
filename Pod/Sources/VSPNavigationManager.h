@@ -31,6 +31,8 @@ extern NSString *const VSPHostingRuleAnyNodeId;
 
 - (BOOL)handleURL:(NSURL *)URL;
 
+- (RACSignal *)navigateToURL:(NSURL *)URL;
+
 - (RACSignal *)navigateWithNewNavigationTree:(VSPNavigationNode *)tree;
 
 @end

@@ -97,6 +97,29 @@ NSString *const VSPHostingRuleAnyNodeId = @"VSPHostingRuleAnyNodeId";
     return [self.router routeURL:URL];
 }
 
+- (RACSignal *)navigateToURL:(NSURL *)URL {
+    // Waiting for the next failure or success
+    RACSignal *signal = [[[[RACSignal merge:@[
+                                              [[NSNotificationCenter defaultCenter]
+                                               rac_addObserverForName:VSPNavigationManagerDidFinishNavigationNotification object:nil],
+                                              [[NSNotificationCenter defaultCenter]
+                                               rac_addObserverForName:VSPNavigationManagerDidFinishNavigationNotification object:nil]
+                                              ]]
+                           take:1]
+                          map:^(NSNotification *note) {
+                              if ([note.name isEqualToString:VSPNavigationManagerDidFinishNavigationNotification]) {
+                                  return [RACSignal empty];
+                              } else {
+                                  return [RACSignal error:[NSError vsp_vespucciErrorWithCode:0 message:@"Navigation failed"]];
+                              }
+                          }]
+                         flatten];
+    if (![self handleURL:URL]) {
+        return [RACSignal error:[NSError vsp_vespucciErrorWithCode:0 message:@"Navigation failed"]];
+    }
+    return signal;
+}
+
 - (RACSignal *)navigateWithNewNavigationTree:(VSPNavigationNode *)tree {
     return [self _navigateToNode:tree];
 }
@@ -105,6 +128,7 @@ NSString *const VSPHostingRuleAnyNodeId = @"VSPHostingRuleAnyNodeId";
 
 - (RACSignal *)_navigateToNode:(VSPNavigationNode *)node {
     if (self.navigationIngflight) {
+        [self _postNotificationNamed:VSPNavigationManagerDidFailNavigationNotification destination:node.root source:self.root];
         return [RACSignal error:[NSError vsp_vespucciErrorWithCode:VSPErrorCodeAnotherNavigationInProgress message:@"Another navigation is in progress"]];
     }
     
@@ -123,7 +147,7 @@ NSString *const VSPHostingRuleAnyNodeId = @"VSPHostingRuleAnyNodeId";
         animated = [animatedString isEqual:@"true"] || [animatedString isEqual:@"yes"] || [animatedString isEqual:@"1"];
     }
     @weakify(self);
-
+    
     VSPNavigationNode *proposedHost = self.root, *proposedChild = node;
     
     RACSignal *navigation = ({
@@ -148,7 +172,7 @@ NSString *const VSPHostingRuleAnyNodeId = @"VSPHostingRuleAnyNodeId";
         @strongify(self);
         self.navigationIngflight = nil;
         [self _postNotificationNamed:VSPNavigationManagerDidFinishNavigationNotification destination:self.root source:oldTree];
-    }];    
+    }];
     return navigation;
 }
 
@@ -262,14 +286,14 @@ NSString *const VSPHostingRuleAnyNodeId = @"VSPHostingRuleAnyNodeId";
 - (RACSignal *)_navigationWithHost:(VSPNavigationNode **)host newChild:(VSPNavigationNode **)child animated:(BOOL)animated {
     // we need to capture new parameters before child will be modified
     NSDictionary *parameters = (*child).parameters;
-
+    
     // Calculate actual host and actual child
     VSPNavigationNode *proposedChild = (*child).root;
     VSPNavigationNode *proposedHost = (*host).root;
     if (![self _getHost:&proposedHost forChild:&proposedChild]) {
         return [RACSignal error:[NSError vsp_vespucciErrorWithCode:VSPErrorCodeNoHostFound message:@"Failed to find the host for %@", *child]];
     }
-
+    
     // Update original pointers with calculated host and child
     *child = proposedChild;
     *host = proposedHost;
@@ -287,7 +311,7 @@ NSString *const VSPHostingRuleAnyNodeId = @"VSPHostingRuleAnyNodeId";
     if (!host.child) {
         return [RACSignal empty];
     }
-
+    
     RACSignal *result = nil;
     VSPNavigationNode *currentHost = host.leaf;
     do {
@@ -320,12 +344,12 @@ NSString *const VSPHostingRuleAnyNodeId = @"VSPHostingRuleAnyNodeId";
                                      reason:[NSString stringWithFormat:@"\"%@\" doesn't know how to mount \"%@\"", host.nodeId, child.nodeId]
                                    userInfo:nil] raise];
         }
-
+        
         RACSignal *mount = mountBlock(host, child, animated) ?: [RACSignal empty];
         result = [result concat:mount];
-
+        
         host = child;
-        child = child.child;        
+        child = child.child;
     }
     result.name = [NSString stringWithFormat:@"Mount %@ on %@", proposedChild.nodeId, host.nodeId];
     return result;
