@@ -1,3 +1,7 @@
+# 0.4.8
+
+1. Added `-[VSPNavigationManager navigateToURL:]`, returning `RACSignal`.
+
 # 0.4.7
 
 1. Added `-[VSPNavigationNode nodeForId:]`.
