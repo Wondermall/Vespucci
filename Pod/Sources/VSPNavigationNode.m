@@ -122,6 +122,20 @@
     [self.child updateParametersRecursively:parameters];
 }
 
+- (BOOL)isDescendantOfNode:(VSPNavigationNode *)node {
+    VSPNavigationNode *currentNode = node.leaf;
+    while (currentNode) {
+        if ([self isEqualToNode:currentNode]) {
+            return YES;
+        }
+        currentNode = currentNode.parent;
+        if (currentNode.child == node) {
+            return NO;
+        }
+    }
+    return NO;
+}
+
 #pragma mark - NSObject
 
 - (NSString *)description {
