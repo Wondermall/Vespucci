@@ -100,20 +100,20 @@ NSString *const VSPHostingRuleAnyNodeId = @"VSPHostingRuleAnyNodeId";
 - (RACSignal *)navigateToURL:(NSURL *)URL {
     // Waiting for the next failure or success
     RACSignal *signal = [[[[RACSignal merge:@[
-                                              [[NSNotificationCenter defaultCenter]
-                                               rac_addObserverForName:VSPNavigationManagerDidFinishNavigationNotification object:nil],
-                                              [[NSNotificationCenter defaultCenter]
-                                               rac_addObserverForName:VSPNavigationManagerDidFinishNavigationNotification object:nil]
-                                              ]]
-                           take:1]
-                          map:^(NSNotification *note) {
-                              if ([note.name isEqualToString:VSPNavigationManagerDidFinishNavigationNotification]) {
-                                  return [RACSignal empty];
-                              } else {
-                                  return [RACSignal error:[NSError vsp_vespucciErrorWithCode:0 message:@"Navigation failed"]];
-                              }
-                          }]
-                         flatten];
+        [[NSNotificationCenter defaultCenter]
+            rac_addObserverForName:VSPNavigationManagerDidFinishNavigationNotification object:nil],
+        [[NSNotificationCenter defaultCenter]
+            rac_addObserverForName:VSPNavigationManagerDidFinishNavigationNotification object:nil]
+    ]]
+        take:1]
+        map:^(NSNotification *note) {
+            if ([note.name isEqualToString:VSPNavigationManagerDidFinishNavigationNotification]) {
+                return [RACSignal empty];
+            } else {
+                return [RACSignal error:[NSError vsp_vespucciErrorWithCode:0 message:@"Navigation failed"]];
+            }
+        }]
+        flatten];
     if (![self handleURL:URL]) {
         return [RACSignal error:[NSError vsp_vespucciErrorWithCode:0 message:@"Navigation failed"]];
     }

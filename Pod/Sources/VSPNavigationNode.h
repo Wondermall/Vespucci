@@ -64,6 +64,8 @@ typedef UIViewController *(^WMLNavigationNodeViewControllerFactory)(NSDictionary
 
 - (BOOL)isEqualToNode:(VSPNavigationNode *)node;
 
+- (BOOL)isDescendantOfNode:(VSPNavigationNode *)node;
+
 @end
 
 
