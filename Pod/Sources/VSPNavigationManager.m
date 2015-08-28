@@ -104,7 +104,7 @@ NSString *const VSPHostingRuleAnyNodeId = @"VSPHostingRuleAnyNodeId";
             rac_addObserverForName:VSPNavigationManagerDidFinishNavigationNotification object:nil],
         [[NSNotificationCenter defaultCenter]
             rac_addObserverForName:VSPNavigationManagerDidFinishNavigationNotification object:nil]
-    ]]
+        ]]
         take:1]
         map:^(NSNotification *note) {
             if ([note.name isEqualToString:VSPNavigationManagerDidFinishNavigationNotification]) {
@@ -147,9 +147,7 @@ NSString *const VSPHostingRuleAnyNodeId = @"VSPHostingRuleAnyNodeId";
         animated = [animatedString isEqual:@"true"] || [animatedString isEqual:@"yes"] || [animatedString isEqual:@"1"];
     }
     @weakify(self);
-    
     VSPNavigationNode *proposedHost = self.root, *proposedChild = node;
-    
     RACSignal *navigation = ({
         RACSignal *navigation = [self _navigationWithHost:&proposedHost newChild:&proposedChild animated:animated];
         RACMulticastConnection *connection = [navigation multicast:[RACReplaySubject subject]];
