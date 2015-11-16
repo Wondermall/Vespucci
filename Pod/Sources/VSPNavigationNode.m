@@ -68,10 +68,11 @@
 
 #pragma mark - Public
 
-- (void)setChild:(VSPNavigationNode *)child {
+- (void)setChild:(VSPNavigationNode *)newChild {
+    newChild.parent.child = nil;
     self.child.parent = nil;
-    _child = child;
-    child.parent = self;
+    _child = newChild;
+    newChild.parent = self;
 }
 
 - (void)setViewController:(UIViewController *)viewController {
