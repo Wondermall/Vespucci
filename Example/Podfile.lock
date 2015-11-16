@@ -1,6 +1,6 @@
 PODS:
   - Expecta (1.0.0)
-  - JLRoutes (1.5.2)
+  - JLRoutes (1.5.3)
   - ReactiveCocoa (2.5):
     - ReactiveCocoa/UI (= 2.5)
   - ReactiveCocoa/Core (2.5):
@@ -24,9 +24,9 @@ EXTERNAL SOURCES:
 
 SPEC CHECKSUMS:
   Expecta: 32604574add2c46a36f8d2f716b6c5736eb75024
-  JLRoutes: fc36fd38ab476d5ac3a6a84b05be60e4b1a2bc81
+  JLRoutes: 20555d00693855b71e80715eeaae6a930a33b2f5
   ReactiveCocoa: e2db045570aa97c695e7aa97c2bcab222ae51f4a
   Specta: 96fe05fe5c7348b5223f85e862904f6e832abb14
   Vespucci: 32889d8c15b4c4768f2bb611ab43436f89382fec
 
-COCOAPODS: 0.38.2
+COCOAPODS: 0.39.0
