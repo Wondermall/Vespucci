@@ -9,7 +9,7 @@
 
 Pod::Spec.new do |s|
   s.name             = "Vespucci"
-  s.version          = "0.4.12"
+  s.version          = "0.4.13"
   s.summary          = "Navigation microframework"
   s.description      = <<-DESC
                         Routing made simple. Not only for UINavigationController.
@@ -30,5 +30,5 @@ Pod::Spec.new do |s|
 
   s.source_files = 'Pod/Sources/**/*'
   s.dependency 'ReactiveCocoa', '~> 2.4'
-  s.dependency 'JLRoutes', '~> 1.5.2'
+  s.dependency 'JLRoutes', '~> 1.6'
 end
