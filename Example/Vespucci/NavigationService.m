@@ -141,36 +141,27 @@ NSString *const BlockUserNodeId = @"root.notifications.profile.block";
 
     // Notifications -> Profile
 
-    [self.navigationManager addRuleForHostNodeId:NotificationsNodeId childNodeId:ProfileNodeId mountBlock:^RACSignal *(VSPNavigationNode *parent, VSPNavigationNode *child, BOOL animated) {
-        return [RACSignal createSignal:^RACDisposable *(id<RACSubscriber> subscriber) {
-            UINavigationController *navigationController = [[UINavigationController alloc] initWithRootViewController:child.viewController];
-            navigationController.navigationBar.barStyle = UIBarStyleBlack;
-            [parent.viewController presentViewController:navigationController animated:animated completion:^{
-                [subscriber sendCompleted];
-            }];
-            return nil;
+    [self.navigationManager addRuleForHostNodeId:NotificationsNodeId childNodeId:ProfileNodeId mountBlock:^(VSPNavigationNode *parent, VSPNavigationNode *child, BOOL animated, VSPNavigatonTransitionCompletion completion) {
+        UINavigationController *navigationController = [[UINavigationController alloc] initWithRootViewController:child.viewController];
+        navigationController.navigationBar.barStyle = UIBarStyleBlack;
+        [parent.viewController presentViewController:navigationController animated:animated completion:^{
+            completion(YES);
         }];
-    } unmounBlock:^RACSignal *(VSPNavigationNode *parent, VSPNavigationNode *child, BOOL animated) {
-        return [RACSignal createSignal:^RACDisposable *(id<RACSubscriber> subscriber) {
-            [child.viewController dismissViewControllerAnimated:animated completion:^{
-                [subscriber sendCompleted];
-            }];
-            return nil;
+    } unmounBlock:^(VSPNavigationNode *parent, VSPNavigationNode *child, BOOL animated, VSPNavigatonTransitionCompletion completion) {
+        [child.viewController dismissViewControllerAnimated:animated completion:^{
+            completion(YES);
         }];
     }];
     
     
     // Notifications
 
-    [self.navigationManager addRuleForHostNodeId:RootNodeId childNodeId:NotificationsNodeId mountBlock:^RACSignal *(VSPNavigationNode *parent, VSPNavigationNode *child, BOOL animated) {
-        return [RACSignal createSignal:^RACDisposable *(id<RACSubscriber> subscriber) {
-            ((UITabBarController *)parent).selectedIndex = 1;
-            [subscriber sendCompleted];
-            return nil;
-        }];
-    } unmounBlock:^RACSignal *(VSPNavigationNode *parent, VSPNavigationNode *child, BOOL animated) {
+    [self.navigationManager addRuleForHostNodeId:RootNodeId childNodeId:NotificationsNodeId mountBlock:^(VSPNavigationNode *parent, VSPNavigationNode *child, BOOL animated, VSPNavigatonTransitionCompletion completion) {
+        ((UITabBarController *)parent).selectedIndex = 1;
+        completion(YES);
+    } unmounBlock:^(VSPNavigationNode *parent, VSPNavigationNode *child, BOOL animated, VSPNavigatonTransitionCompletion completion) {
         // no-op
-        return nil;
+        completion(YES);
     }];
 
     [self.navigationManager registerNavigationForRoute:[self notificationsRoute] handler:^VSPNavigationNode *(NSDictionary *parameters) {
@@ -183,14 +174,11 @@ NSString *const BlockUserNodeId = @"root.notifications.profile.block";
 
     // Messages
 
-    [self.navigationManager addRuleForHostNodeId:RootNodeId childNodeId:MessagesNodeId mountBlock:^RACSignal *(VSPNavigationNode *parent, VSPNavigationNode *child, BOOL animated) {
-        return [RACSignal createSignal:^RACDisposable *(id<RACSubscriber> subscriber) {
-            ((UITabBarController *)parent).selectedIndex = 0;
-            [subscriber sendCompleted];
-            return nil;
-        }];
-    } unmounBlock:^RACSignal *(VSPNavigationNode *parent, VSPNavigationNode *child, BOOL animated) {
-        return nil;
+    [self.navigationManager addRuleForHostNodeId:RootNodeId childNodeId:MessagesNodeId mountBlock:^(VSPNavigationNode *parent, VSPNavigationNode *child, BOOL animated, VSPNavigatonTransitionCompletion completion) {
+        ((UITabBarController *)parent).selectedIndex = 0;
+        completion(YES);
+    } unmounBlock:^(VSPNavigationNode *parent, VSPNavigationNode *child, BOOL animated, VSPNavigatonTransitionCompletion completion) {
+        completion(YES);
     }];
 
     // Root -> Messages
@@ -203,42 +191,30 @@ NSString *const BlockUserNodeId = @"root.notifications.profile.block";
     }];
 
     // Messages -> Single Message
-    [self.navigationManager addRuleForHostNodeId:MessagesNodeId childNodeId:SingleMessageNodeId mountBlock:^RACSignal *(VSPNavigationNode *parent, VSPNavigationNode *child, BOOL animated) {
-        return [RACSignal createSignal:^RACDisposable *(id<RACSubscriber> subscriber) {
-            UINavigationController *navigationController = [[UINavigationController alloc] initWithRootViewController:child.viewController];
-            navigationController.navigationBar.barStyle = UIBarStyleBlack;
-            [parent.viewController presentViewController:navigationController animated:animated completion:^{
-                [subscriber sendCompleted];
-            }];
-            return nil;
+    [self.navigationManager addRuleForHostNodeId:MessagesNodeId childNodeId:SingleMessageNodeId mountBlock:^(VSPNavigationNode *parent, VSPNavigationNode *child, BOOL animated, VSPNavigatonTransitionCompletion completion) {
+        UINavigationController *navigationController = [[UINavigationController alloc] initWithRootViewController:child.viewController];
+        navigationController.navigationBar.barStyle = UIBarStyleBlack;
+        [parent.viewController presentViewController:navigationController animated:animated completion:^{
+            completion(YES);
         }];
-    } unmounBlock:^RACSignal *(VSPNavigationNode *parent, VSPNavigationNode *child, BOOL animated) {
-        return [RACSignal createSignal:^RACDisposable *(id<RACSubscriber> subscriber) {
-            [child.viewController dismissViewControllerAnimated:animated completion:^{
-                [subscriber sendCompleted];
-            }];
-            return nil;
+    } unmounBlock:^(VSPNavigationNode *parent, VSPNavigationNode *child, BOOL animated, VSPNavigatonTransitionCompletion completion) {
+        [child.viewController dismissViewControllerAnimated:animated completion:^{
+            completion(YES);
         }];
     }];
 
     @weakify(self);
-    [self.navigationManager addRuleForHostNodeId:ProfileNodeId childNodeId:BlockUserNodeId mountBlock:^RACSignal *(VSPNavigationNode *parent, VSPNavigationNode *child, BOOL animated) {
-        return [RACSignal createSignal:^RACDisposable *(id <RACSubscriber> subscriber) {
-            [parent.viewController presentViewController:child.viewController animated:animated completion:^{
-                dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(4 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-                    @strongify(self);
-                    [[UIApplication sharedApplication] openURL:[self messagesURL]];
-                });
-                [subscriber sendCompleted];
-            }];
-            return nil;
+    [self.navigationManager addRuleForHostNodeId:ProfileNodeId childNodeId:BlockUserNodeId mountBlock:^(VSPNavigationNode *parent, VSPNavigationNode *child, BOOL animated, VSPNavigatonTransitionCompletion completion) {
+        [parent.viewController presentViewController:child.viewController animated:animated completion:^{
+            dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(4 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+                @strongify(self);
+                [[UIApplication sharedApplication] openURL:[self messagesURL]];
+            });
+            completion(YES);
         }];
-    } unmounBlock:^RACSignal *(VSPNavigationNode *parent, VSPNavigationNode *child, BOOL animated) {
-        return [RACSignal createSignal:^RACDisposable *(id <RACSubscriber> subscriber) {
-            [child.viewController dismissViewControllerAnimated:animated completion:^{
-                [subscriber sendCompleted];
-            }];
-            return nil;
+    } unmounBlock:^(VSPNavigationNode *parent, VSPNavigationNode *child, BOOL animated, VSPNavigatonTransitionCompletion completion) {
+        [child.viewController dismissViewControllerAnimated:animated completion:^{
+            completion(YES);
         }];
     }];
 }

@@ -284,7 +284,7 @@ NSString *const VSPHostingRuleAnyNodeId = @"VSPHostingRuleAnyNodeId";
     return [self _tupleForHostNodeId:parent.nodeId childNodeId:child.nodeId] != nil;
 }
 
-- (RACSignal *)_navigationWithHost:(VSPNavigationNode **)host newChild:(VSPNavigationNode **)child animated:(BOOL)animated {
+- (void)_navigationWithHost:(VSPNavigationNode **)host newChild:(VSPNavigationNode **)child animated:(BOOL)animated completion:(VSPNavigatonTransitionCompletion)completion {
     // we need to capture new parameters before child will be modified
     NSDictionary *parameters = (*child).parameters;
     
@@ -292,68 +292,88 @@ NSString *const VSPHostingRuleAnyNodeId = @"VSPHostingRuleAnyNodeId";
     VSPNavigationNode *proposedChild = (*child).root;
     VSPNavigationNode *proposedHost = (*host).root;
     if (![self _getHost:&proposedHost forChild:&proposedChild]) {
-        return [RACSignal error:[NSError vsp_vespucciErrorWithCode:VSPErrorCodeNoHostFound message:@"Failed to find the host for %@", *child]];
+        NSAssert(NO, @"Failed to find the host for %@", *child);
+        completion(NO);
+        return;
     }
     
     // Update original pointers with calculated host and child
     *child = proposedChild;
     *host = proposedHost;
-    
-    RACSignal *unmount = [self _unmountForHost:proposedHost animated:animated];
-    unmount = [unmount doCompleted:^{
+
+    [self _unmountForHost:proposedHost animated:animated completion:^(BOOL finished) {
+        if (!finished) {
+            NSAssert(NO, @"Unmounting was not successfull");
+            completion(NO);
+            return;
+        }
         [proposedHost.root updateParametersRecursively:parameters];
         proposedHost.child = proposedChild;
+        [self _mountForHost:proposedHost newChild:proposedChild animated:animated completion:^(BOOL finished) {
+            NSAssert(finished, @"Mounting navigation failed");
+            completion(finished);
+        }];
     }];
-    RACSignal *mount = [self _mountForHost:proposedHost newChild:proposedChild animated:animated];
-    return [unmount concat:mount];
 }
 
-- (RACSignal *)_unmountForHost:(VSPNavigationNode *)host animated:(BOOL)animated {
+- (void)_unmountForHost:(VSPNavigationNode *)host animated:(BOOL)animated completion:(VSPNavigatonTransitionCompletion)completion {
     if (!host.child) {
-        return [RACSignal empty];
+        completion(YES);
+        return;
     }
     
     RACSignal *result = nil;
     VSPNavigationNode *currentHost = host.leaf;
-    do {
-        currentHost = currentHost.parent;
-        __VSPMountingTuple *tuple = [self _tupleForHostNodeId:currentHost.nodeId childNodeId:currentHost.child.nodeId];
-        NSAssert(tuple, @"No tuple found for pair host: %@; child: %@", currentHost, currentHost.child);
-        NSAssert(tuple.unmountHandler, @"Don't know how to dismount current child %@", host.child);
-        RACSignal *dismount = tuple.unmountHandler(currentHost, currentHost.child, animated) ?: [RACSignal empty];
-        dismount.name = [NSString stringWithFormat:@"Unmounting %@ - %@", currentHost.nodeId, host.child.nodeId];
-        result = result ? [result concat:dismount] : dismount;
-    } while (![currentHost isEqual:host]);
-    result.name = [NSString stringWithFormat:@"Unmounting all children of %@", host.nodeId];
-    return result;
+    VSPNavigationNode *child = currentHost.child;
+    [self __unmountForHost:currentHost child:child stopAtNode:host animated:animated completion:completion];
 }
 
-- (RACSignal *)_mountForHost:(VSPNavigationNode *)host newChild:(VSPNavigationNode *)proposedChild animated:(BOOL)animated {
+- (void)__unmountForHost:(VSPNavigationNode *)host child:(VSPNavigationNode *)child stopAtNode:(VSPNavigationNode *)stopNode animated:(BOOL)animated completion:(VSPNavigatonTransitionCompletion)completion {
+    if ([host isEqualToNode:stopNode]) {
+        completion(YES);
+        return;
+    }
+    __VSPMountingTuple *tuple = [self _tupleForHostNodeId:host.nodeId childNodeId:child.nodeId];
+    NSAssert(tuple, @"No tuple found for pair host: %@; child: %@", host, child);
+    NSAssert(tuple.unmountHandler, @"Don't know how to dismount current child %@", child);
+    tuple.unmountHandler(host, child, animated, ^(BOOL finished){
+        if (!finished) {
+            completion(NO);
+            return;
+        }
+        [self __unmountForHost:host.parent child:host stopAtNode:stopNode animated:animated completion:completion];
+    });
+}
+
+- (void)_mountForHost:(VSPNavigationNode *)host newChild:(VSPNavigationNode *)proposedChild animated:(BOOL)animated completion:(VSPNavigatonTransitionCompletion)completion {
+    NSParameterAssert(host);
     if (!proposedChild) {
         // nothing to mount
-        return [RACSignal empty];
+        completion(YES);
+        return;
     }
-    NSParameterAssert(host);
-    NSParameterAssert(proposedChild);
-    RACSignal *result = [RACSignal empty];
-    VSPNavigationNode *child = proposedChild;
-    while (child) {
-        __VSPMountingTuple *tuple = [self _tupleForHostNodeId:host.nodeId childNodeId:child.nodeId];
-        VSPNavigationNodeViewControllerMountHandler mountBlock = tuple.mountHandler;
-        if (child && !mountBlock) {
-            [[NSException exceptionWithName:NSInternalInconsistencyException
-                                     reason:[NSString stringWithFormat:@"\"%@\" doesn't know how to mount \"%@\"", host.nodeId, child.nodeId]
-                                   userInfo:nil] raise];
+    [self __mountForHost:host child:proposedChild animated:animated completion:completion];
+}
+
+- (void)__mountForHost:(VSPNavigationNode *)host child:(VSPNavigationNode *)child animated:(BOOL)animated completion:(VSPNavigatonTransitionCompletion)completion {
+    if (!child) {
+        completion(YES);
+        return;
+    }
+    __VSPMountingTuple *tuple = [self _tupleForHostNodeId:host.nodeId childNodeId:child.nodeId];
+    VSPNavigationNodeViewControllerMountHandler mountBlock = tuple.mountHandler;
+    NSAssert(mountBlock, @"%@ doesn't know how to mount %@", host.nodeId, child.nodeId);
+    if (!mountBlock) {
+        completion(NO);
+        return;
+    }
+    mountBlock(host, child, animated, ^(BOOL finished){
+        if (!finished) {
+            completion(NO);
+            return;
         }
-        
-        RACSignal *mount = mountBlock(host, child, animated) ?: [RACSignal empty];
-        result = [result concat:mount];
-        
-        host = child;
-        child = child.child;
-    }
-    result.name = [NSString stringWithFormat:@"Mount %@ on %@", proposedChild.nodeId, host.nodeId];
-    return result;
+        [self __mountForHost:child child:child.child animated:animated completion:completion];
+    });
 }
 
 @end

@@ -46,9 +46,11 @@ extern NSString *const VSPHostingRuleAnyNodeId;
 @end
 
 
-typedef RACSignal *(^VSPNavigationNodeViewControllerMountHandler)(VSPNavigationNode *parent, VSPNavigationNode *child, BOOL animated);
+typedef void(^VSPNavigatonTransitionCompletion)(BOOL finished);
 
-typedef RACSignal *(^VSPNavigationNodeViewControllerDismountHandler)(VSPNavigationNode *parent, VSPNavigationNode *child, BOOL animated);
+typedef void(^VSPNavigationNodeViewControllerMountHandler)(VSPNavigationNode *parent, VSPNavigationNode *child, BOOL animated, VSPNavigatonTransitionCompletion completion);
+
+typedef void(^VSPNavigationNodeViewControllerDismountHandler)(VSPNavigationNode *parent, VSPNavigationNode *child, BOOL animated, VSPNavigatonTransitionCompletion completion);
 
 typedef UIViewController *(^VSPViewControllerFactory)(VSPNavigationNode *node);
 

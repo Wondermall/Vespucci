@@ -12,7 +12,6 @@
 typedef UIViewController *(^WMLNavigationNodeViewControllerFactory)(NSDictionary *navigationParameters);
 
 
-@class RACSignal;
 @interface VSPNavigationNode : NSObject <NSCopying>
 
 /**
