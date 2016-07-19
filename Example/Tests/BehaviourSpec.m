@@ -208,26 +208,20 @@ SpecEnd
 
 @implementation TestNavigationManager
 - (void)addSimpleRuleForHostNodeId:(NSString *)hostNodeId childNodeId:(NSString *)childNodeId {
-    [self addRuleForHostNodeId:hostNodeId childNodeId:childNodeId mountBlock:^RACSignal *(VSPNavigationNode *parent, VSPNavigationNode *child, BOOL animated) {
-        return [RACSignal createSignal:^RACDisposable *(id<RACSubscriber> subscriber) {
-            UIViewController *parentController = parent.viewController;
-            UIViewController *childController = child.viewController;
-            [parentController addChildViewController:childController];
-            childController.view.frame = parentController.view.bounds;
-            childController.view.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
-            [parentController.view addSubview:childController.view];
-            [childController didMoveToParentViewController:parentController];
-            [subscriber sendCompleted];
-            return nil;
-        }];
-    } unmounBlock:^RACSignal *(VSPNavigationNode *parent, VSPNavigationNode *child, BOOL animated) {
-        return [RACSignal createSignal:^RACDisposable *(id<RACSubscriber> subscriber) {
-            [child.viewController willMoveToParentViewController:nil];
-            [child.viewController.view removeFromSuperview];
-            [child.viewController removeFromParentViewController];
-            [subscriber sendCompleted];
-            return nil;
-        }];
+    [self addRuleForHostNodeId:hostNodeId childNodeId:childNodeId mountBlock:^(VSPNavigationNode *parent, VSPNavigationNode *child, BOOL animated, VSPNavigatonTransitionCompletion completion) {
+        UIViewController *parentController = parent.viewController;
+        UIViewController *childController = child.viewController;
+        [parentController addChildViewController:childController];
+        childController.view.frame = parentController.view.bounds;
+        childController.view.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
+        [parentController.view addSubview:childController.view];
+        [childController didMoveToParentViewController:parentController];
+        completion(YES);
+    } unmounBlock:^(VSPNavigationNode *parent, VSPNavigationNode *child, BOOL animated, VSPNavigatonTransitionCompletion completion) {
+        [child.viewController willMoveToParentViewController:nil];
+        [child.viewController.view removeFromSuperview];
+        [child.viewController removeFromParentViewController];
+        completion(YES);
     }];
 }
 - (void)registerSimpleNavigationForRoute:(NSString *)route nodeId:(NSString *)nodeId, ... {
