@@ -160,6 +160,7 @@
 - (id)copyWithZone:(NSZone *)zone {
     VSPNavigationNode *node = [[VSPNavigationNode allocWithZone:zone] initWithNavigationParameters:self.parameters];
     node.nodeId = self.nodeId;
+    node.viewController = self.viewController;
     node.child = [self.child copy];
     return node;
 }

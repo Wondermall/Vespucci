@@ -201,6 +201,9 @@ NSString *const VSPHostingRuleAnyNodeId = @"VSPHostingRuleAnyNodeId";
         }
         @strongify(self);
         NSAssert(node.viewController, @"No view controller provided, this can't be good!");
+        if (!node.viewController) {
+            return NO;
+        }
         RACSignal *navigation = [self _navigateToNode:node];
         if (!navigation) {
             return NO;
