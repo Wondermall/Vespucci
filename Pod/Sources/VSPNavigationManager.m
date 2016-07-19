@@ -52,7 +52,7 @@ NSString *const VSPHostingRuleAnyNodeId = @"VSPHostingRuleAnyNodeId";
 
 - (BOOL)_getHost:(inout VSPNavigationNode **)inOutParent forChild:(inout VSPNavigationNode **)inOutChild;
 
-- (RACSignal *)_navigationWithHost:(inout VSPNavigationNode **)host newChild:(inout VSPNavigationNode **)child animated:(BOOL)animated;
+- (BOOL)_navigationWithHost:(VSPNavigationNode **)host newChild:(VSPNavigationNode **)child animated:(BOOL)animated completion:(VSPNavigatonTransitionCompletion)completion;
 
 @end
 
@@ -65,7 +65,8 @@ NSString *const VSPHostingRuleAnyNodeId = @"VSPHostingRuleAnyNodeId";
 
 @property (nonatomic) NSMutableDictionary *hostingRules;
 
-@property (nonatomic, weak) RACSignal *navigationIngflight;
+@property (nonatomic, getter=isNavigationInFlight) BOOL navigationInFlight;
+
 @property (nonatomic) NSMutableDictionary *viewControllerFactories;
 
 @end
@@ -120,16 +121,17 @@ NSString *const VSPHostingRuleAnyNodeId = @"VSPHostingRuleAnyNodeId";
     return signal;
 }
 
-- (RACSignal *)navigateWithNewNavigationTree:(VSPNavigationNode *)tree {
-    return [self _navigateToNode:tree];
+- (BOOL)navigateWithNewNavigationTree:(VSPNavigationNode *)tree completion:(VSPNavigatonTransitionCompletion)completion {
+    return [self _navigateToNode:tree completion:completion];
 }
 
 #pragma mark - Private
 
-- (RACSignal *)_navigateToNode:(VSPNavigationNode *)node {
-    if (self.navigationIngflight) {
+- (BOOL)_navigateToNode:(VSPNavigationNode *)node completion:(VSPNavigatonTransitionCompletion)completion {
+    NSAssert(!self.isNavigationInFlight, @"Another navigaiton is in flight");
+    if (self.isNavigationInFlight) {
         [self _postNotificationNamed:VSPNavigationManagerDidFailNavigationNotification destination:node.root source:self.root];
-        return [RACSignal error:[NSError vsp_vespucciErrorWithCode:VSPErrorCodeAnotherNavigationInProgress message:@"Another navigation is in progress"]];
+        return NO;
     }
     
     NSAssert(self.root, @"No root node installed");
@@ -148,30 +150,22 @@ NSString *const VSPHostingRuleAnyNodeId = @"VSPHostingRuleAnyNodeId";
     }
     @weakify(self);
     VSPNavigationNode *proposedHost = self.root, *proposedChild = node;
-    RACSignal *navigation = ({
-        RACSignal *navigation = [self _navigationWithHost:&proposedHost newChild:&proposedChild animated:animated];
-        RACMulticastConnection *connection = [navigation multicast:[RACReplaySubject subject]];
-        RACDisposable *disposable = [connection connect];
-        RACSignal *signal = connection.signal;
-        [signal subscribeCompleted:^{
-            [disposable dispose];
-        }];
-        signal;
-    });
-    self.navigationIngflight = navigation;
-    
-    [self _postNotificationNamed:VSPNavigationManagerWillNavigateNotification destination:proposedChild.leaf source:oldTree];
-    
-    [navigation subscribeError:^(NSError *error) {
+
+    self.navigationInFlight = YES;
+    [self _navigationWithHost:&proposedHost newChild:&proposedChild animated:animated completion:^(BOOL finished) {
         @strongify(self);
-        self.navigationIngflight = nil;
-        [self _postNotificationNamed:VSPNavigationManagerDidFailNavigationNotification destination:self.root source:oldTree];
-    } completed:^{
-        @strongify(self);
-        self.navigationIngflight = nil;
+        self.navigationInFlight = NO;
+
+        NSAssert(finished, @"Navigation to node %@ failed", node.nodeId);
+        if (!finished) {
+            [self _postNotificationNamed:VSPNavigationManagerDidFailNavigationNotification destination:self.root source:oldTree];
+            completion(NO);
+            return;
+        }
+
         [self _postNotificationNamed:VSPNavigationManagerDidFinishNavigationNotification destination:self.root source:oldTree];
     }];
-    return navigation;
+    return YES;
 }
 
 - (void)_postNotificationNamed:(NSString *)notificationName destination:(VSPNavigationNode *)node source:(VSPNavigationNode *)source {
@@ -204,17 +198,8 @@ NSString *const VSPHostingRuleAnyNodeId = @"VSPHostingRuleAnyNodeId";
         if (!node.viewController) {
             return NO;
         }
-        RACSignal *navigation = [self _navigateToNode:node];
-        if (!navigation) {
-            return NO;
-        }
-        
-        __block BOOL isSuccessful = YES;
-        [navigation subscribeError:^(NSError *error) {
-            isSuccessful = NO;
-        }];
-        
-        return isSuccessful;
+
+        return [self _navigateToNode:node completion:^(BOOL finished){}];
     }];
 }
 
@@ -302,8 +287,8 @@ NSString *const VSPHostingRuleAnyNodeId = @"VSPHostingRuleAnyNodeId";
     *host = proposedHost;
 
     [self _unmountForHost:proposedHost animated:animated completion:^(BOOL finished) {
+        NSAssert(finished, @"Unmounting was not successfull");
         if (!finished) {
-            NSAssert(NO, @"Unmounting was not successfull");
             completion(NO);
             return;
         }
@@ -316,15 +301,19 @@ NSString *const VSPHostingRuleAnyNodeId = @"VSPHostingRuleAnyNodeId";
     }];
 }
 
+// TODO: flatten stack trace by inlining _unmountForHost:animated:completion:
 - (void)_unmountForHost:(VSPNavigationNode *)host animated:(BOOL)animated completion:(VSPNavigatonTransitionCompletion)completion {
     if (!host.child) {
         completion(YES);
         return;
     }
     
-    RACSignal *result = nil;
     VSPNavigationNode *currentHost = host.leaf;
     VSPNavigationNode *child = currentHost.child;
+    if (!child) {
+        completion(YES);
+        return;
+    }
     [self __unmountForHost:currentHost child:child stopAtNode:host animated:animated completion:completion];
 }
 
@@ -345,6 +334,7 @@ NSString *const VSPHostingRuleAnyNodeId = @"VSPHostingRuleAnyNodeId";
     });
 }
 
+// TODO: flatten stack trace by inlining _mountForHost:animated:completion:
 - (void)_mountForHost:(VSPNavigationNode *)host newChild:(VSPNavigationNode *)proposedChild animated:(BOOL)animated completion:(VSPNavigatonTransitionCompletion)completion {
     NSParameterAssert(host);
     if (!proposedChild) {

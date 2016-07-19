@@ -11,6 +11,9 @@
 #import "VSPNavigationNode.h"
 
 
+typedef void(^VSPNavigatonTransitionCompletion)(BOOL finished);
+
+
 extern NSString *const VSPNavigationManagerWillNavigateNotification;
 extern NSString *const VSPNavigationManagerDidFinishNavigationNotification;
 extern NSString *const VSPNavigationManagerDidFailNavigationNotification;
@@ -31,9 +34,9 @@ extern NSString *const VSPHostingRuleAnyNodeId;
 
 - (BOOL)handleURL:(NSURL *)URL;
 
-- (RACSignal *)navigateToURL:(NSURL *)URL;
+- (void)navigateToURL:(NSURL *)URL completion:(VSPNavigatonTransitionCompletion)completion;
 
-- (RACSignal *)navigateWithNewNavigationTree:(VSPNavigationNode *)tree;
+- (BOOL)navigateWithNewNavigationTree:(VSPNavigationNode *)tree completion:(VSPNavigatonTransitionCompletion)completion;
 
 @end
 
@@ -46,7 +49,7 @@ extern NSString *const VSPHostingRuleAnyNodeId;
 @end
 
 
-typedef void(^VSPNavigatonTransitionCompletion)(BOOL finished);
+
 
 typedef void(^VSPNavigationNodeViewControllerMountHandler)(VSPNavigationNode *parent, VSPNavigationNode *child, BOOL animated, VSPNavigatonTransitionCompletion completion);
 
