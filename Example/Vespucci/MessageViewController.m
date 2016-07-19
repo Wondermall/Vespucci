@@ -45,13 +45,13 @@
 }
 
 - (IBAction)_profileButtonAction:(id)sender {
-    NSURL *URL = [[NavigationService sharedService] profileURLForUser:self.userId];
-    [[UIApplication sharedApplication] openURL:URL];
+    NSURL *url = [[NavigationService sharedService] profileURLForUser:self.userId];
+    [[NavigationService sharedService] handleURL:url];
 }
 
 - (IBAction)_blockButtonAction:(id)sender {
-    NSURL *URL = [[NavigationService sharedService] blockUserWithUserIdURL:self.userId];
-    [[UIApplication sharedApplication] openURL:URL];
+    NSURL *url = [[NavigationService sharedService] blockUserWithUserIdURL:self.userId];
+    [[NavigationService sharedService] handleURL:url];
 }
 
 @end

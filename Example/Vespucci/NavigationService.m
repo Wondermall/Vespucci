@@ -157,7 +157,7 @@ NSString *const BlockUserNodeId = @"root.notifications.profile.block";
     // Notifications
 
     [self.navigationManager addRuleForHostNodeId:RootNodeId childNodeId:NotificationsNodeId mountBlock:^(VSPNavigationNode *parent, VSPNavigationNode *child, BOOL animated, VSPNavigatonTransitionCompletion completion) {
-        ((UITabBarController *)parent).selectedIndex = 1;
+        ((UITabBarController *)parent.viewController).selectedIndex = 1;
         completion(YES);
     } unmounBlock:^(VSPNavigationNode *parent, VSPNavigationNode *child, BOOL animated, VSPNavigatonTransitionCompletion completion) {
         // no-op
@@ -191,10 +191,10 @@ NSString *const BlockUserNodeId = @"root.notifications.profile.block";
     }];
 
     // Messages -> Single Message
-    [self.navigationManager addRuleForHostNodeId:MessagesNodeId childNodeId:SingleMessageNodeId mountBlock:^(VSPNavigationNode *parent, VSPNavigationNode *child, BOOL animated, VSPNavigatonTransitionCompletion completion) {
+    [self.navigationManager addRuleForHostNodeId:VSPHostingRuleAnyNodeId childNodeId:SingleMessageNodeId mountBlock:^(VSPNavigationNode *parent, VSPNavigationNode *child, BOOL animated, VSPNavigatonTransitionCompletion completion) {
         UINavigationController *navigationController = [[UINavigationController alloc] initWithRootViewController:child.viewController];
         navigationController.navigationBar.barStyle = UIBarStyleBlack;
-        [parent.viewController presentViewController:navigationController animated:animated completion:^{
+        [parent.viewController presentViewController:navigationController animated:YES completion:^{
             completion(YES);
         }];
     } unmounBlock:^(VSPNavigationNode *parent, VSPNavigationNode *child, BOOL animated, VSPNavigatonTransitionCompletion completion) {
@@ -208,7 +208,8 @@ NSString *const BlockUserNodeId = @"root.notifications.profile.block";
         [parent.viewController presentViewController:child.viewController animated:animated completion:^{
             dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(4 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
                 @strongify(self);
-                [[UIApplication sharedApplication] openURL:[self messagesURL]];
+                NSURL *url = [self messagesURL];
+                [[NavigationService sharedService] handleURL:url];
             });
             completion(YES);
         }];
