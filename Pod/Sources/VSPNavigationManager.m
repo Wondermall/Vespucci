@@ -52,7 +52,7 @@ NSString *const VSPHostingRuleAnyNodeId = @"VSPHostingRuleAnyNodeId";
 
 - (BOOL)_getHost:(inout VSPNavigationNode **)inOutParent forChild:(inout VSPNavigationNode **)inOutChild;
 
-- (BOOL)_navigationWithHost:(VSPNavigationNode **)host newChild:(VSPNavigationNode **)child animated:(BOOL)animated completion:(VSPNavigatonTransitionCompletion)completion;
+- (BOOL)_navigationWithHost:(VSPNavigationNode **)host newChild:(VSPNavigationNode **)child completion:(VSPNavigatonTransitionCompletion)completion;
 
 @end
 
@@ -143,16 +143,11 @@ NSString *const VSPHostingRuleAnyNodeId = @"VSPHostingRuleAnyNodeId";
         node = rootCopy;
     }
     
-    BOOL animated = NO;
-    if (node.parameters[@"animated"]) {
-        NSString *animatedString = [node.parameters[@"animated"] lowercaseString];
-        animated = [animatedString isEqual:@"true"] || [animatedString isEqual:@"yes"] || [animatedString isEqual:@"1"];
-    }
     @weakify(self);
     VSPNavigationNode *proposedHost = self.root, *proposedChild = node;
 
     self.navigationInFlight = YES;
-    [self _navigationWithHost:&proposedHost newChild:&proposedChild animated:animated completion:^(BOOL finished) {
+    [self _navigationWithHost:&proposedHost newChild:&proposedChild completion:^(BOOL finished) {
         @strongify(self);
         self.navigationInFlight = NO;
 
@@ -269,7 +264,7 @@ NSString *const VSPHostingRuleAnyNodeId = @"VSPHostingRuleAnyNodeId";
     return [self _tupleForHostNodeId:parent.nodeId childNodeId:child.nodeId] != nil;
 }
 
-- (void)_navigationWithHost:(VSPNavigationNode **)host newChild:(VSPNavigationNode **)child animated:(BOOL)animated completion:(VSPNavigatonTransitionCompletion)completion {
+- (void)_navigationWithHost:(VSPNavigationNode **)host newChild:(VSPNavigationNode **)child completion:(VSPNavigatonTransitionCompletion)completion {
     // we need to capture new parameters before child will be modified
     NSDictionary *parameters = (*child).parameters;
     
@@ -286,7 +281,7 @@ NSString *const VSPHostingRuleAnyNodeId = @"VSPHostingRuleAnyNodeId";
     *child = proposedChild;
     *host = proposedHost;
 
-    [self _unmountForHost:proposedHost animated:animated completion:^(BOOL finished) {
+    [self _unmountForHost:proposedHost completion:^(BOOL finished) {
         NSAssert(finished, @"Unmounting was not successfull");
         if (!finished) {
             completion(NO);
@@ -294,15 +289,15 @@ NSString *const VSPHostingRuleAnyNodeId = @"VSPHostingRuleAnyNodeId";
         }
         [proposedHost.root updateParametersRecursively:parameters];
         proposedHost.child = proposedChild;
-        [self _mountForHost:proposedHost newChild:proposedChild animated:animated completion:^(BOOL finished) {
+        [self _mountForHost:proposedHost newChild:proposedChild completion:^(BOOL finished) {
             NSAssert(finished, @"Mounting navigation failed");
             completion(finished);
         }];
     }];
 }
 
-// TODO: flatten stack trace by inlining _unmountForHost:animated:completion:
-- (void)_unmountForHost:(VSPNavigationNode *)host animated:(BOOL)animated completion:(VSPNavigatonTransitionCompletion)completion {
+// TODO: flatten stack trace by inlining _unmountForHost:completion:
+- (void)_unmountForHost:(VSPNavigationNode *)host completion:(VSPNavigatonTransitionCompletion)completion {
     if (!host.child) {
         completion(YES);
         return;
@@ -314,10 +309,10 @@ NSString *const VSPHostingRuleAnyNodeId = @"VSPHostingRuleAnyNodeId";
         completion(YES);
         return;
     }
-    [self __unmountForHost:currentHost child:child stopAtNode:host animated:animated completion:completion];
+    [self __unmountForHost:currentHost child:child stopAtNode:host completion:completion];
 }
 
-- (void)__unmountForHost:(VSPNavigationNode *)host child:(VSPNavigationNode *)child stopAtNode:(VSPNavigationNode *)stopNode animated:(BOOL)animated completion:(VSPNavigatonTransitionCompletion)completion {
+- (void)__unmountForHost:(VSPNavigationNode *)host child:(VSPNavigationNode *)child stopAtNode:(VSPNavigationNode *)stopNode completion:(VSPNavigatonTransitionCompletion)completion {
     if ([host isEqualToNode:stopNode]) {
         completion(YES);
         return;
@@ -325,27 +320,27 @@ NSString *const VSPHostingRuleAnyNodeId = @"VSPHostingRuleAnyNodeId";
     __VSPMountingTuple *tuple = [self _tupleForHostNodeId:host.nodeId childNodeId:child.nodeId];
     NSAssert(tuple, @"No tuple found for pair host: %@; child: %@", host, child);
     NSAssert(tuple.unmountHandler, @"Don't know how to dismount current child %@", child);
-    tuple.unmountHandler(host, child, animated, ^(BOOL finished){
+    tuple.unmountHandler(host, child, ^(BOOL finished){
         if (!finished) {
             completion(NO);
             return;
         }
-        [self __unmountForHost:host.parent child:host stopAtNode:stopNode animated:animated completion:completion];
+        [self __unmountForHost:host.parent child:host stopAtNode:stopNode completion:completion];
     });
 }
 
-// TODO: flatten stack trace by inlining _mountForHost:animated:completion:
-- (void)_mountForHost:(VSPNavigationNode *)host newChild:(VSPNavigationNode *)proposedChild animated:(BOOL)animated completion:(VSPNavigatonTransitionCompletion)completion {
+// TODO: flatten stack trace by inlining _mountForHost:completion:
+- (void)_mountForHost:(VSPNavigationNode *)host newChild:(VSPNavigationNode *)proposedChild completion:(VSPNavigatonTransitionCompletion)completion {
     NSParameterAssert(host);
     if (!proposedChild) {
         // nothing to mount
         completion(YES);
         return;
     }
-    [self __mountForHost:host child:proposedChild animated:animated completion:completion];
+    [self __mountForHost:host child:proposedChild completion:completion];
 }
 
-- (void)__mountForHost:(VSPNavigationNode *)host child:(VSPNavigationNode *)child animated:(BOOL)animated completion:(VSPNavigatonTransitionCompletion)completion {
+- (void)__mountForHost:(VSPNavigationNode *)host child:(VSPNavigationNode *)child completion:(VSPNavigatonTransitionCompletion)completion {
     if (!child) {
         completion(YES);
         return;
@@ -357,12 +352,12 @@ NSString *const VSPHostingRuleAnyNodeId = @"VSPHostingRuleAnyNodeId";
         completion(NO);
         return;
     }
-    mountBlock(host, child, animated, ^(BOOL finished){
+    mountBlock(host, child, ^(BOOL finished){
         if (!finished) {
             completion(NO);
             return;
         }
-        [self __mountForHost:child child:child.child animated:animated completion:completion];
+        [self __mountForHost:child child:child.child completion:completion];
     });
 }
 

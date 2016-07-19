@@ -208,7 +208,7 @@ SpecEnd
 
 @implementation TestNavigationManager
 - (void)addSimpleRuleForHostNodeId:(NSString *)hostNodeId childNodeId:(NSString *)childNodeId {
-    [self addRuleForHostNodeId:hostNodeId childNodeId:childNodeId mountBlock:^(VSPNavigationNode *parent, VSPNavigationNode *child, BOOL animated, VSPNavigatonTransitionCompletion completion) {
+    [self addRuleForHostNodeId:hostNodeId childNodeId:childNodeId mountBlock:^(VSPNavigationNode *parent, VSPNavigationNode *child, VSPNavigatonTransitionCompletion completion) {
         UIViewController *parentController = parent.viewController;
         UIViewController *childController = child.viewController;
         [parentController addChildViewController:childController];
@@ -217,7 +217,7 @@ SpecEnd
         [parentController.view addSubview:childController.view];
         [childController didMoveToParentViewController:parentController];
         completion(YES);
-    } unmounBlock:^(VSPNavigationNode *parent, VSPNavigationNode *child, BOOL animated, VSPNavigatonTransitionCompletion completion) {
+    } unmounBlock:^(VSPNavigationNode *parent, VSPNavigationNode *child, VSPNavigatonTransitionCompletion completion) {
         [child.viewController willMoveToParentViewController:nil];
         [child.viewController.view removeFromSuperview];
         [child.viewController removeFromParentViewController];

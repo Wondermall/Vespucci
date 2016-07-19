@@ -51,9 +51,9 @@ extern NSString *const VSPHostingRuleAnyNodeId;
 
 
 
-typedef void(^VSPNavigationNodeViewControllerMountHandler)(VSPNavigationNode *parent, VSPNavigationNode *child, BOOL animated, VSPNavigatonTransitionCompletion completion);
+typedef void(^VSPNavigationNodeViewControllerMountHandler)(VSPNavigationNode *parent, VSPNavigationNode *child, VSPNavigatonTransitionCompletion completion);
 
-typedef void(^VSPNavigationNodeViewControllerDismountHandler)(VSPNavigationNode *parent, VSPNavigationNode *child, BOOL animated, VSPNavigatonTransitionCompletion completion);
+typedef void(^VSPNavigationNodeViewControllerDismountHandler)(VSPNavigationNode *parent, VSPNavigationNode *child, VSPNavigatonTransitionCompletion completion);
 
 typedef UIViewController *(^VSPViewControllerFactory)(VSPNavigationNode *node);
 
