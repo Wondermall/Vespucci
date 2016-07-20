@@ -9,7 +9,6 @@
 #import "TestHelpers.h"
 #import "EXPMatchers+NodeQuality.h"
 #import <Vespucci/Vespucci.h>
-#import <ReactiveCocoa/ReactiveCocoa.h>
 
 //
 // Who can present what

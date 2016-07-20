@@ -11,8 +11,6 @@
 #import "VSPNavigationNode.h"
 
 #import <Vespucci/Vespucci.h>
-#import <ReactiveCocoa/RACSubject.h>
-#import <ReactiveCocoa/RACEXTScope.h>
 
 
 NSString *const RootNodeId = @"root";
@@ -203,11 +201,11 @@ NSString *const BlockUserNodeId = @"root.notifications.profile.block";
         }];
     }];
 
-    @weakify(self);
+    __weak NavigationService *__weakSelf = self;
     [self.navigationManager addRuleForHostNodeId:ProfileNodeId childNodeId:BlockUserNodeId mountBlock:^(VSPNavigationNode *parent, VSPNavigationNode *child, VSPNavigatonTransitionCompletion completion) {
         [parent.viewController presentViewController:child.viewController animated:YES completion:^{
             dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(4 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-                @strongify(self);
+                NavigationService *self = __weakSelf;
                 NSURL *url = [self messagesURL];
                 [[NavigationService sharedService] handleURL:url];
             });

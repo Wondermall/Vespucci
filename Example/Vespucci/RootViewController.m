@@ -9,7 +9,6 @@
 #import "RootViewController.h"
 
 #import "NavigationService.h"
-#import <ReactiveCocoa/ReactiveCocoa.h>
 
 
 @interface RootViewController () <UITabBarControllerDelegate>
@@ -20,13 +19,6 @@
 @implementation RootViewController
 
 #pragma mark - Private
-
-- (void)_addRestGesture {
-    UITapGestureRecognizer *gesture = [[UITapGestureRecognizer alloc] init];
-    gesture.numberOfTapsRequired = 2;
-    [self rac_liftSelector:@selector(_reset:) withSignals:gesture.rac_gestureSignal, nil];
-    [self.view addGestureRecognizer:gesture];
-}
 
 - (void)_reset:(id)sender {
     [[NavigationService sharedService] setupDefaultRoutesWithRootViewController:self];
@@ -47,8 +39,6 @@
     dispatch_once(&onceToken, ^{
         [[NavigationService sharedService] setupDefaultRoutesWithRootViewController:self];
     });
-
-    [self _addRestGesture];
 }
 
 #pragma mark - UITabBarControllerDelegate
