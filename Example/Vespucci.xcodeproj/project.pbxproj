@@ -320,7 +320,7 @@
 			isa = PBXProject;
 			attributes = {
 				CLASSPREFIX = "";
-				LastUpgradeCheck = 0510;
+				LastUpgradeCheck = 0730;
 				ORGANIZATIONNAME = Wondermall;
 				TargetAttributes = {
 					6003F5AD195388D20070C39A = {
@@ -538,6 +538,7 @@
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				COPY_PHASE_STRIP = NO;
+				ENABLE_TESTABILITY = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_OPTIMIZATION_LEVEL = 0;
@@ -601,6 +602,7 @@
 				GCC_PREFIX_HEADER = "Vespucci/Vespucci-Prefix.pch";
 				GCC_TREAT_WARNINGS_AS_ERRORS = YES;
 				INFOPLIST_FILE = "Vespucci/Vespucci-Info.plist";
+				PRODUCT_BUNDLE_IDENTIFIER = "org.cocoapods.demo.$(PRODUCT_NAME:rfc1034identifier)";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				WRAPPER_EXTENSION = app;
 			};
@@ -615,6 +617,7 @@
 				GCC_PREFIX_HEADER = "Vespucci/Vespucci-Prefix.pch";
 				GCC_TREAT_WARNINGS_AS_ERRORS = YES;
 				INFOPLIST_FILE = "Vespucci/Vespucci-Info.plist";
+				PRODUCT_BUNDLE_IDENTIFIER = "org.cocoapods.demo.$(PRODUCT_NAME:rfc1034identifier)";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				WRAPPER_EXTENSION = app;
 			};
@@ -638,6 +641,7 @@
 				);
 				GCC_TREAT_WARNINGS_AS_ERRORS = YES;
 				INFOPLIST_FILE = "Tests/Tests-Info.plist";
+				PRODUCT_BUNDLE_IDENTIFIER = "org.cocoapods.demo.${PRODUCT_NAME:rfc1034identifier}";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				TEST_HOST = "$(BUNDLE_LOADER)";
 				WRAPPER_EXTENSION = xctest;
@@ -658,6 +662,7 @@
 				GCC_PREFIX_HEADER = "Tests/Tests-Prefix.pch";
 				GCC_TREAT_WARNINGS_AS_ERRORS = YES;
 				INFOPLIST_FILE = "Tests/Tests-Info.plist";
+				PRODUCT_BUNDLE_IDENTIFIER = "org.cocoapods.demo.${PRODUCT_NAME:rfc1034identifier}";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				TEST_HOST = "$(BUNDLE_LOADER)";
 				WRAPPER_EXTENSION = xctest;
