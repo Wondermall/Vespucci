@@ -65,9 +65,12 @@ NSString *const VSPHostingRuleAnyNodeId = @"VSPHostingRuleAnyNodeId";
 
 @property (nonatomic) NSMutableDictionary *hostingRules;
 
-@property (nonatomic, getter=isNavigationInFlight) BOOL navigationInFlight;
 
 @property (nonatomic) NSMutableDictionary *viewControllerFactories;
+
+@property (nonatomic, getter=isNavigationInFlight) BOOL navigationInFlight;
+// For debug
+@property (nonatomic) NSTimer *inflightNavigationTimer;
 
 @end
 
@@ -127,13 +130,21 @@ NSString *const VSPHostingRuleAnyNodeId = @"VSPHostingRuleAnyNodeId";
 
 #pragma mark - Private
 
+- (void)_inflightNavigationTimerHandler {
+    NSAssert(NO, @"Failed to navigate in 5 seconds; Current navigation tree: %@", self.root.recursiveDescription);
+    self.inflightNavigationTimer = nil;
+
+}
+
 - (BOOL)_navigateToNode:(VSPNavigationNode *)node completion:(VSPNavigatonTransitionCompletion)completion {
     NSAssert(!self.isNavigationInFlight, @"Another navigaiton is in flight");
     if (self.isNavigationInFlight) {
         [self _postNotificationNamed:VSPNavigationManagerDidFailNavigationNotification destination:node.root source:self.root];
         return NO;
     }
-    
+
+    self.inflightNavigationTimer = [NSTimer scheduledTimerWithTimeInterval:5 target:self selector:@selector(_inflightNavigationTimerHandler) userInfo:nil repeats:NO];
+
     NSAssert(self.root, @"No root node installed");
     VSPNavigationNode *oldTree = [self.root copy];
     if (![self.root.nodeId isEqual:node.nodeId]) {
@@ -150,6 +161,9 @@ NSString *const VSPHostingRuleAnyNodeId = @"VSPHostingRuleAnyNodeId";
     [self _navigationWithHost:&proposedHost newChild:&proposedChild completion:^(BOOL finished) {
         @strongify(self);
         self.navigationInFlight = NO;
+
+        [self.inflightNavigationTimer invalidate];
+        self.inflightNavigationTimer = nil;
 
         NSAssert(finished, @"Navigation to node %@ failed", node.nodeId);
         if (!finished) {
@@ -302,7 +316,7 @@ NSString *const VSPHostingRuleAnyNodeId = @"VSPHostingRuleAnyNodeId";
         return;
     }
     
-    VSPNavigationNode *currentHost = host.leaf;
+    VSPNavigationNode *currentHost = host.leaf.parent;
     VSPNavigationNode *child = currentHost.child;
     if (!child) {
         completion(YES);
@@ -312,16 +326,16 @@ NSString *const VSPHostingRuleAnyNodeId = @"VSPHostingRuleAnyNodeId";
 }
 
 - (void)__unmountForHost:(VSPNavigationNode *)host child:(VSPNavigationNode *)child stopAtNode:(VSPNavigationNode *)stopNode completion:(VSPNavigatonTransitionCompletion)completion {
-    if ([host isEqualToNode:stopNode]) {
-        completion(YES);
-        return;
-    }
     __VSPMountingTuple *tuple = [self _tupleForHostNodeId:host.nodeId childNodeId:child.nodeId];
     NSAssert(tuple, @"No tuple found for pair host: %@; child: %@", host, child);
     NSAssert(tuple.unmountHandler, @"Don't know how to dismount current child %@", child);
     tuple.unmountHandler(host, child, ^(BOOL finished){
         if (!finished) {
             completion(NO);
+            return;
+        }
+        if ([host isEqualToNode:stopNode]) {
+            completion(YES);
             return;
         }
         [self __unmountForHost:host.parent child:host stopAtNode:stopNode completion:completion];
