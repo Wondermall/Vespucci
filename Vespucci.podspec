@@ -29,6 +29,5 @@ Pod::Spec.new do |s|
   s.requires_arc = true
 
   s.source_files = 'Pod/Sources/**/*'
-  s.dependency 'ReactiveCocoa', '~> 2.4'
   s.dependency 'JLRoutes', '~> 1.6'
 end
