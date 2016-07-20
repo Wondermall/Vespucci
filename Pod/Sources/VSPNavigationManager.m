@@ -296,7 +296,6 @@ NSString *const VSPHostingRuleAnyNodeId = @"VSPHostingRuleAnyNodeId";
     }];
 }
 
-// TODO: flatten stack trace by inlining _unmountForHost:completion:
 - (void)_unmountForHost:(VSPNavigationNode *)host completion:(VSPNavigatonTransitionCompletion)completion {
     if (!host.child) {
         completion(YES);
@@ -329,7 +328,6 @@ NSString *const VSPHostingRuleAnyNodeId = @"VSPHostingRuleAnyNodeId";
     });
 }
 
-// TODO: flatten stack trace by inlining _mountForHost:completion:
 - (void)_mountForHost:(VSPNavigationNode *)host newChild:(VSPNavigationNode *)proposedChild completion:(VSPNavigatonTransitionCompletion)completion {
     NSParameterAssert(host);
     if (!proposedChild) {

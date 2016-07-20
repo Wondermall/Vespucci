@@ -141,14 +141,14 @@ NSString *const BlockUserNodeId = @"root.notifications.profile.block";
 
     // Notifications -> Profile
 
-    [self.navigationManager addRuleForHostNodeId:NotificationsNodeId childNodeId:ProfileNodeId mountBlock:^(VSPNavigationNode *parent, VSPNavigationNode *child, BOOL animated, VSPNavigatonTransitionCompletion completion) {
+    [self.navigationManager addRuleForHostNodeId:NotificationsNodeId childNodeId:ProfileNodeId mountBlock:^(VSPNavigationNode *parent, VSPNavigationNode *child, VSPNavigatonTransitionCompletion completion) {
         UINavigationController *navigationController = [[UINavigationController alloc] initWithRootViewController:child.viewController];
         navigationController.navigationBar.barStyle = UIBarStyleBlack;
-        [parent.viewController presentViewController:navigationController animated:animated completion:^{
+        [parent.viewController presentViewController:navigationController animated:YES completion:^{
             completion(YES);
         }];
-    } unmounBlock:^(VSPNavigationNode *parent, VSPNavigationNode *child, BOOL animated, VSPNavigatonTransitionCompletion completion) {
-        [child.viewController dismissViewControllerAnimated:animated completion:^{
+    } unmounBlock:^(VSPNavigationNode *parent, VSPNavigationNode *child, VSPNavigatonTransitionCompletion completion) {
+        [child.viewController dismissViewControllerAnimated:YES completion:^{
             completion(YES);
         }];
     }];
@@ -156,10 +156,10 @@ NSString *const BlockUserNodeId = @"root.notifications.profile.block";
     
     // Notifications
 
-    [self.navigationManager addRuleForHostNodeId:RootNodeId childNodeId:NotificationsNodeId mountBlock:^(VSPNavigationNode *parent, VSPNavigationNode *child, BOOL animated, VSPNavigatonTransitionCompletion completion) {
+    [self.navigationManager addRuleForHostNodeId:RootNodeId childNodeId:NotificationsNodeId mountBlock:^(VSPNavigationNode *parent, VSPNavigationNode *child, VSPNavigatonTransitionCompletion completion) {
         ((UITabBarController *)parent.viewController).selectedIndex = 1;
         completion(YES);
-    } unmounBlock:^(VSPNavigationNode *parent, VSPNavigationNode *child, BOOL animated, VSPNavigatonTransitionCompletion completion) {
+    } unmounBlock:^(VSPNavigationNode *parent, VSPNavigationNode *child, VSPNavigatonTransitionCompletion completion) {
         // no-op
         completion(YES);
     }];
@@ -174,10 +174,10 @@ NSString *const BlockUserNodeId = @"root.notifications.profile.block";
 
     // Messages
 
-    [self.navigationManager addRuleForHostNodeId:RootNodeId childNodeId:MessagesNodeId mountBlock:^(VSPNavigationNode *parent, VSPNavigationNode *child, BOOL animated, VSPNavigatonTransitionCompletion completion) {
+    [self.navigationManager addRuleForHostNodeId:RootNodeId childNodeId:MessagesNodeId mountBlock:^(VSPNavigationNode *parent, VSPNavigationNode *child, VSPNavigatonTransitionCompletion completion) {
         ((UITabBarController *)parent).selectedIndex = 0;
         completion(YES);
-    } unmounBlock:^(VSPNavigationNode *parent, VSPNavigationNode *child, BOOL animated, VSPNavigatonTransitionCompletion completion) {
+    } unmounBlock:^(VSPNavigationNode *parent, VSPNavigationNode *child, VSPNavigatonTransitionCompletion completion) {
         completion(YES);
     }];
 
@@ -191,21 +191,21 @@ NSString *const BlockUserNodeId = @"root.notifications.profile.block";
     }];
 
     // Messages -> Single Message
-    [self.navigationManager addRuleForHostNodeId:VSPHostingRuleAnyNodeId childNodeId:SingleMessageNodeId mountBlock:^(VSPNavigationNode *parent, VSPNavigationNode *child, BOOL animated, VSPNavigatonTransitionCompletion completion) {
+    [self.navigationManager addRuleForHostNodeId:VSPHostingRuleAnyNodeId childNodeId:SingleMessageNodeId mountBlock:^(VSPNavigationNode *parent, VSPNavigationNode *child, VSPNavigatonTransitionCompletion completion) {
         UINavigationController *navigationController = [[UINavigationController alloc] initWithRootViewController:child.viewController];
         navigationController.navigationBar.barStyle = UIBarStyleBlack;
         [parent.viewController presentViewController:navigationController animated:YES completion:^{
             completion(YES);
         }];
-    } unmounBlock:^(VSPNavigationNode *parent, VSPNavigationNode *child, BOOL animated, VSPNavigatonTransitionCompletion completion) {
-        [child.viewController dismissViewControllerAnimated:animated completion:^{
+    } unmounBlock:^(VSPNavigationNode *parent, VSPNavigationNode *child, VSPNavigatonTransitionCompletion completion) {
+        [child.viewController dismissViewControllerAnimated:YES completion:^{
             completion(YES);
         }];
     }];
 
     @weakify(self);
-    [self.navigationManager addRuleForHostNodeId:ProfileNodeId childNodeId:BlockUserNodeId mountBlock:^(VSPNavigationNode *parent, VSPNavigationNode *child, BOOL animated, VSPNavigatonTransitionCompletion completion) {
-        [parent.viewController presentViewController:child.viewController animated:animated completion:^{
+    [self.navigationManager addRuleForHostNodeId:ProfileNodeId childNodeId:BlockUserNodeId mountBlock:^(VSPNavigationNode *parent, VSPNavigationNode *child, VSPNavigatonTransitionCompletion completion) {
+        [parent.viewController presentViewController:child.viewController animated:YES completion:^{
             dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(4 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
                 @strongify(self);
                 NSURL *url = [self messagesURL];
@@ -213,8 +213,8 @@ NSString *const BlockUserNodeId = @"root.notifications.profile.block";
             });
             completion(YES);
         }];
-    } unmounBlock:^(VSPNavigationNode *parent, VSPNavigationNode *child, BOOL animated, VSPNavigatonTransitionCompletion completion) {
-        [child.viewController dismissViewControllerAnimated:animated completion:^{
+    } unmounBlock:^(VSPNavigationNode *parent, VSPNavigationNode *child, VSPNavigatonTransitionCompletion completion) {
+        [child.viewController dismissViewControllerAnimated:YES completion:^{
             completion(YES);
         }];
     }];

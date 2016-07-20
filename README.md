@@ -18,14 +18,14 @@ VSPNavigationManager *manager = [[VSPNavigationManager alloc] initWithURLScheme:
 }];
 
 // Define presentation and dismissal rules
-[self addRuleForHostNodeId:NewsFeedNodeId childNodeId:PostNodeId mountBlock:^RACSignal *(VSPNavigationNode *parent, VSPNavigationNode *child, BOOL animated) {
+[self addRuleForHostNodeId:NewsFeedNodeId childNodeId:PostNodeId mountBlock:^RACSignal *(VSPNavigationNode *parent, VSPNavigationNode *child) {
     return [RACSignal createSignal:^RACDisposable *(id<RACSubscriber> subscriber) {
         [parent.viewController presentViewController:child.viewController animated:animated completion:^{
             [subscriber sendCompleted];
         }];
         return nil;
     }];
-} unmounBlock:^RACSignal *(VSPNavigationNode *parent, VSPNavigationNode *child, BOOL animated) {
+} unmounBlock:^RACSignal *(VSPNavigationNode *parent, VSPNavigationNode *child) {
 	return [RACSignal createSignal:^RACDisposable *(id<RACSubscriber> subscriber) {
 		[child.viewController dismissViewControllerAnimated:animated completion:^(BOOL finished){
 			[subscriber sendCompleted];
