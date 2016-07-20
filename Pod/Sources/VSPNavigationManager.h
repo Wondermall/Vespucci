@@ -33,6 +33,8 @@ extern NSString *const VSPHostingRuleAnyNodeId;
 
 - (BOOL)handleURL:(NSURL *)URL;
 
+- (BOOL)navigateToURL:(NSURL *)URL completion:(VSPNavigatonTransitionCompletion)completion;
+
 - (BOOL)navigateWithNewNavigationTree:(VSPNavigationNode *)tree completion:(VSPNavigatonTransitionCompletion)completion;
 
 @end
@@ -50,7 +52,7 @@ extern NSString *const VSPHostingRuleAnyNodeId;
 
 typedef void(^VSPNavigationNodeViewControllerMountHandler)(VSPNavigationNode *parent, VSPNavigationNode *child, VSPNavigatonTransitionCompletion completion);
 
-typedef void(^VSPNavigationNodeViewControllerDismountHandler)(VSPNavigationNode *parent, VSPNavigationNode *child, VSPNavigatonTransitionCompletion completion);
+typedef VSPNavigationNodeViewControllerMountHandler VSPNavigationNodeViewControllerDismountHandler;
 
 typedef UIViewController *(^VSPViewControllerFactory)(VSPNavigationNode *node);
 

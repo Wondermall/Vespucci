@@ -96,8 +96,35 @@ NSString *const VSPHostingRuleAnyNodeId = @"VSPHostingRuleAnyNodeId";
 #pragma mark - Public
 
 - (BOOL)handleURL:(NSURL *)URL {
-    return [self.router routeURL:URL];
+    return [self navigateToURL:URL completion:^(BOOL finished) {
+        // no-op
+    }];
 }
+
+- (BOOL)navigateToURL:(NSURL *)URL completion:(VSPNavigatonTransitionCompletion)completion {
+    __block id didFinishToken;
+    __block id didFailToken;
+    didFinishToken = [[NSNotificationCenter defaultCenter] addObserverForName:VSPNavigationManagerDidFinishNavigationNotification object:nil queue:nil usingBlock:^(NSNotification * _Nonnull note) {
+        [[NSNotificationCenter defaultCenter] removeObserver:didFinishToken];
+        [[NSNotificationCenter defaultCenter] removeObserver:didFailToken];
+        completion(YES);
+    }];
+
+    didFailToken = [[NSNotificationCenter defaultCenter] addObserverForName:VSPNavigationManagerDidFailNavigationNotification object:nil queue:nil usingBlock:^(NSNotification * _Nonnull note) {
+        [[NSNotificationCenter defaultCenter] removeObserver:didFinishToken];
+        [[NSNotificationCenter defaultCenter] removeObserver:didFailToken];
+        completion(NO);
+    }];
+
+    if (![self.router routeURL:URL]) {
+        [[NSNotificationCenter defaultCenter] removeObserver:didFinishToken];
+        [[NSNotificationCenter defaultCenter] removeObserver:didFailToken];
+        completion(NO);
+        return NO;
+    }
+    return YES;
+}
+
 
 - (BOOL)navigateWithNewNavigationTree:(VSPNavigationNode *)tree completion:(VSPNavigatonTransitionCompletion)completion {
     return [self _navigateToNode:tree completion:completion];
