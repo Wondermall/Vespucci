@@ -33,8 +33,6 @@ extern NSString *const VSPHostingRuleAnyNodeId;
 
 - (BOOL)handleURL:(NSURL *)URL;
 
-- (void)navigateToURL:(NSURL *)URL completion:(VSPNavigatonTransitionCompletion)completion;
-
 - (BOOL)navigateWithNewNavigationTree:(VSPNavigationNode *)tree completion:(VSPNavigatonTransitionCompletion)completion;
 
 @end
