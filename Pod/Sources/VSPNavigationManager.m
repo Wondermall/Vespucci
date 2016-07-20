@@ -201,6 +201,7 @@ NSString *const VSPHostingRuleAnyNodeId = @"VSPHostingRuleAnyNodeId";
     __weak VSPNavigationManager *__weakSelf = self;
     [self.router addRoute:route handler:^BOOL(NSDictionary *parameters) {
         VSPNavigationNode *node = handler(parameters);
+        NSAssert(node != nil, @"No node to navigate to");
         if (!node) {
             return NO;
         }
