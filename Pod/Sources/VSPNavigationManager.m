@@ -11,8 +11,6 @@
 
 #import "NSError+Vespucci.h"
 #import <JLROutes/JLRoutes.h>
-#import <ReactiveCocoa/RACExtScope.h>
-#import <ReactiveCocoa/ReactiveCocoa.h>
 #import <Vespucci/Vespucci.h>
 
 
@@ -101,29 +99,6 @@ NSString *const VSPHostingRuleAnyNodeId = @"VSPHostingRuleAnyNodeId";
     return [self.router routeURL:URL];
 }
 
-- (RACSignal *)navigateToURL:(NSURL *)URL {
-    // Waiting for the next failure or success
-    RACSignal *signal = [[[[RACSignal merge:@[
-        [[NSNotificationCenter defaultCenter]
-            rac_addObserverForName:VSPNavigationManagerDidFinishNavigationNotification object:nil],
-        [[NSNotificationCenter defaultCenter]
-            rac_addObserverForName:VSPNavigationManagerDidFinishNavigationNotification object:nil]
-        ]]
-        take:1]
-        map:^(NSNotification *note) {
-            if ([note.name isEqualToString:VSPNavigationManagerDidFinishNavigationNotification]) {
-                return [RACSignal empty];
-            } else {
-                return [RACSignal error:[NSError vsp_vespucciErrorWithCode:0 message:@"Navigation failed"]];
-            }
-        }]
-        flatten];
-    if (![self handleURL:URL]) {
-        return [RACSignal error:[NSError vsp_vespucciErrorWithCode:0 message:@"Navigation failed"]];
-    }
-    return signal;
-}
-
 - (BOOL)navigateWithNewNavigationTree:(VSPNavigationNode *)tree completion:(VSPNavigatonTransitionCompletion)completion {
     return [self _navigateToNode:tree completion:completion];
 }
@@ -153,13 +128,13 @@ NSString *const VSPHostingRuleAnyNodeId = @"VSPHostingRuleAnyNodeId";
         rootCopy.leaf.child = node;
         node = rootCopy;
     }
-    
-    @weakify(self);
+
+    __weak VSPNavigationManager *__weakSelf = self;
     VSPNavigationNode *proposedHost = self.root, *proposedChild = node;
 
     self.navigationInFlight = YES;
     [self _navigationWithHost:&proposedHost newChild:&proposedChild completion:^(BOOL finished) {
-        @strongify(self);
+        VSPNavigationManager *self = __weakSelf;
         self.navigationInFlight = NO;
 
         [self.inflightNavigationTimer invalidate];
@@ -196,13 +171,13 @@ NSString *const VSPHostingRuleAnyNodeId = @"VSPHostingRuleAnyNodeId";
 #pragma mark - Public
 
 - (void)registerNavigationForRoute:(NSString *)route handler:(VSPNavigationNode *(^)(NSDictionary *))handler {
-    @weakify(self);
+    __weak VSPNavigationManager *__weakSelf = self;
     [self.router addRoute:route handler:^BOOL(NSDictionary *parameters) {
         VSPNavigationNode *node = handler(parameters);
         if (!node) {
             return NO;
         }
-        @strongify(self);
+        VSPNavigationManager *self = __weakSelf;
         NSAssert(node.viewController, @"No view controller provided, this can't be good!");
         if (!node.viewController) {
             return NO;

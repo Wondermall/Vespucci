@@ -23,7 +23,6 @@ extern NSString *const VSPNavigationManagerNotificationSourceNodeKey;
 extern NSString *const VSPHostingRuleAnyNodeId;
 
 @class JLRoutes;
-@class RACSignal;
 @interface VSPNavigationManager : NSObject
 
 @property (nonatomic, readonly) JLRoutes *router;
