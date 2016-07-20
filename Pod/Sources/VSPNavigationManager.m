@@ -67,8 +67,10 @@ NSString *const VSPHostingRuleAnyNodeId = @"VSPHostingRuleAnyNodeId";
 @property (nonatomic) NSMutableDictionary *viewControllerFactories;
 
 @property (nonatomic, getter=isNavigationInFlight) BOOL navigationInFlight;
-// For debug
 @property (nonatomic) NSTimer *inflightNavigationTimer;
+
+@property (nonatomic) id navigationDidFailToken;
+@property (nonatomic) id navigationDidFinishToken;
 
 @end
 
@@ -102,27 +104,31 @@ NSString *const VSPHostingRuleAnyNodeId = @"VSPHostingRuleAnyNodeId";
 }
 
 - (BOOL)navigateToURL:(NSURL *)URL completion:(VSPNavigatonTransitionCompletion)completion {
-    __block id didFinishToken;
-    __block id didFailToken;
-    didFinishToken = [[NSNotificationCenter defaultCenter] addObserverForName:VSPNavigationManagerDidFinishNavigationNotification object:nil queue:nil usingBlock:^(NSNotification * _Nonnull note) {
-        [[NSNotificationCenter defaultCenter] removeObserver:didFinishToken];
-        [[NSNotificationCenter defaultCenter] removeObserver:didFailToken];
+    NSAssert(self.navigationDidFailToken == nil, @"Previous token was not dismissed");
+    NSAssert(self.navigationDidFinishToken == nil, @"Previous token was not dismissed");
+    __weak VSPNavigationManager *__weakSelf = self;
+    self.navigationDidFinishToken = [[NSNotificationCenter defaultCenter] addObserverForName:VSPNavigationManagerDidFinishNavigationNotification object:nil queue:nil usingBlock:^(NSNotification * _Nonnull note) {
+        [__weakSelf _unsubscribeFromNavigationObservers];
         completion(YES);
     }];
 
-    didFailToken = [[NSNotificationCenter defaultCenter] addObserverForName:VSPNavigationManagerDidFailNavigationNotification object:nil queue:nil usingBlock:^(NSNotification * _Nonnull note) {
-        [[NSNotificationCenter defaultCenter] removeObserver:didFinishToken];
-        [[NSNotificationCenter defaultCenter] removeObserver:didFailToken];
+    self.navigationDidFailToken = [[NSNotificationCenter defaultCenter] addObserverForName:VSPNavigationManagerDidFailNavigationNotification object:nil queue:nil usingBlock:^(NSNotification * _Nonnull note) {
+        [__weakSelf _unsubscribeFromNavigationObservers];
         completion(NO);
     }];
 
     if (![self.router routeURL:URL]) {
-        [[NSNotificationCenter defaultCenter] removeObserver:didFinishToken];
-        [[NSNotificationCenter defaultCenter] removeObserver:didFailToken];
+        [self _unsubscribeFromNavigationObservers];
+        NSAssert(NO, @"Failed to navigate to \"%@\"", URL.absoluteString);
         completion(NO);
         return NO;
     }
     return YES;
+}
+
+- (void)_unsubscribeFromNavigationObservers {
+    [[NSNotificationCenter defaultCenter] removeObserver:self.navigationDidFailToken];
+    [[NSNotificationCenter defaultCenter] removeObserver:self.navigationDidFinishToken];
 }
 
 
