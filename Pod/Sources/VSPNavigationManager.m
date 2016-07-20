@@ -133,7 +133,7 @@ NSString *const VSPHostingRuleAnyNodeId = @"VSPHostingRuleAnyNodeId";
     VSPNavigationNode *proposedHost = self.root, *proposedChild = node;
 
     self.navigationInFlight = YES;
-    [self _navigationWithHost:&proposedHost newChild:&proposedChild completion:^(BOOL finished) {
+    return [self _navigationWithHost:&proposedHost newChild:&proposedChild completion:^(BOOL finished) {
         VSPNavigationManager *self = __weakSelf;
         self.navigationInFlight = NO;
 
@@ -149,7 +149,6 @@ NSString *const VSPHostingRuleAnyNodeId = @"VSPHostingRuleAnyNodeId";
 
         [self _postNotificationNamed:VSPNavigationManagerDidFinishNavigationNotification destination:self.root source:oldTree];
     }];
-    return YES;
 }
 
 - (void)_postNotificationNamed:(NSString *)notificationName destination:(VSPNavigationNode *)node source:(VSPNavigationNode *)source {
@@ -253,7 +252,7 @@ NSString *const VSPHostingRuleAnyNodeId = @"VSPHostingRuleAnyNodeId";
     return [self _tupleForHostNodeId:parent.nodeId childNodeId:child.nodeId] != nil;
 }
 
-- (void)_navigationWithHost:(VSPNavigationNode **)host newChild:(VSPNavigationNode **)child completion:(VSPNavigatonTransitionCompletion)completion {
+- (BOOL)_navigationWithHost:(VSPNavigationNode **)host newChild:(VSPNavigationNode **)child completion:(VSPNavigatonTransitionCompletion)completion {
     // we need to capture new parameters before child will be modified
     NSDictionary *parameters = (*child).parameters;
     
@@ -263,7 +262,7 @@ NSString *const VSPHostingRuleAnyNodeId = @"VSPHostingRuleAnyNodeId";
     if (![self _getHost:&proposedHost forChild:&proposedChild]) {
         NSAssert(NO, @"Failed to find the host for %@", *child);
         completion(NO);
-        return;
+        return NO;
     }
     
     // Update original pointers with calculated host and child
@@ -283,6 +282,7 @@ NSString *const VSPHostingRuleAnyNodeId = @"VSPHostingRuleAnyNodeId";
             completion(finished);
         }];
     }];
+    return YES;
 }
 
 - (void)_unmountForHost:(VSPNavigationNode *)host completion:(VSPNavigatonTransitionCompletion)completion {
