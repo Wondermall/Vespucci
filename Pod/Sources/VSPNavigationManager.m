@@ -128,7 +128,10 @@ NSString *const VSPHostingRuleAnyNodeId = @"VSPHostingRuleAnyNodeId";
 
 - (void)_unsubscribeFromNavigationObservers {
     [[NSNotificationCenter defaultCenter] removeObserver:self.navigationDidFailToken];
+    self.navigationDidFailToken = nil;
+
     [[NSNotificationCenter defaultCenter] removeObserver:self.navigationDidFinishToken];
+    self.navigationDidFinishToken = nil;
 }
 
 
