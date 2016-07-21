@@ -2,11 +2,10 @@ source 'https://github.com/CocoaPods/Specs.git'
 
 target 'Vespucci' do
   pod 'Vespucci', :path => '../'
+
+  target 'Tests' do
+    pod 'Specta'
+    pod 'Expecta'
+  end
 end
 
-target 'Tests' do
-  pod 'Vespucci', :path => "../"
-
-  pod 'Specta'
-  pod 'Expecta'
-end

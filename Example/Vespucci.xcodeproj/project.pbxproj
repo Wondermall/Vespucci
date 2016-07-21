@@ -11,6 +11,7 @@
 		38EFEC48DA8AF0676921CE74 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 38EFE5D79F5B70D872BD7AF9 /* Main.storyboard */; };
 		38EFEE04ECB0EFF1818A19BA /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 38EFE0A4F1AB58BAB477F413 /* Images.xcassets */; };
 		38EFEFC4DB76CCA53681F19D /* NavigationService.m in Sources */ = {isa = PBXBuildFile; fileRef = 38EFEE8E8DB2250672DEAF53 /* NavigationService.m */; };
+		42EAF616E2E4D4AA1C22F3AC /* libPods-Vespucci-Tests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = EFAE4C58977C20B681C4690E /* libPods-Vespucci-Tests.a */; };
 		5C1C0B691B0A6ECC00AEA2F7 /* EXPMatchers+NodeQuality.m in Sources */ = {isa = PBXBuildFile; fileRef = 5C1C0B681B0A6ECC00AEA2F7 /* EXPMatchers+NodeQuality.m */; };
 		5C96047E1AD5B0020044A899 /* NotificationsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 5C96047D1AD5B0020044A899 /* NotificationsViewController.m */; };
 		5C9604871AD5CBE00044A899 /* MessageViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 5C9604861AD5CBE00044A899 /* MessageViewController.m */; };
@@ -89,9 +90,12 @@
 		6003F5BB195388D20070C39A /* BehaviourSpec.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; lineEnding = 0; path = BehaviourSpec.m; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objc; };
 		606FC2411953D9B200FFA9A0 /* Tests-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Tests-Prefix.pch"; sourceTree = "<group>"; };
 		6E172E739FCC70393AFD9375 /* README.md */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = net.daringfireball.markdown; name = README.md; path = ../README.md; sourceTree = "<group>"; };
+		88DA3C4D87584392B367D755 /* Pods-Vespucci-Tests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Vespucci-Tests.debug.xcconfig"; path = "Pods/Target Support Files/Pods-Vespucci-Tests/Pods-Vespucci-Tests.debug.xcconfig"; sourceTree = "<group>"; };
 		9280FA1DE17A5206F26C68A5 /* libPods-Tests.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-Tests.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		A2EF32F549CF4C523B539B53 /* libPods-Vespucci.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-Vespucci.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		A8DD47CFF59F2C451B165F76 /* Pods-Tests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Tests.release.xcconfig"; path = "Pods/Target Support Files/Pods-Tests/Pods-Tests.release.xcconfig"; sourceTree = "<group>"; };
+		D944E8A10D149EE4FF07BB2D /* Pods-Vespucci-Tests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Vespucci-Tests.release.xcconfig"; path = "Pods/Target Support Files/Pods-Vespucci-Tests/Pods-Vespucci-Tests.release.xcconfig"; sourceTree = "<group>"; };
+		EFAE4C58977C20B681C4690E /* libPods-Vespucci-Tests.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-Vespucci-Tests.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -114,6 +118,7 @@
 				6003F5B2195388D20070C39A /* UIKit.framework in Frameworks */,
 				6003F5B1195388D20070C39A /* Foundation.framework in Frameworks */,
 				675A7B2E15C8DB8AE58F696A /* libPods-Tests.a in Frameworks */,
+				42EAF616E2E4D4AA1C22F3AC /* libPods-Vespucci-Tests.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -197,6 +202,7 @@
 				6003F5AF195388D20070C39A /* XCTest.framework */,
 				9280FA1DE17A5206F26C68A5 /* libPods-Tests.a */,
 				A2EF32F549CF4C523B539B53 /* libPods-Vespucci.a */,
+				EFAE4C58977C20B681C4690E /* libPods-Vespucci-Tests.a */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -265,6 +271,8 @@
 				A8DD47CFF59F2C451B165F76 /* Pods-Tests.release.xcconfig */,
 				52BEF4071A7E7ABE6605DB10 /* Pods-Vespucci.debug.xcconfig */,
 				3D51F58E1D1B3BC84F884B61 /* Pods-Vespucci.release.xcconfig */,
+				88DA3C4D87584392B367D755 /* Pods-Vespucci-Tests.debug.xcconfig */,
+				D944E8A10D149EE4FF07BB2D /* Pods-Vespucci-Tests.release.xcconfig */,
 			);
 			name = Pods;
 			sourceTree = "<group>";
@@ -397,7 +405,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-Tests/Pods-Tests-frameworks.sh\"\n";
+			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-Vespucci-Tests/Pods-Vespucci-Tests-frameworks.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
 		6DEFB53D3235EC77C90F4EDF /* [CP] Check Pods Manifest.lock */ = {
@@ -427,7 +435,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-Tests/Pods-Tests-resources.sh\"\n";
+			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-Vespucci-Tests/Pods-Vespucci-Tests-resources.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
 		B062EBDF250E1AB8F114574E /* [CP] Copy Pods Resources */ = {
@@ -625,7 +633,7 @@
 		};
 		6003F5C3195388D20070C39A /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 2307CF7C8FF401A68BE2BCFD /* Pods-Tests.debug.xcconfig */;
+			baseConfigurationReference = 88DA3C4D87584392B367D755 /* Pods-Vespucci-Tests.debug.xcconfig */;
 			buildSettings = {
 				BUNDLE_LOADER = "$(BUILT_PRODUCTS_DIR)/Vespucci.app/Vespucci";
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
@@ -645,7 +653,7 @@
 		};
 		6003F5C4195388D20070C39A /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = A8DD47CFF59F2C451B165F76 /* Pods-Tests.release.xcconfig */;
+			baseConfigurationReference = D944E8A10D149EE4FF07BB2D /* Pods-Vespucci-Tests.release.xcconfig */;
 			buildSettings = {
 				BUNDLE_LOADER = "$(BUILT_PRODUCTS_DIR)/Vespucci.app/Vespucci";
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
