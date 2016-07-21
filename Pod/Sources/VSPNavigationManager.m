@@ -211,13 +211,7 @@ NSString *const VSPHostingRuleAnyNodeId = @"VSPHostingRuleAnyNodeId";
         if (!node) {
             return NO;
         }
-        VSPNavigationManager *self = __weakSelf;
-        NSAssert(node.viewController, @"No view controller provided, this can't be good!");
-        if (!node.viewController) {
-            return NO;
-        }
-
-        return [self _navigateToNode:node completion:^(BOOL finished){}];
+        return [__weakSelf _navigateToNode:node completion:^(BOOL finished){}];
     }];
 }
 
