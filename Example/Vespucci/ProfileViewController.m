@@ -9,7 +9,6 @@
 #import "ProfileViewController.h"
 
 #import "NavigationService.h"
-#import <ReactiveCocoa/ReactiveCocoa.h>
 
 
 @interface ProfileViewController ()
@@ -30,15 +29,10 @@
 
 #pragma mark - UIViewController
 
-- (void)viewDidLoad {
-    [super viewDidLoad];
-    
-    RAC(self, userId) = [RACObserve(self, navigationNode.parameters)
-        map:^id(NSDictionary *dictionary) {
-            return dictionary[@"userId"];
-        }];
-    
-    RAC(self.userIdLabel, text) = RACObserve(self, userId);
+- (void)setNavigationNode:(VSPNavigationNode *)navigationNode {
+    _navigationNode = navigationNode;
+    self.userId = navigationNode.parameters[@"userId"];
+    self.userIdLabel.text = self.userId;
 }
 
 - (void)viewDidAppear:(BOOL)animated {

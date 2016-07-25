@@ -28,8 +28,8 @@
 #pragma mark - Private
 
 - (void)_openConversationAtIndex:(NSUInteger)row {
-    NSURL *URL = [[NavigationService sharedService] messageURLForMessageId:self.userIds[row]];
-    [[UIApplication sharedApplication] openURL:URL];
+    NSURL *url = [[NavigationService sharedService] messageURLForMessageId:self.userIds[row]];
+    [[NavigationService sharedService] handleURL:url];
 }
 
 #pragma mark - UITableViewDelegate

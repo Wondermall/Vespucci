@@ -8,8 +8,6 @@
 
 #import "VSPNavigationNode.h"
 #import "VSPNavigationNode+Internal.h"
-
-#import <ReactiveCocoa/ReactiveCocoa.h>
 #import <Vespucci/Vespucci.h>
 
 

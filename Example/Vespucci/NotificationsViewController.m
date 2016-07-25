@@ -20,18 +20,18 @@
 #pragma mark - Private
 
 - (void)_openProfile {
-    NSURL *URL = [[NavigationService sharedService] profileURLForUser:@"Johny"];
-    [[UIApplication sharedApplication] openURL:URL];
+    NSURL *url = [[NavigationService sharedService] profileURLForUser:@"Johny"];
+    [[NavigationService sharedService] handleURL:url];
 }
 
 - (void)_openMessages {
-    NSURL *URL = [[NavigationService sharedService] messageURLForMessageId:[self _randomId]];
-    [[UIApplication sharedApplication] openURL:URL];
+    NSURL *url = [[NavigationService sharedService] messageURLForMessageId:[self _randomId]];
+    [[NavigationService sharedService] handleURL:url];
 }
 
 - (void)_openPicture {
-    NSURL *URL = [[NavigationService sharedService] picturesURLForPictureId:[self _randomId]];
-    [[UIApplication sharedApplication] openURL:URL];
+    NSURL *url = [[NavigationService sharedService] picturesURLForPictureId:[self _randomId]];
+    [[NavigationService sharedService] handleURL:url];
 }
 
 - (NSString *)_randomId {

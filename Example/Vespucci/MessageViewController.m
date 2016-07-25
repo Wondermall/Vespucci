@@ -9,31 +9,23 @@
 #import "MessageViewController.h"
 
 #import "NavigationService.h"
-#import <ReactiveCocoa/ReactiveCocoa.h>
 
 
 @interface MessageViewController ()
 @property (weak, nonatomic) IBOutlet UILabel *messageIdLabel;
 @property (nonatomic) IBOutlet UIBarButtonItem *blockBarButtonItem;
 @property (weak, nonatomic) IBOutlet UIBarButtonItem *profileBarButtonItem;
-@property (nonatomic, copy) NSString *userId;
+@property (nonatomic, copy) NSString *messageId;
 @end
 
 @implementation MessageViewController
 
 #pragma mark - Lifecycle
 
-- (void)viewDidLoad {
-    [super viewDidLoad];
-    
-    self.navigationItem.leftBarButtonItems = @[ self.blockBarButtonItem, self.profileBarButtonItem ];
-    
-    RAC(self, userId) = [RACObserve(self, navigationNode)
-        map:^id(VSPNavigationNode *node) {
-            // this is just a demo, right?
-            return node.parameters[@"messageId"];
-        }];
-    RAC(self.messageIdLabel, text) = RACObserve(self, userId);
+- (void)setNavigationNode:(VSPNavigationNode *)navigationNode {
+    _navigationNode = navigationNode;
+    self.messageId = navigationNode.parameters[@"messageId"];
+    self.messageIdLabel.text = self.messageId;
 }
 
 #pragma mark - Actions
@@ -45,13 +37,13 @@
 }
 
 - (IBAction)_profileButtonAction:(id)sender {
-    NSURL *URL = [[NavigationService sharedService] profileURLForUser:self.userId];
-    [[UIApplication sharedApplication] openURL:URL];
+    NSURL *url = [[NavigationService sharedService] profileURLForUser:self.messageId];
+    [[NavigationService sharedService] handleURL:url];
 }
 
 - (IBAction)_blockButtonAction:(id)sender {
-    NSURL *URL = [[NavigationService sharedService] blockUserWithUserIdURL:self.userId];
-    [[UIApplication sharedApplication] openURL:URL];
+    NSURL *url = [[NavigationService sharedService] blockUserWithUserIdURL:self.messageId];
+    [[NavigationService sharedService] handleURL:url];
 }
 
 @end

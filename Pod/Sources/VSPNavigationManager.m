@@ -11,8 +11,6 @@
 
 #import "NSError+Vespucci.h"
 #import <JLROutes/JLRoutes.h>
-#import <ReactiveCocoa/RACExtScope.h>
-#import <ReactiveCocoa/ReactiveCocoa.h>
 #import <Vespucci/Vespucci.h>
 
 
@@ -52,7 +50,7 @@ NSString *const VSPHostingRuleAnyNodeId = @"VSPHostingRuleAnyNodeId";
 
 - (BOOL)_getHost:(inout VSPNavigationNode **)inOutParent forChild:(inout VSPNavigationNode **)inOutChild;
 
-- (RACSignal *)_navigationWithHost:(inout VSPNavigationNode **)host newChild:(inout VSPNavigationNode **)child animated:(BOOL)animated;
+- (BOOL)_navigationWithHost:(VSPNavigationNode **)host newChild:(VSPNavigationNode **)child completion:(VSPNavigatonTransitionCompletion)completion;
 
 @end
 
@@ -65,8 +63,14 @@ NSString *const VSPHostingRuleAnyNodeId = @"VSPHostingRuleAnyNodeId";
 
 @property (nonatomic) NSMutableDictionary *hostingRules;
 
-@property (nonatomic, weak) RACSignal *navigationIngflight;
+
 @property (nonatomic) NSMutableDictionary *viewControllerFactories;
+
+@property (nonatomic, getter=isNavigationInFlight) BOOL navigationInFlight;
+@property (nonatomic) NSTimer *inflightNavigationTimer;
+
+@property (nonatomic) id navigationDidFailToken;
+@property (nonatomic) id navigationDidFinishToken;
 
 @end
 
@@ -94,44 +98,64 @@ NSString *const VSPHostingRuleAnyNodeId = @"VSPHostingRuleAnyNodeId";
 #pragma mark - Public
 
 - (BOOL)handleURL:(NSURL *)URL {
-    return [self.router routeURL:URL];
+    return [self navigateToURL:URL completion:^(BOOL finished) {
+        // no-op
+    }];
 }
 
-- (RACSignal *)navigateToURL:(NSURL *)URL {
-    // Waiting for the next failure or success
-    RACSignal *signal = [[[[RACSignal merge:@[
-        [[NSNotificationCenter defaultCenter]
-            rac_addObserverForName:VSPNavigationManagerDidFinishNavigationNotification object:nil],
-        [[NSNotificationCenter defaultCenter]
-            rac_addObserverForName:VSPNavigationManagerDidFinishNavigationNotification object:nil]
-        ]]
-        take:1]
-        map:^(NSNotification *note) {
-            if ([note.name isEqualToString:VSPNavigationManagerDidFinishNavigationNotification]) {
-                return [RACSignal empty];
-            } else {
-                return [RACSignal error:[NSError vsp_vespucciErrorWithCode:0 message:@"Navigation failed"]];
-            }
-        }]
-        flatten];
-    if (![self handleURL:URL]) {
-        return [RACSignal error:[NSError vsp_vespucciErrorWithCode:0 message:@"Navigation failed"]];
+- (BOOL)navigateToURL:(NSURL *)URL completion:(VSPNavigatonTransitionCompletion)completion {
+    NSAssert(self.navigationDidFailToken == nil, @"Previous token was not dismissed");
+    NSAssert(self.navigationDidFinishToken == nil, @"Previous token was not dismissed");
+    __weak VSPNavigationManager *__weakSelf = self;
+    self.navigationDidFinishToken = [[NSNotificationCenter defaultCenter] addObserverForName:VSPNavigationManagerDidFinishNavigationNotification object:nil queue:nil usingBlock:^(NSNotification * _Nonnull note) {
+        [__weakSelf _unsubscribeFromNavigationObservers];
+        completion(YES);
+    }];
+
+    self.navigationDidFailToken = [[NSNotificationCenter defaultCenter] addObserverForName:VSPNavigationManagerDidFailNavigationNotification object:nil queue:nil usingBlock:^(NSNotification * _Nonnull note) {
+        [__weakSelf _unsubscribeFromNavigationObservers];
+        completion(NO);
+    }];
+
+    if (![self.router routeURL:URL]) {
+        [self _unsubscribeFromNavigationObservers];
+        NSAssert(NO, @"Failed to navigate to \"%@\"", URL.absoluteString);
+        completion(NO);
+        return NO;
     }
-    return signal;
+    return YES;
 }
 
-- (RACSignal *)navigateWithNewNavigationTree:(VSPNavigationNode *)tree {
-    return [self _navigateToNode:tree];
+- (void)_unsubscribeFromNavigationObservers {
+    [[NSNotificationCenter defaultCenter] removeObserver:self.navigationDidFailToken];
+    self.navigationDidFailToken = nil;
+
+    [[NSNotificationCenter defaultCenter] removeObserver:self.navigationDidFinishToken];
+    self.navigationDidFinishToken = nil;
+}
+
+
+- (BOOL)navigateWithNewNavigationTree:(VSPNavigationNode *)tree completion:(VSPNavigatonTransitionCompletion)completion {
+    return [self _navigateToNode:tree completion:completion];
 }
 
 #pragma mark - Private
 
-- (RACSignal *)_navigateToNode:(VSPNavigationNode *)node {
-    if (self.navigationIngflight) {
+- (void)_inflightNavigationTimerHandler {
+    NSAssert(NO, @"Failed to navigate in 5 seconds; Current navigation tree: %@", self.root.recursiveDescription);
+    self.inflightNavigationTimer = nil;
+
+}
+
+- (BOOL)_navigateToNode:(VSPNavigationNode *)node completion:(VSPNavigatonTransitionCompletion)completion {
+    NSAssert(!self.isNavigationInFlight, @"Another navigaiton is in flight");
+    if (self.isNavigationInFlight) {
         [self _postNotificationNamed:VSPNavigationManagerDidFailNavigationNotification destination:node.root source:self.root];
-        return [RACSignal error:[NSError vsp_vespucciErrorWithCode:VSPErrorCodeAnotherNavigationInProgress message:@"Another navigation is in progress"]];
+        return NO;
     }
-    
+
+    self.inflightNavigationTimer = [NSTimer scheduledTimerWithTimeInterval:5 target:self selector:@selector(_inflightNavigationTimerHandler) userInfo:nil repeats:NO];
+
     NSAssert(self.root, @"No root node installed");
     VSPNavigationNode *oldTree = [self.root copy];
     if (![self.root.nodeId isEqual:node.nodeId]) {
@@ -140,38 +164,28 @@ NSString *const VSPHostingRuleAnyNodeId = @"VSPHostingRuleAnyNodeId";
         rootCopy.leaf.child = node;
         node = rootCopy;
     }
-    
-    BOOL animated = NO;
-    if (node.parameters[@"animated"]) {
-        NSString *animatedString = [node.parameters[@"animated"] lowercaseString];
-        animated = [animatedString isEqual:@"true"] || [animatedString isEqual:@"yes"] || [animatedString isEqual:@"1"];
-    }
-    @weakify(self);
+
+    __weak VSPNavigationManager *__weakSelf = self;
     VSPNavigationNode *proposedHost = self.root, *proposedChild = node;
-    RACSignal *navigation = ({
-        RACSignal *navigation = [self _navigationWithHost:&proposedHost newChild:&proposedChild animated:animated];
-        RACMulticastConnection *connection = [navigation multicast:[RACReplaySubject subject]];
-        RACDisposable *disposable = [connection connect];
-        RACSignal *signal = connection.signal;
-        [signal subscribeCompleted:^{
-            [disposable dispose];
-        }];
-        signal;
-    });
-    self.navigationIngflight = navigation;
-    
-    [self _postNotificationNamed:VSPNavigationManagerWillNavigateNotification destination:proposedChild.leaf source:oldTree];
-    
-    [navigation subscribeError:^(NSError *error) {
-        @strongify(self);
-        self.navigationIngflight = nil;
-        [self _postNotificationNamed:VSPNavigationManagerDidFailNavigationNotification destination:self.root source:oldTree];
-    } completed:^{
-        @strongify(self);
-        self.navigationIngflight = nil;
+
+    self.navigationInFlight = YES;
+    return [self _navigationWithHost:&proposedHost newChild:&proposedChild completion:^(BOOL finished) {
+        VSPNavigationManager *self = __weakSelf;
+        self.navigationInFlight = NO;
+
+        [self.inflightNavigationTimer invalidate];
+        self.inflightNavigationTimer = nil;
+
+        NSAssert(finished, @"Navigation to node %@ failed", node.nodeId);
+        if (!finished) {
+            [self _postNotificationNamed:VSPNavigationManagerDidFailNavigationNotification destination:self.root source:oldTree];
+            completion(NO);
+            return;
+        }
+
         [self _postNotificationNamed:VSPNavigationManagerDidFinishNavigationNotification destination:self.root source:oldTree];
+        completion(YES);
     }];
-    return navigation;
 }
 
 - (void)_postNotificationNamed:(NSString *)notificationName destination:(VSPNavigationNode *)node source:(VSPNavigationNode *)source {
@@ -193,25 +207,14 @@ NSString *const VSPHostingRuleAnyNodeId = @"VSPHostingRuleAnyNodeId";
 #pragma mark - Public
 
 - (void)registerNavigationForRoute:(NSString *)route handler:(VSPNavigationNode *(^)(NSDictionary *))handler {
-    @weakify(self);
+    __weak VSPNavigationManager *__weakSelf = self;
     [self.router addRoute:route handler:^BOOL(NSDictionary *parameters) {
         VSPNavigationNode *node = handler(parameters);
+        NSAssert(node != nil, @"No node to navigate to");
         if (!node) {
             return NO;
         }
-        @strongify(self);
-        NSAssert(node.viewController, @"No view controller provided, this can't be good!");
-        RACSignal *navigation = [self _navigateToNode:node];
-        if (!navigation) {
-            return NO;
-        }
-        
-        __block BOOL isSuccessful = YES;
-        [navigation subscribeError:^(NSError *error) {
-            isSuccessful = NO;
-        }];
-        
-        return isSuccessful;
+        return [__weakSelf _navigateToNode:node completion:^(BOOL finished){}];
     }];
 }
 
@@ -281,7 +284,7 @@ NSString *const VSPHostingRuleAnyNodeId = @"VSPHostingRuleAnyNodeId";
     return [self _tupleForHostNodeId:parent.nodeId childNodeId:child.nodeId] != nil;
 }
 
-- (RACSignal *)_navigationWithHost:(VSPNavigationNode **)host newChild:(VSPNavigationNode **)child animated:(BOOL)animated {
+- (BOOL)_navigationWithHost:(VSPNavigationNode **)host newChild:(VSPNavigationNode **)child completion:(VSPNavigatonTransitionCompletion)completion {
     // we need to capture new parameters before child will be modified
     NSDictionary *parameters = (*child).parameters;
     
@@ -289,68 +292,92 @@ NSString *const VSPHostingRuleAnyNodeId = @"VSPHostingRuleAnyNodeId";
     VSPNavigationNode *proposedChild = (*child).root;
     VSPNavigationNode *proposedHost = (*host).root;
     if (![self _getHost:&proposedHost forChild:&proposedChild]) {
-        return [RACSignal error:[NSError vsp_vespucciErrorWithCode:VSPErrorCodeNoHostFound message:@"Failed to find the host for %@", *child]];
+        NSAssert(NO, @"Failed to find the host for %@", *child);
+        completion(NO);
+        return NO;
     }
     
     // Update original pointers with calculated host and child
     *child = proposedChild;
     *host = proposedHost;
-    
-    RACSignal *unmount = [self _unmountForHost:proposedHost animated:animated];
-    unmount = [unmount doCompleted:^{
+
+    [self _unmountForHost:proposedHost completion:^(BOOL finished) {
+        NSAssert(finished, @"Unmounting was not successfull");
+        if (!finished) {
+            completion(NO);
+            return;
+        }
         [proposedHost.root updateParametersRecursively:parameters];
         proposedHost.child = proposedChild;
+        [self _mountForHost:proposedHost newChild:proposedChild completion:^(BOOL finished) {
+            NSAssert(finished, @"Mounting navigation failed");
+            completion(finished);
+        }];
     }];
-    RACSignal *mount = [self _mountForHost:proposedHost newChild:proposedChild animated:animated];
-    return [unmount concat:mount];
+    return YES;
 }
 
-- (RACSignal *)_unmountForHost:(VSPNavigationNode *)host animated:(BOOL)animated {
+- (void)_unmountForHost:(VSPNavigationNode *)host completion:(VSPNavigatonTransitionCompletion)completion {
     if (!host.child) {
-        return [RACSignal empty];
+        completion(YES);
+        return;
     }
     
-    RACSignal *result = nil;
-    VSPNavigationNode *currentHost = host.leaf;
-    do {
-        currentHost = currentHost.parent;
-        __VSPMountingTuple *tuple = [self _tupleForHostNodeId:currentHost.nodeId childNodeId:currentHost.child.nodeId];
-        NSAssert(tuple, @"No tuple found for pair host: %@; child: %@", currentHost, currentHost.child);
-        NSAssert(tuple.unmountHandler, @"Don't know how to dismount current child %@", host.child);
-        RACSignal *dismount = tuple.unmountHandler(currentHost, currentHost.child, animated) ?: [RACSignal empty];
-        dismount.name = [NSString stringWithFormat:@"Unmounting %@ - %@", currentHost.nodeId, host.child.nodeId];
-        result = result ? [result concat:dismount] : dismount;
-    } while (![currentHost isEqual:host]);
-    result.name = [NSString stringWithFormat:@"Unmounting all children of %@", host.nodeId];
-    return result;
+    VSPNavigationNode *currentHost = host.leaf.parent;
+    VSPNavigationNode *child = currentHost.child;
+    if (!child) {
+        completion(YES);
+        return;
+    }
+    [self __unmountForHost:currentHost child:child stopAtNode:host completion:completion];
 }
 
-- (RACSignal *)_mountForHost:(VSPNavigationNode *)host newChild:(VSPNavigationNode *)proposedChild animated:(BOOL)animated {
+- (void)__unmountForHost:(VSPNavigationNode *)host child:(VSPNavigationNode *)child stopAtNode:(VSPNavigationNode *)stopNode completion:(VSPNavigatonTransitionCompletion)completion {
+    __VSPMountingTuple *tuple = [self _tupleForHostNodeId:host.nodeId childNodeId:child.nodeId];
+    NSAssert(tuple, @"No tuple found for pair host: %@; child: %@", host, child);
+    NSAssert(tuple.unmountHandler, @"Don't know how to dismount current child %@", child);
+    tuple.unmountHandler(host, child, ^(BOOL finished){
+        if (!finished) {
+            completion(NO);
+            return;
+        }
+        if ([host isEqualToNode:stopNode]) {
+            completion(YES);
+            return;
+        }
+        [self __unmountForHost:host.parent child:host stopAtNode:stopNode completion:completion];
+    });
+}
+
+- (void)_mountForHost:(VSPNavigationNode *)host newChild:(VSPNavigationNode *)proposedChild completion:(VSPNavigatonTransitionCompletion)completion {
+    NSParameterAssert(host);
     if (!proposedChild) {
         // nothing to mount
-        return [RACSignal empty];
+        completion(YES);
+        return;
     }
-    NSParameterAssert(host);
-    NSParameterAssert(proposedChild);
-    RACSignal *result = [RACSignal empty];
-    VSPNavigationNode *child = proposedChild;
-    while (child) {
-        __VSPMountingTuple *tuple = [self _tupleForHostNodeId:host.nodeId childNodeId:child.nodeId];
-        VSPNavigationNodeViewControllerMountHandler mountBlock = tuple.mountHandler;
-        if (child && !mountBlock) {
-            [[NSException exceptionWithName:NSInternalInconsistencyException
-                                     reason:[NSString stringWithFormat:@"\"%@\" doesn't know how to mount \"%@\"", host.nodeId, child.nodeId]
-                                   userInfo:nil] raise];
+    [self __mountForHost:host child:proposedChild completion:completion];
+}
+
+- (void)__mountForHost:(VSPNavigationNode *)host child:(VSPNavigationNode *)child completion:(VSPNavigatonTransitionCompletion)completion {
+    if (!child) {
+        completion(YES);
+        return;
+    }
+    __VSPMountingTuple *tuple = [self _tupleForHostNodeId:host.nodeId childNodeId:child.nodeId];
+    VSPNavigationNodeViewControllerMountHandler mountBlock = tuple.mountHandler;
+    NSAssert(mountBlock, @"%@ doesn't know how to mount %@", host.nodeId, child.nodeId);
+    if (!mountBlock) {
+        completion(NO);
+        return;
+    }
+    mountBlock(host, child, ^(BOOL finished){
+        if (!finished) {
+            completion(NO);
+            return;
         }
-        
-        RACSignal *mount = mountBlock(host, child, animated) ?: [RACSignal empty];
-        result = [result concat:mount];
-        
-        host = child;
-        child = child.child;
-    }
-    result.name = [NSString stringWithFormat:@"Mount %@ on %@", proposedChild.nodeId, host.nodeId];
-    return result;
+        [self __mountForHost:child child:child.child completion:completion];
+    });
 }
 
 @end
