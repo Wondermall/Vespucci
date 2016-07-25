@@ -25,7 +25,7 @@ Pod::Spec.new do |s|
   s.author           = { "Sash Zats" => "sash@zats.io" }
   s.source           = { :git => "https://github.com/Wondermall/Vespucci.git", :tag => s.version.to_s }
   s.social_media_url = 'https://twitter.com/zats'
-  s.platform     = :ios, '8.0'
+  s.platform     = :ios
   s.requires_arc = true
 
   s.source_files = 'Pod/Sources/**/*'
