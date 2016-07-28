@@ -169,6 +169,7 @@ NSString *const VSPHostingRuleAnyNodeId = @"VSPHostingRuleAnyNodeId";
     VSPNavigationNode *proposedHost = self.root, *proposedChild = node;
 
     self.navigationInFlight = YES;
+    [self _postNotificationNamed:VSPNavigationManagerWillNavigateNotification destination:self.root source:oldTree];
     return [self _navigationWithHost:&proposedHost newChild:&proposedChild completion:^(BOOL finished) {
         VSPNavigationManager *self = __weakSelf;
         self.navigationInFlight = NO;
