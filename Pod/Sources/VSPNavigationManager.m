@@ -337,6 +337,10 @@ NSString *const VSPHostingRuleAnyNodeId = @"VSPHostingRuleAnyNodeId";
     __VSPMountingTuple *tuple = [self _tupleForHostNodeId:host.nodeId childNodeId:child.nodeId];
     NSAssert(tuple, @"No tuple found for pair host: %@; child: %@", host, child);
     NSAssert(tuple.unmountHandler, @"Don't know how to dismount current child %@", child);
+    if (!tuple.unmountHandler) {
+        completion(NO);
+        return;
+    }
     tuple.unmountHandler(host, child, ^(BOOL finished){
         if (!finished) {
             completion(NO);
