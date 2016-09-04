@@ -113,9 +113,7 @@
 }
 
 - (void)updateParametersRecursively:(NSDictionary *)parameters {
-    NSMutableDictionary *newParamters = [self.parameters mutableCopy];
-    [newParamters addEntriesFromDictionary:parameters];
-    self.parameters = newParamters;
+    self.parameters = parameters;
     [self.child updateParametersRecursively:parameters];
 }
 
